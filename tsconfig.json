@@ -20,7 +20,7 @@
       "dom"
     ],
     "paths": {
-      "useful": [
+      "@lamnhan/ngx-useful": [
         "dist/useful/useful",
         "dist/useful"
       ]

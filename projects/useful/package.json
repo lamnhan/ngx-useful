@@ -1,6 +1,22 @@
 {
-  "name": "useful",
-  "version": "0.0.1",
+  "name": "@lamnhan/ngx-useful",
+  "version": "1.0.0",
+  "description": "A collection of helpful Angular services, pipes, ....",
+  "author": "Lam Nhan",
+  "homepage": "https://lamnhan.com",
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "service",
+    "pipe"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lamnhan/ngx-useful.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lamnhan/ngx-useful/issues"
+  },
   "peerDependencies": {
     "@angular/common": "^11.0.9",
     "@angular/core": "^11.0.9"

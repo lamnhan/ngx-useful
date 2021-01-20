@@ -1,15 +1,33 @@
 {
-  "name": "ngx-useful",
+  "name": "@lamnhan/ngx-useful",
   "version": "0.0.0",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
-  },
+  "description": "A collection of helpful Angular services, pipes, ....",
+  "author": "Lam Nhan",
+  "homepage": "https://lamnhan.com",
+  "license": "MIT",
   "private": true,
+  "scripts": {
+    "build": "cpx README.md \"projects/useful\" && ng build useful --prod",
+    "deploy": "cd ./dist/useful && npm publish && cd ../../",
+    "docs": "ayedocs generate",
+    "test": "ng test useful",
+    "e2e": "ng e2e useful",
+    "coverage": "cat ./coverage/*/lcov.info | coveralls",
+    "lint": "ng lint useful",
+    "webdriver-update-ci": "webdriver-manager update --standalone false --gecko false --versions.chrome 2.37"
+  },
+  "keywords": [
+    "angular",
+    "service",
+    "pipe"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lamnhan/ngx-useful.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lamnhan/ngx-useful/issues"
+  },
   "dependencies": {
     "@angular/animations": "~11.0.9",
     "@angular/common": "~11.0.9",
@@ -29,6 +47,8 @@
     "@angular/compiler-cli": "~11.0.9",
     "@types/jasmine": "~3.6.0",
     "@types/node": "^12.11.1",
+    "coveralls": "^3.1.0",
+    "cpx": "^1.5.0",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
