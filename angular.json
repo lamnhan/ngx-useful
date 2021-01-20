@@ -125,7 +125,50 @@
           }
         }
       }
+    },
+    "useful": {
+      "projectType": "library",
+      "root": "projects/useful",
+      "sourceRoot": "projects/useful/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/useful/tsconfig.lib.json",
+            "project": "projects/useful/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/useful/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/useful/src/test.ts",
+            "tsConfig": "projects/useful/tsconfig.spec.json",
+            "karmaConfig": "projects/useful/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/useful/tsconfig.lib.json",
+              "projects/useful/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
-  "defaultProject": "ngx-useful"
+  "defaultProject": "ngx-useful",
+  "cli": {
+    "analytics": "bc795447-9926-44bc-9a2d-2bbdd364323a"
+  }
 }
