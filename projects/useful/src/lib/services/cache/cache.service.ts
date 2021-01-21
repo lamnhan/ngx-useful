@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class UsefulService {
+export class CacheService {
 
   constructor() { }
 }

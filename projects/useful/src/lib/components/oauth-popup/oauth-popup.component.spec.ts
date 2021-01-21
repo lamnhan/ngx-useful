@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UsefulComponent } from './useful.component';
+import { OauthPopupComponent } from './oauth-popup.component';
 
-describe('UsefulComponent', () => {
-  let component: UsefulComponent;
-  let fixture: ComponentFixture<UsefulComponent>;
+describe('OauthPopupComponent', () => {
+  let component: OauthPopupComponent;
+  let fixture: ComponentFixture<OauthPopupComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UsefulComponent ]
+      declarations: [ OauthPopupComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UsefulComponent);
+    fixture = TestBed.createComponent(OauthPopupComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
