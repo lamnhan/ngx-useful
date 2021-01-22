@@ -33,7 +33,7 @@ export interface Metas extends CustomMetas {
 })
 export class NavService {
 
-  private router: undefined | Router;
+  private router?: Router;
   private data: Record<string, unknown> = {};
   
   private loading = false;

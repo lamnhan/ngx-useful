@@ -13,7 +13,7 @@ export class PlayerService {
   private audio: Howl;
 
   // data
-  bundle: undefined | Bundle; // album, playlist
+  bundle?: Bundle; // album, playlist
   items: Audio[] = []; // songs
   itemIndex = 0;
 

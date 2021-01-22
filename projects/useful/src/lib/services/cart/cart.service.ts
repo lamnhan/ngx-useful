@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
-import { Product, Promotion, OrderItem, OrderProduct, UserProfile, OrderDiscount } from '@lamnhan/schemata';
-import { AuthUser } from '@sheetbase/client';
+import {
+  Product,
+  Promotion,
+  OrderItem,
+  OrderProduct,
+  UserProfile,
+  OrderDiscount,
+  UserInfo
+} from '@lamnhan/schemata';
 
 import { AppService } from '../app/app.service';
-import { LocalstorageService } from '../../sheetbase-services/localstorage/localstorage.service';
+import { LocalstorageService } from '../localstorage/localstorage.service';
 
 type PromotionGroup = {
   [type in 'CODE' | 'AUTO' | 'CUSTOM']: {
@@ -22,8 +29,8 @@ interface PromotionHelpers {
 })
 export class CartService {
 
-  private SHEETBASE_LOCAL_CART = 'local_cart';
-  private customPromotionHelpers: PromotionHelpers;
+  private APP_LOCAL_CART = 'app_local_cart';
+  private customPromotionHelpers?: PromotionHelpers;
 
   // events
   private changeEventSource = new Subject<void>();
@@ -46,7 +53,7 @@ export class CartService {
 
   constructor(
     private localstorageService: LocalstorageService,
-    public appService: AppService,
+    private appService: AppService,
   ) {
     // register change event listener
     this.onChange.subscribe(() => {
@@ -57,7 +64,7 @@ export class CartService {
         this.getShippingCost();
       }
       // save cart locally
-      this.localstorageService.set(this.SHEETBASE_LOCAL_CART, {
+      this.localstorageService.set(this.APP_LOCAL_CART, {
         items: this.items,
         customer: this.customer,
         discountData: this.discountData,
@@ -65,7 +72,7 @@ export class CartService {
       });
     });
     // load local cart
-    this.localstorageService.get<any>(this.SHEETBASE_LOCAL_CART)
+    this.localstorageService.get<any>(this.APP_LOCAL_CART)
     .subscribe(localCart => {
       // patch data
       const {

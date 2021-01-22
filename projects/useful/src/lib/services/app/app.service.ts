@@ -4,36 +4,66 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AppService {
+  private options: {[name: string]: unknown} = {};
+  private meta: {[name: string]: unknown} = {};
 
-  options: {[name: string]: any} = {};
+  constructor() {}
 
-  width = 0;
-  height = 0;
-  host = '';
-
-  constructor() {
+  init<
+    AppOptions extends Record<string, unknown>,
+    AppMeta extends Record<string, unknown>
+  >(
+    options?: AppOptions,
+    meta?: AppMeta
+  ) {
+    // save options
+    this.options = { ...this.options, ...options };
+    // save meta
+    this.meta = { ...this.meta, ...meta };
+    // built-in meta
     this.loadDemension();
     this.loadHost();
   }
 
-  setOptions<AppOptions>(options: AppOptions): AppService {
-    this.options = options;
-    return this;
+  get OPTIONS() {
+    return this.options;
+  }
+  getOptions() {
+    return this.OPTIONS;
   }
 
-  setProps(props: {[name: string]: any}): AppService {
-    if (!!props) {
-      for (const name of Object.keys(props)) {
-        (this as Record<string, unknown>)[name] = props[name];
-      }
-    }
-    return this;
+  get META() {
+    return this.meta;
+  }
+  getMeta() {
+    return this.META;
+  }
+
+  get VIEW_WIDTH() {
+    return this.meta.viewWidth || 0;
+  }
+  getViewWidth() {
+    return this.VIEW_WIDTH;
+  }
+
+  get VIEW_HEIGHT() {
+    return this.meta.viewHeight || 0;
+  }
+  getViewHeight() {
+    return this.VIEW_HEIGHT;
+  }
+
+  get HOST() {
+    return this.meta.host || '';
+  }
+  getHost() {
+    return this.HOST;
   }
 
   private loadDemension() {
     const setViewport = () => {
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
+      this.meta.viewWidth = window.innerWidth;
+      this.meta.viewHeight = window.innerHeight;
     };
     window.addEventListener('resize', setViewport);
     setViewport();
@@ -42,10 +72,10 @@ export class AppService {
   private loadHost() {
     const baseHref = ((document.getElementsByTagName('base')[0] || {})['href'] || '').slice(0, -1);
     if (!!baseHref) {
-      this.host = baseHref;
+      this.meta.host = baseHref;
     } else {
       const hrefSplit = window.location.href.split('/').filter(Boolean);
-      this.host = hrefSplit[0] + '//' + hrefSplit[1];
+      this.meta.host = hrefSplit[0] + '//' + hrefSplit[1];
     }
   }
 

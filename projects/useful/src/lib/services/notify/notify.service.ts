@@ -1,84 +1,72 @@
 import { Injectable } from '@angular/core';
-
 import { Notification } from '@lamnhan/schemata';
 
-import { LocalstorageService } from '../../sheetbase-services/localstorage/localstorage.service';
+import { LocalstorageService } from '../localstorage/localstorage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotifyService {
 
-  SHEETBASE_NOTIFICATION_READ_IDS = 'notification_read_ids';
-
-  rawNotifications: Notification[] = [];
-  readNotificationIds: {[$key: string]: true} = {};
+  private NOTIFICATION_READ_IDS = 'notification_read_ids';
+  private readNotificationIds: Record<string, true> = {};
+  private notifications: Notification[] = [];
 
   constructor(
     private localstorageService: LocalstorageService,
+  ) {}
+  
+  init(
+    notifications: Notification[] = [],
+    readNotificationIds?: Record<string, true>
   ) {
-    // load read ids
-    this.localstorageService
-      .get(this.SHEETBASE_NOTIFICATION_READ_IDS)
+    // notifications
+    this.notifications = notifications;
+    // read ids
+    if (readNotificationIds) {
+      this.readNotificationIds = readNotificationIds;
+    } else {
+      this.localstorageService
+      .get<Record<string, true>>(this.NOTIFICATION_READ_IDS)
       .subscribe(ids => {
-        this.readNotificationIds = ids || {} as any;
+        this.readNotificationIds = ids || {} as Record<string, true>;  
       });
-  }
-
-  setNotifications(notifications: Notification[]) {
-    this.rawNotifications = notifications;
-  }
-
-  notifications() {
-    const unreadNotifications: Notification[] = [];
-    const readNotifications: Notification[] = [];
-    for (const notification of this.rawNotifications) {
-      if (this.readNotificationIds[notification.$key]) {
-        notification['read'] = true;
-        readNotifications.push(notification);
-      } else {
-        unreadNotifications.push(notification);
-      }
     }
-    return [ ... unreadNotifications, ... readNotifications ];
   }
 
-  unreadNotifications() {
-    const notifications: Notification[] = [];
-    const allNotifications = this.notifications();
-    for (const notification of allNotifications) {
-      if (!notification['read']) {
-        notifications.push(notification);
-      }
-    }
-    return notifications;
+  isNotificationRead(key: string) {
+    return !!this.readNotificationIds[key];
   }
 
-  readNotifications() {
-    const notifications: Notification[] = [];
-    const allNotifications = this.notifications();
-    for (const notification of allNotifications) {
-      if (notification['read']) {
-        notifications.push(notification);
-      }
-    }
-    return notifications;
+  getUnreadNotifications() {
+    return this.notifications
+      .filter(
+        notification => notification.$key && !this.isNotificationRead(notification.$key)
+      );
+  }
+
+  getReadNotifications() {
+    return this.notifications
+      .filter(
+        notification => notification.$key && this.isNotificationRead(notification.$key)
+      );
   }
 
   count() {
-    return this.rawNotifications.length;
+    return this.notifications.length;
   }
 
   countUnread() {
-    return this.unreadNotifications().length;
+    return this.getUnreadNotifications().length;
   }
 
-  async setReadId($key: string) {
-    this.readNotificationIds[$key] = true;
-    await this.localstorageService.set(
-      this.SHEETBASE_NOTIFICATION_READ_IDS,
+  setReadNotificationId(key: string) {
+    // in memory
+    this.readNotificationIds[key] = true;
+    // local storage
+    return this.localstorageService.set(
+      this.NOTIFICATION_READ_IDS,
       this.readNotificationIds,
     );
   }
-
 }
