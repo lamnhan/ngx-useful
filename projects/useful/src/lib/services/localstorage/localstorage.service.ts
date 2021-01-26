@@ -26,14 +26,13 @@ export type LocalstorageIterateKeysHandler = (
   providedIn: 'root'
 })
 export class LocalstorageService {
-
   private localforage?: LocalForage;
 
   constructor() { }
 
   init(storageConfigs: LocalstorageConfigs = {}) {
     this.localforage = createInstance({
-      name: 'APP_STORAGE',
+      name: 'APP_LOCAL_STORAGE',
       ...storageConfigs
     });
     return this as LocalstorageService;

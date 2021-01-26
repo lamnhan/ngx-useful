@@ -21,7 +21,6 @@ export interface DateConfigs {
   providedIn: 'root'
 })
 export class DateService {
-
   private configs: DateConfigs = {};
   private datePipe: DatePipe = new DatePipe('en-US');
 
@@ -96,5 +95,4 @@ export class DateService {
     }
     return !!formatter ? formatter(then) : this.format(then);
   }
-
 }

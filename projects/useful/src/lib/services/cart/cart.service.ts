@@ -11,141 +11,171 @@ import {
   UserInfo
 } from '@lamnhan/schemata';
 
-import { AppService } from '../app/app.service';
+import { HelperService } from '../helper/helper.service';
 import { LocalstorageService } from '../localstorage/localstorage.service';
 
-type PromotionGroup = {
-  [type in 'CODE' | 'AUTO' | 'CUSTOM']: {
+type AuthUser = UserInfo & Record<string, Function>;
+
+type PromotionTypes = 'code' | 'auto' | 'custom';
+
+type PromotionGrouping = {
+  [type in PromotionTypes]: {
     [key: string]: Promotion;
   };
 };
 
-interface PromotionHelpers {
+export interface CustomPromotionHelpers {
   [name: string]: (...args: any[]) => boolean;
+}
+
+interface CartShipping {
+  defaultCost?: number;
+  freeIfGreaterThan?: number;
+  costCalculator?: (cartService: CartService) => number;
+}
+
+export interface CartOptions {
+  shipping?: CartShipping;
+  noLocal?: true;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
+  private APP_LOCAL_CART_STORAGE_KEY = 'app_local_cart';
 
-  private APP_LOCAL_CART = 'app_local_cart';
-  private customPromotionHelpers?: PromotionHelpers;
-
-  // events
-  private changeEventSource = new Subject<void>();
+  private changeEventSource = new Subject<CartService>();
   onChange = this.changeEventSource.asObservable();
 
-  // app data
-  user: AuthUser;
-  promoGroup: PromotionGroup = {
-    AUTO: {},
-    CODE: {},
-    CUSTOM: {},
+  private options: CartOptions = {};
+  private customPromotionHelpers: CustomPromotionHelpers = {};
+  private authUser?: AuthUser;
+  private promoByGroups: PromotionGrouping = {
+    code: {},
+    auto: {},
+    custom: {},
   };
 
-  // cart data
-  items: {[key: string]: OrderItem} = {};
-  customer: UserProfile = {};
-  discountData: {[type: string]: OrderDiscount} = {};
-  note = '';
-  shipping: any;
+  private items: Record<string, OrderItem> = {};
+  private customer: UserProfile = {};
+  private discountData: Record<string, OrderDiscount> = {};
+  private note = '';
 
   constructor(
+    private helperService: HelperService,
     private localstorageService: LocalstorageService,
-    private appService: AppService,
+  ) {}
+
+  init(
+    options: CartOptions = {},
+    customPromotionHelpers: CustomPromotionHelpers = {},
   ) {
-    // register change event listener
+    this.options = options;
+    this.customPromotionHelpers = customPromotionHelpers;
+    // on change
     this.onChange.subscribe(() => {
       // re-evaluate promotions
-      this.applyPromotions();
-      // re-calculate the shipping cost
-      if (!!this.appService.options.shipping) {
-        this.getShippingCost();
-      }
+      this.applyAutoPromotion();
+      this.applyCustomPromotion();
       // save cart locally
-      this.localstorageService.set(this.APP_LOCAL_CART, {
-        items: this.items,
-        customer: this.customer,
-        discountData: this.discountData,
-        note: this.note,
-      });
+      this.saveLocalCart();
     });
     // load local cart
-    this.localstorageService.get<any>(this.APP_LOCAL_CART)
-    .subscribe(localCart => {
-      // patch data
-      const {
-        items = {},
-        customer = {},
-        discountData = {},
-        note = '',
-      } = localCart || {};
-      this.items = items;
-      this.customer = customer;
-      this.discountData = discountData;
-      this.note = note;
-      // emit the events
-      this.changeEventSource.next();
-    });
+    this.loadLocalCart();
+  }
+ 
+  loadLocalCart() {
+    if (!this.options.noLocal) {
+      this.localstorageService
+        .get<any>(this.APP_LOCAL_CART_STORAGE_KEY)
+        .subscribe(localCart => {
+          // patch data
+          const {
+            items = {},
+            customer = {},
+            discountData = {},
+            note = '',
+          } = localCart || {};
+          this.items = items;
+          this.customer = customer;
+          this.discountData = discountData;
+          this.note = note;
+          // emit the events
+          this.changeEventSource.next(this);
+        });
+    }
   }
 
-  setUser(user: AuthUser): CartService {
-    this.user = user;
+  saveLocalCart() {
+    if (!this.options.noLocal) {
+      this.localstorageService
+        .set(this.APP_LOCAL_CART_STORAGE_KEY, {
+          items: this.items,
+          customer: this.customer,
+          discountData: this.discountData,
+          note: this.note,
+        });
+    }
+  }
+
+  setAuthUser(user: AuthUser) {
+    this.authUser = user;
     // set customer data based on the user
-    if (!!user) {
-      const { email = '', phoneNumber = '', addresses = {} } = this.customer;
-      const { email: userEmail = '', phoneNumber: userPhoneNumber = '', addresses: userAddresses = {} } = this.user;
+    if (this.authUser) {
+      const {
+        email = '',
+        phoneNumber = '',
+        addresses = {}
+      } = this.customer;
+      const {
+        email: userEmail = '',
+        phoneNumber: userPhoneNumber = '',
+        addresses: userAddresses = {}
+      } = this.authUser;
       this.customer = {
         email: email || userEmail,
         phoneNumber: phoneNumber || userPhoneNumber,
         addresses: addresses || userAddresses,
       };
     }
-    return this;
+    return this as CartService;
   }
 
-  setPromos(promotions: Promotion[]): CartService {
-    // sort promotions into groups
-    for (let i = 0; i < (promotions || []).length; i++) {
-      const promotion = promotions[i];
-      const { $key, kind, content } = promotion;
-      if (kind.indexOf('CODE') > -1) {
-        this.promoGroup.CODE[content] = promotion;
-      } else if (kind.indexOf('CUSTOM') > -1) {
-        this.promoGroup.CUSTOM[$key] = promotion;
-      } else if (kind.indexOf('AUTO') > -1) {
-        this.promoGroup.AUTO[$key] = promotion;
+  setPromotions(promotions: Promotion[]) {
+    promotions.forEach(promotion => {
+      const { id, kind = 'auto', content } = promotion;
+      if (content && kind.indexOf('code') > -1) {
+        this.promoByGroups.code[content] = promotion;
+      } else if (kind.indexOf('custom') > -1) {
+        this.promoByGroups.custom[id] = promotion;
+      } else {
+        this.promoByGroups.auto[id] = promotion;
       }
-    }
-    return this;
-  }
-
-  setPromotionHelpers(helpers: PromotionHelpers): CartService {
-    this.customPromotionHelpers = helpers;
-    return this;
+    });
+    return this as CartService;
   }
 
   count() {
     return Object.keys(this.items).length;
   }
 
-  subtotal() {
+  getSubtotal() {
     let subtotal = 0;
     for (const key of Object.keys(this.items)) {
-      const item = this.items[key];
-      subtotal += Math.abs(item.qty) * item.product.price;
+      const {qty, product} = this.items[key];
+      subtotal += Math.abs(qty) * (product.price || 0);
     }
     return subtotal;
   }
 
-  discountTotal() {
+  getDiscountTotal() {
     let discountTotal = 0;
     for (const key of Object.keys(this.discountData)) {
       const { value } = this.discountData[key];
       let discountValue = 0;
       if (value > 0 && value < 1) {
-        discountValue = this.subtotal() * value;
+        discountValue = this.getSubtotal() * value;
       } else {
         discountValue = value;
       }
@@ -153,11 +183,30 @@ export class CartService {
     }
     return discountTotal;
   }
+  
+  getShippingCost(customPrice?: number) {
+    const {
+      shipping: {
+        defaultCost = 0,
+        freeIfGreaterThan,
+        costCalculator
+      } = {}
+    } = this.options;
+    if (
+      freeIfGreaterThan
+      && (customPrice || (this.getSubtotal() - this.getDiscountTotal())) >= freeIfGreaterThan
+    ) {
+      return 0;
+    } else if (costCalculator && costCalculator instanceof Function) {
+      return costCalculator(this);
+    } else {
+      return defaultCost;
+    }
+  }
 
-  total() {
-    const total = this.subtotal()
-      - this.discountTotal()
-      + (this.shipping ? this.shipping.cost : 0);
+  gotTotal() {
+    const price = this.getSubtotal() - this.getDiscountTotal();
+    const total = price + this.getShippingCost(price);
     return total > 0 ? total : 0;
   }
 
@@ -166,20 +215,22 @@ export class CartService {
   }
 
   updateItem(product: Product, qty = 1) {
-    const { $key, title, sku, price, unit, thumbnail } = product;
-    const cartProduct: OrderProduct = { _id: $key, title, sku, price, unit, thumbnail };
+    const { id, title, sku, price, unit, thumbnail } = product;
+    const cartProduct: OrderProduct = { id, title, sku, price, unit, thumbnail };
     // modify the list
-    this.items[$key] = {
-      qty: (!!this.items[$key] && this.items[$key].qty > qty) ? this.items[$key].qty : qty, // choose higher qty
+    this.items[id] = {
+      qty: (this.items[id] && this.items[id].qty > qty)
+        ? this.items[id].qty
+        : qty, // choose higher qty
       at: new Date().toISOString(),
       product: cartProduct,
     };
     // finalization
-    if (!this.items[$key]) {
+    if (!this.items[id]) {
       // new item
     }
     // emit the event
-    this.changeEventSource.next();
+    this.changeEventSource.next(this);
   }
 
   removeItem(key: string) {
@@ -188,7 +239,7 @@ export class CartService {
     delete items[key];
     this.items = items;
     // emit the event
-    this.changeEventSource.next();
+    this.changeEventSource.next(this);
   }
 
   updateQty(key: string, qty: number) {
@@ -196,7 +247,7 @@ export class CartService {
       this.items[key].qty = !isNaN(qty) && qty > 0 ? qty : 1;
       this.items[key].at = new Date().toISOString();
       // finalization
-      this.changeEventSource.next();
+      this.changeEventSource.next(this);
     }
   }
 
@@ -205,7 +256,7 @@ export class CartService {
       this.items[key].qty++;
       this.items[key].at = new Date().toISOString();
       // finalization
-      this.changeEventSource.next();
+      this.changeEventSource.next(this);
     }
   }
 
@@ -214,7 +265,7 @@ export class CartService {
       this.items[key].qty--;
       this.items[key].at = new Date().toISOString();
       // finalization
-      this.changeEventSource.next();
+      this.changeEventSource.next(this);
     }
   }
 
@@ -223,48 +274,42 @@ export class CartService {
     this.discountData = {};
     this.note = '';
     // emit the event
-    this.changeEventSource.next();
+    this.changeEventSource.next(this);
   }
 
   setCustomer(customer: UserProfile) {
     this.customer = { ... this.customer, ... customer };
     // emit the event
-    this.changeEventSource.next();
+    this.changeEventSource.next(this);
   }
 
   setNote(note: string) {
     this.note = note;
     // emit the event
-    this.changeEventSource.next();
+    this.changeEventSource.next(this);
   }
 
   applyDiscountCode(code: string) {
-    const discount = this.promoGroup.CODE[
-      code.toLowerCase()
-    ];
-    if (!!discount) {
-      const { title, kind, value } = discount;
+    const codeMd5 = this.helperService.md5(code.toLowerCase());
+    const { title, kind, value } = this.promoByGroups.code[codeMd5] || {};
+    if (kind && value) {
       this.discountData[kind] = { title, value };
-      // emit the event
-      this.changeEventSource.next();
+      this.changeEventSource.next(this);
     } else {
       throw new Error('Invalid code.');
     }
   }
 
-  private applyPromotions() {
-    this.applyAutoPromotions();
-    this.applyCustomPromotions();
-  }
-
-  private applyAutoPromotions() {
-    for (const key of Object.keys(this.promoGroup.AUTO)) {
-      const { title, kind, value } = this.promoGroup.AUTO[key];
-      this.discountData[kind] = { title, value };
+  private applyAutoPromotion() {
+    for (const key of Object.keys(this.promoByGroups.auto)) {
+      const { title, kind, value } = this.promoByGroups.auto[key];
+      if (kind && value) {
+        this.discountData[kind] = { title, value };
+      }
     }
   }
 
-  private applyCustomPromotions() {
+  private applyCustomPromotion() {
     const executeCode = (code: string, input: {[key: string]: any}): boolean => {
       const body = `
         Object.keys(input).map(function (k) {
@@ -293,31 +338,23 @@ export class CartService {
     // executor
     const executeCustomPromo = (script: string) => executeCode(script, {
       cart: this,
-      user: this.user,
+      user: this.authUser,
       now: new Date(),
-      ... this.customPromotionHelpers,
+      ...this.customPromotionHelpers,
       been,
       beenHours,
       beenDays,
     });
-    for (const key of Object.keys(this.promoGroup.CUSTOM)) {
-      const { title, kind, value, content } = this.promoGroup.CUSTOM[key];
-      if (!!executeCustomPromo(content)) {
-        this.discountData[kind] = { title, value };
-      } else {
-        delete this.discountData[kind];
+    // apply
+    for (const key of Object.keys(this.promoByGroups.custom)) {
+      const { title, value, kind, content } = this.promoByGroups.custom[key];
+      if (kind) {
+        if (value && content && executeCustomPromo(content)) {
+          this.discountData[kind] = { title, value };
+        } else {
+          delete this.discountData[kind];
+        }
       }
     }
   }
-
-  getShippingCost() {
-    const shipping = { ... this.appService.options.shipping };
-    // overide cost
-    const price = this.subtotal() - this.discountTotal();
-    if (!!shipping.forFree && price >= shipping.forFree) {
-      shipping.cost = 0;
-    }
-    this.shipping = shipping;
-  }
-
 }

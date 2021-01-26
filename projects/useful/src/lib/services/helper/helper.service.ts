@@ -15,7 +15,6 @@ export interface PopupConfigs {
   providedIn: 'root'
 })
 export class HelperService {
-
   constructor() {}
 
   md5(str: string, key?: string | undefined, raw?: boolean) {

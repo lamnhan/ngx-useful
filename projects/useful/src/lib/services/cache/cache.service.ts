@@ -22,7 +22,7 @@ export class CacheService {
 
   init(storageConfigs: LocalstorageConfigs = {}) {
     this.localstorage = this.localstorageService.extend({
-      name: 'APP_CACHE',
+      name: 'APP_LOCAL_CACHE',
       ...storageConfigs,
     });
     return this as CacheService;

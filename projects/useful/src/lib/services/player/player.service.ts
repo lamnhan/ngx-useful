@@ -9,7 +9,6 @@ type PlayerType = 'audio' | 'radio' | 'video';
   providedIn: 'root'
 })
 export class PlayerService {
-
   private audio: Howl;
 
   // data
@@ -35,7 +34,7 @@ export class PlayerService {
     });
     // init items
     this.items.push({
-      $key: '__',
+      id: '__',
       title: 'Welcome!',
       authors: '--' as any,
       src: blankAudio,

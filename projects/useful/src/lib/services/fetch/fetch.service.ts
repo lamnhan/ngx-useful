@@ -3,11 +3,11 @@ import { from } from 'rxjs';
 
 import { HelperService } from '../helper/helper.service';
 import { CacheService } from '../cache/cache.service';
+
 @Injectable({
   providedIn: 'root'
 })
 export class FetchService {
-
   constructor(
     private helperService: HelperService,
     private cacheService: CacheService

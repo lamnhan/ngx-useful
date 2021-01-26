@@ -7,8 +7,7 @@ import { LocalstorageService } from '../localstorage/localstorage.service';
   providedIn: 'root'
 })
 export class NotifyService {
-
-  private NOTIFICATION_READ_IDS = 'notification_read_ids';
+  private APP_LOCAL_NOTIFICATION_READ_IDS = 'app_local_notification_read_ids';
   private readNotificationIds: Record<string, true> = {};
   private notifications: Notification[] = [];
 
@@ -27,7 +26,7 @@ export class NotifyService {
       this.readNotificationIds = readNotificationIds;
     } else {
       this.localstorageService
-      .get<Record<string, true>>(this.NOTIFICATION_READ_IDS)
+      .get<Record<string, true>>(this.APP_LOCAL_NOTIFICATION_READ_IDS)
       .subscribe(ids => {
         this.readNotificationIds = ids || {} as Record<string, true>;  
       });
@@ -65,7 +64,7 @@ export class NotifyService {
     this.readNotificationIds[key] = true;
     // local storage
     return this.localstorageService.set(
-      this.NOTIFICATION_READ_IDS,
+      this.APP_LOCAL_NOTIFICATION_READ_IDS,
       this.readNotificationIds,
     );
   }

@@ -16,11 +16,9 @@ export interface CurrencyConfigs {
   providedIn: 'root'
 })
 export class CurrencyService {
-
   private configs: CurrencyConfigs = {};
   private currencyPipe: CurrencyPipe = new CurrencyPipe('en-US');
-
-  exchangeRate = 1;
+  private exchangeRate = 1;
 
   constructor() {}
 
@@ -84,5 +82,4 @@ export class CurrencyService {
       this.exchangeRate = rate;
     }
   }
-
 }

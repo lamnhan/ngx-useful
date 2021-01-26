@@ -32,7 +32,6 @@ export interface Metas extends CustomMetas {
   providedIn: 'root'
 })
 export class NavService {
-
   private router?: Router;
   private data: Record<string, unknown> = {};
   
