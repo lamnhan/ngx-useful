@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { from } from 'rxjs';
 import {createInstance} from 'localforage';
 
+import { LocalForage } from '../../vendors/localforage.vendor';
+
 export interface LocalstorageConfigs {
   name?: string;
   storeName?: string;
