@@ -8,5 +8,9 @@
       "localforage": "localforage",
       "howler": "howler"
     }
-  }
+  },
+  "whitelistedNonPeerDependencies": [
+    "howler",
+    "localforage"
+  ]
 }

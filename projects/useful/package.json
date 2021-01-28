@@ -1,6 +1,6 @@
 {
   "name": "@lamnhan/ngx-useful",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A collection of helpful Angular services, pipes, ....",
   "author": "Lam Nhan",
   "homepage": "https://lamnhan.com",
@@ -23,11 +23,11 @@
     "@angular/platform-browser": "~11.0.9",
     "@angular/router": "^11.0.9",
     "@lamnhan/schemata": "^1.0.3",
-    "howler": "^2.2.1",
-    "localforage": "^1.9.0",
     "rxjs": "~6.6.0"
   },
   "dependencies": {
+    "howler": "^2.2.1",
+    "localforage": "^1.9.0",
     "tslib": "^2.0.0"
   }
 }
