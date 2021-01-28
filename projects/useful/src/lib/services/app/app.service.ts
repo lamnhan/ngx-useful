@@ -17,32 +17,26 @@ export class AppService {
     this.setHost();
   }
 
-  get DATA() {
+  getData() {
     return this.data;
   }
-  getOptions() {
-    return this.DATA;
-  }
 
-  get VIEW_WIDTH() {
+  getViewWidth() {
     return this.data.viewWidth || 0;
   }
-  getViewWidth() {
-    return this.VIEW_WIDTH;
-  }
 
-  get VIEW_HEIGHT() {
+  getViewHeight() {
     return this.data.viewHeight || 0;
   }
-  getViewHeight() {
-    return this.VIEW_HEIGHT;
-  }
 
-  get HOST() {
+  getHost() {
     return this.data.host || '';
   }
-  getHost() {
-    return this.HOST;
+
+  changeTheme(name?: string) {
+    return name
+      ? document.body.setAttribute('data-theme', name)
+      : document.body.removeAttribute('data-theme');
   }
 
   private setViewPort() {

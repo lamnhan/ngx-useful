@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'ln-oauth-popup',
+  selector: 'useful-oauth-popup',
   templateUrl: './oauth-popup.component.html',
   styleUrls: ['./oauth-popup.component.scss']
 })
 export class OauthPopupComponent implements OnInit {
-
   constructor() { }
 
   ngOnInit(): void {
@@ -15,5 +14,4 @@ export class OauthPopupComponent implements OnInit {
     }
     window.close();
   }
-
 }

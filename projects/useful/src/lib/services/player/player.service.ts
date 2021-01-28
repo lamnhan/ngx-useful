@@ -37,7 +37,7 @@ export class PlayerService {
       id: '__',
       title: 'Welcome!',
       authors: '--' as any,
-      src: blankAudio,
+      srcs: blankAudio,
     });
   }
 
@@ -126,10 +126,10 @@ export class PlayerService {
     // play audio
     const item = items[itemIndex];
     const srcs = [] as string[];
-    if (typeof item.src === 'string') {
-      srcs.push(item.src);
+    if (typeof item.srcs === 'string') {
+      srcs.push(item.srcs);
     } else {
-      const objectSrc = (item.src || {}) as Record<string, string>;
+      const objectSrc = (item.srcs || {}) as Record<string, string>;
       for (const key of Object.keys(objectSrc)) {
         srcs.push(objectSrc[key]);
       }

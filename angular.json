@@ -130,7 +130,7 @@
       "projectType": "library",
       "root": "projects/useful",
       "sourceRoot": "projects/useful/src",
-      "prefix": "lib",
+      "prefix": "useful",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",

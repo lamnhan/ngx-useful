@@ -28,6 +28,19 @@ export interface Metas extends CustomMetas {
   fbAppId?: string;
 }
 
+export interface NavItem {
+  text?: string;
+  icon?: string;
+  classes?: string | string[];
+  level?: number;
+  id?: string;
+  href?: string;
+  target?: string;
+  routerLink?: string | string[];
+  handler?: (...args: unknown[]) => void;
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
