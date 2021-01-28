@@ -3,7 +3,7 @@
   "dest": "../../dist/useful",
   "lib": {
     "entryFile": "src/public-api.ts",
-    "umdId": "ng.useful",
+    "umdId": "ng.lamnhan.useful",
     "umdModuleIds": {
       "localforage": "localforage",
       "howler": "howler"
