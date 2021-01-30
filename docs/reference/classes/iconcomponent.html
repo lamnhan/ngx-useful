@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>OauthPopupComponent | @lamnhan/ngx-useful</title>
+	<title>IconComponent | @lamnhan/ngx-useful</title>
 	<meta name="description" content="Documentation for @lamnhan/ngx-useful">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="oauthpopupcomponent.html">OauthPopupComponent</a>
+					<a href="iconcomponent.html">IconComponent</a>
 				</li>
 			</ul>
-			<h1>Class OauthPopupComponent</h1>
+			<h1>Class IconComponent</h1>
 		</div>
 	</div>
 </header>
@@ -68,7 +68,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">OauthPopupComponent</span>
+						<span class="target">IconComponent</span>
 					</li>
 				</ul>
 			</section>
@@ -85,13 +85,22 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="oauthpopupcomponent.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="iconcomponent.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="iconcomponent.html#icon" class="tsd-kind-icon">icon</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="iconcomponent.html#id" class="tsd-kind-icon">id</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="iconcomponent.html#issvg" class="tsd-kind-icon">is<wbr>Svg</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="iconcomponent.html#src" class="tsd-kind-icon">src</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="oauthpopupcomponent.html#ngoninit" class="tsd-kind-icon">ng<wbr>OnInit</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="iconcomponent.html#ngoninit" class="tsd-kind-icon">ng<wbr>OnInit</a></li>
 							</ul>
 						</section>
 					</div>
@@ -103,18 +112,67 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Oauth<wbr>Popup<wbr>Component<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="oauthpopupcomponent.html" class="tsd-signature-type">OauthPopupComponent</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Icon<wbr>Component<span class="tsd-signature-symbol">(</span>iconService<span class="tsd-signature-symbol">: </span><a href="iconservice.html" class="tsd-signature-type">IconService</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="iconcomponent.html" class="tsd-signature-type">IconComponent</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b64b618/projects/useful/src/lib/components/oauth-popup/oauth-popup.component.ts#L8">projects/useful/src/lib/components/oauth-popup/oauth-popup.component.ts:8</a></li>
+									<li>Defined in projects/useful/src/lib/components/icon/icon.component.ts:15</li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="oauthpopupcomponent.html" class="tsd-signature-type">OauthPopupComponent</a></h4>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>iconService: <a href="iconservice.html" class="tsd-signature-type">IconService</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="iconcomponent.html" class="tsd-signature-type">IconComponent</a></h4>
 						</li>
 					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="icon" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> icon</h3>
+					<div class="tsd-signature tsd-kind-icon">icon<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in projects/useful/src/lib/components/icon/icon.component.ts:15</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="id" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> id</h3>
+					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in projects/useful/src/lib/components/icon/icon.component.ts:11</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="issvg" class="tsd-anchor"></a>
+					<h3>is<wbr>Svg</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Svg<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in projects/useful/src/lib/components/icon/icon.component.ts:14</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="src" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> src</h3>
+					<div class="tsd-signature tsd-kind-icon">src<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in projects/useful/src/lib/components/icon/icon.component.ts:12</li>
+						</ul>
+					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -129,7 +187,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b64b618/projects/useful/src/lib/components/oauth-popup/oauth-popup.component.ts#L11">projects/useful/src/lib/components/oauth-popup/oauth-popup.component.ts:11</a></li>
+									<li>Defined in projects/useful/src/lib/components/icon/icon.component.ts:19</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -151,13 +209,25 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class">
-						<a href="oauthpopupcomponent.html" class="tsd-kind-icon">Oauth<wbr>Popup<wbr>Component</a>
+						<a href="iconcomponent.html" class="tsd-kind-icon">Icon<wbr>Component</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="oauthpopupcomponent.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="iconcomponent.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="iconcomponent.html#icon" class="tsd-kind-icon">icon</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="iconcomponent.html#id" class="tsd-kind-icon">id</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="iconcomponent.html#issvg" class="tsd-kind-icon">is<wbr>Svg</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="iconcomponent.html#src" class="tsd-kind-icon">src</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="oauthpopupcomponent.html#ngoninit" class="tsd-kind-icon">ng<wbr>OnInit</a>
+								<a href="iconcomponent.html#ngoninit" class="tsd-kind-icon">ng<wbr>OnInit</a>
 							</li>
 						</ul>
 					</li>

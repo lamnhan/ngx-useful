@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>OauthPopupComponent | @lamnhan/ngx-useful</title>
+	<title>IconService | @lamnhan/ngx-useful</title>
 	<meta name="description" content="Documentation for @lamnhan/ngx-useful">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="oauthpopupcomponent.html">OauthPopupComponent</a>
+					<a href="iconservice.html">IconService</a>
 				</li>
 			</ul>
-			<h1>Class OauthPopupComponent</h1>
+			<h1>Class IconService</h1>
 		</div>
 	</div>
 </header>
@@ -68,14 +68,8 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">OauthPopupComponent</span>
+						<span class="target">IconService</span>
 					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel">
-				<h3>Implements</h3>
-				<ul class="tsd-hierarchy">
-					<li><span class="tsd-signature-type">OnInit</span></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -85,13 +79,14 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="oauthpopupcomponent.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="iconservice.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="oauthpopupcomponent.html#ngoninit" class="tsd-kind-icon">ng<wbr>OnInit</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="iconservice.html#geticon" class="tsd-kind-icon">get<wbr>Icon</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="iconservice.html#init" class="tsd-kind-icon">init</a></li>
 							</ul>
 						</section>
 					</div>
@@ -103,16 +98,22 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Oauth<wbr>Popup<wbr>Component<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="oauthpopupcomponent.html" class="tsd-signature-type">OauthPopupComponent</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Icon<wbr>Service<span class="tsd-signature-symbol">(</span>appService<span class="tsd-signature-symbol">: </span><a href="appservice.html" class="tsd-signature-type">AppService</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="iconservice.html" class="tsd-signature-type">IconService</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b64b618/projects/useful/src/lib/components/oauth-popup/oauth-popup.component.ts#L8">projects/useful/src/lib/components/oauth-popup/oauth-popup.component.ts:8</a></li>
+									<li>Defined in projects/useful/src/lib/services/icon/icon.service.ts:14</li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="oauthpopupcomponent.html" class="tsd-signature-type">OauthPopupComponent</a></h4>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>appService: <a href="appservice.html" class="tsd-signature-type">AppService</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="iconservice.html" class="tsd-signature-type">IconService</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -120,19 +121,48 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="ngoninit" class="tsd-anchor"></a>
-					<h3>ng<wbr>OnInit</h3>
+					<a name="geticon" class="tsd-anchor"></a>
+					<h3>get<wbr>Icon</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">ng<wbr>OnInit<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Icon<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b64b618/projects/useful/src/lib/components/oauth-popup/oauth-popup.component.ts#L11">projects/useful/src/lib/components/oauth-popup/oauth-popup.component.ts:11</a></li>
+									<li>Defined in projects/useful/src/lib/services/icon/icon.service.ts:27</li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>id: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="init" class="tsd-anchor"></a>
+					<h3>init</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">init<span class="tsd-signature-symbol">(</span>register<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#icongroupbytheme" class="tsd-signature-type">IconGroupByTheme</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="iconservice.html" class="tsd-signature-type">IconService</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in projects/useful/src/lib/services/icon/icon.service.ts:18</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>register: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#icongroupbytheme" class="tsd-signature-type">IconGroupByTheme</a><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="iconservice.html" class="tsd-signature-type">IconService</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -151,13 +181,16 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class">
-						<a href="oauthpopupcomponent.html" class="tsd-kind-icon">Oauth<wbr>Popup<wbr>Component</a>
+						<a href="iconservice.html" class="tsd-kind-icon">Icon<wbr>Service</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="oauthpopupcomponent.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="iconservice.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="oauthpopupcomponent.html#ngoninit" class="tsd-kind-icon">ng<wbr>OnInit</a>
+								<a href="iconservice.html#geticon" class="tsd-kind-icon">get<wbr>Icon</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="iconservice.html#init" class="tsd-kind-icon">init</a>
 							</li>
 						</ul>
 					</li>

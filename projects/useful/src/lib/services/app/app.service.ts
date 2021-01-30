@@ -47,15 +47,19 @@ export class AppService {
   }
 
   getViewWidth() {
-    return this.data.viewWidth || 0;
+    return (this.data.viewWidth || 0) as number;
   }
 
   getViewHeight() {
-    return this.data.viewHeight || 0;
+    return (this.data.viewHeight || 0) as number;
   }
 
   getHost() {
-    return this.data.host || '';
+    return (this.data.host || '') as string;
+  }
+
+  getTheme() {
+    return (this.data.theme || 'default') as string;
   }
 
   changeLang(code = 'en') {
@@ -63,6 +67,7 @@ export class AppService {
   }
 
   changeTheme(name?: string) {
+    this.data.theme = name;
     return name
       ? document.body.setAttribute('data-theme', name)
       : document.body.removeAttribute('data-theme');

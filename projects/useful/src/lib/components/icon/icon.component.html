@@ -1,0 +1,13 @@
+<main class="icon" *ngIf="icon">
+
+  <object
+    type="image/svg+xml"
+    *ngIf="isSvg; else notSVGElse"
+    [data]="icon | safe: false"
+  ></object>
+
+  <ng-template #notSVGElse>
+    <img [src]="icon" [alt]="alt" />
+  </ng-template>
+
+</main>
