@@ -35,7 +35,6 @@
 
 | Class                                                                                        | Description |
 | -------------------------------------------------------------------------------------------- | ----------- |
-| [IconComponent](https://lamnhan.github.io/ngx-useful/classes/iconcomponent.html)             |             |
 | [OauthPopupComponent](https://lamnhan.github.io/ngx-useful/classes/oauthpopupcomponent.html) |             |
 
 </section>
@@ -54,7 +53,6 @@
 | [DateService](https://lamnhan.github.io/ngx-useful/classes/dateservice.html)                 |             |
 | [FetchService](https://lamnhan.github.io/ngx-useful/classes/fetchservice.html)               |             |
 | [HelperService](https://lamnhan.github.io/ngx-useful/classes/helperservice.html)             |             |
-| [IconService](https://lamnhan.github.io/ngx-useful/classes/iconservice.html)                 |             |
 | [LocalstorageService](https://lamnhan.github.io/ngx-useful/classes/localstorageservice.html) |             |
 | [NavService](https://lamnhan.github.io/ngx-useful/classes/navservice.html)                   |             |
 | [NotifyService](https://lamnhan.github.io/ngx-useful/classes/notifyservice.html)             |             |

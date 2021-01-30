@@ -7,8 +7,6 @@ export {UsefulModule} from './lib/useful.module';
 // components
 export * from './lib/components/oauth-popup/oauth-popup.component';
 export {OauthPopupComponentModule} from './lib/components/oauth-popup/oauth-popup.module';
-export * from './lib/components/icon/icon.component';
-export {IconComponentModule} from './lib/components/icon/icon.module';
 
 // pipes
 export * from './lib/pipes/o2a/o2a.pipe';
@@ -38,4 +36,3 @@ export * from './lib/services/currency/currency.service';
 export * from './lib/services/notify/notify.service';
 export * from './lib/services/cart/cart.service';
 export * from './lib/services/player/player.service';
-export * from './lib/services/icon/icon.service';

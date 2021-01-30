@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 
 import { OauthPopupComponentModule } from './components/oauth-popup/oauth-popup.module';
-import { IconComponentModule } from './components/icon/icon.module';
 
 import { O2aPipeModule } from './pipes/o2a/o2a.module';
 import { FilterPipeModule } from './pipes/filter/filter.module';
@@ -15,7 +14,6 @@ import { ListPipeModule } from './pipes/list/list.module';
   declarations: [],
   imports: [
     OauthPopupComponentModule,
-    IconComponentModule,
     O2aPipeModule,
     FilterPipeModule,
     SafePipeModule,
@@ -26,7 +24,6 @@ import { ListPipeModule } from './pipes/list/list.module';
   ],
   exports: [
     OauthPopupComponentModule,
-    IconComponentModule,
     O2aPipeModule,
     FilterPipeModule,
     SafePipeModule,
