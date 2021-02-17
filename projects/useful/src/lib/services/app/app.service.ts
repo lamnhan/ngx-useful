@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
+import { mergeMap, catchError } from 'rxjs/operators';
 
+import { HelperService } from '../helper/helper.service';
 import { LocalstorageService } from '../localstorage/localstorage.service';
 
 export interface AppCustomMetas {
@@ -46,6 +48,7 @@ export class AppService {
   constructor(
     private title: Title,
     private meta: Meta,
+    private helperService: HelperService,
     private localstorageService: LocalstorageService,
   ) {}
 
@@ -60,25 +63,29 @@ export class AppService {
     // built-in data
     this.setViewPortAuto();
     this.setHostAuto();
-    // local theme/loading
-    const updateLoading = () => {
-      this.loading = false;
-      if (this.options.splashScreen) {
-        this.hideSplashScreen();
-      }
-    };
-    if (this.options.localTheme) {
-      this.localstorageService
-        .get('theme')
-        .subscribe(theme => {
-          if (theme) {
-            this.changeTheme(theme as string, false);
-          }
-          updateLoading();
-        });
-    } else {
-      updateLoading();
-    }      
+    // handle loading
+    this.helperService
+      .observableResponder(true)
+      .pipe(
+        // TODO: support loading waiters
+        // local theme
+        mergeMap(() =>
+          this.options.localTheme
+            ? this.localstorageService.get('theme')
+            : this.helperService.observableResponder(null)
+        )
+      )
+      .subscribe(theme => {
+        // set theme
+        if (theme) {
+          this.changeTheme(theme as string, false);
+        }
+        // update loading
+        this.loading = false;
+        if (this.options.splashScreen) {
+          this.hideSplashScreen();
+        }
+      });
   }
 
   get OPTIONS() {
