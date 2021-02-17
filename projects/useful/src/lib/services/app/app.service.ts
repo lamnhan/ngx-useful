@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
+import { mergeMap, catchError } from 'rxjs/operators';
+
+import { HelperService } from '../helper/helper.service';
+import { LocalstorageService } from '../localstorage/localstorage.service';
 
 export interface AppCustomMetas {
   title?: string;
@@ -19,60 +23,111 @@ export interface AppMetas extends AppCustomMetas {
   fbAppId?: string;
 }
 
+export interface AppOptions {
+  localTheme?: boolean;
+  splashScreen?: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AppService {
+  private options: AppOptions = {};
   private data: {[key: string]: unknown} = {};
   private defaultMetas: AppMetas = {};
+
+  // splash screen
+  private loading = true;
+
+  // commonly data
+  private viewWidth = 0;
+  private viewHeight = 0;
+  private host = '';
+  private theme = 'default';
 
   constructor(
     private title: Title,
     private meta: Meta,
+    private helperService: HelperService,
+    private localstorageService: LocalstorageService,
   ) {}
 
   init(
-    data: Record<string, unknown> = {},
+    options: AppOptions = {},
+    customData: Record<string, unknown> = {},
     defaultMetas: AppMetas = {},
   ) {
-    this.data = { ...this.data, ...data };
+    this.options = options;
+    this.data = { ...this.data, ...customData };
     this.defaultMetas = defaultMetas;
     // built-in data
     this.setViewPortAuto();
     this.setHostAuto();
+    // handle loading
+    this.helperService
+      .observableResponder(true)
+      .pipe(
+        // TODO: support loading waiters
+        // local theme
+        mergeMap(() =>
+          this.options.localTheme
+            ? this.localstorageService.get('theme')
+            : this.helperService.observableResponder(null)
+        )
+      )
+      .subscribe(theme => {
+        // set theme
+        if (theme) {
+          this.changeTheme(theme as string, false);
+        }
+        // update loading
+        this.loading = false;
+        if (this.options.splashScreen) {
+          this.hideSplashScreen();
+        }
+      });
   }
 
-  getData() {
+  get OPTIONS() {
+    return this.options;
+  }
+
+  get DATA() {
     return this.data;
   }
 
-  getViewWidth() {
-    return (this.data.viewWidth || 0) as number;
+  get VIEW_WIDTH() {
+    return this.viewWidth;
   }
 
-  getViewHeight() {
-    return (this.data.viewHeight || 0) as number;
+  get VIEW_HEIGHT() {
+    return this.viewHeight;
   }
 
-  getHost() {
-    return (this.data.host || '') as string;
+  get HOST() {
+    return this.host;
   }
 
-  getTheme() {
-    return (this.data.theme || 'default') as string;
+  get THEME() {
+    return this.theme;
   }
 
-  changeLang(code = 'en') {
+  get IS_LOADING() {
+    return this.loading;
+  }
+
+  changeTheme(name = 'default', withLocalstorage = true) {
+    if (withLocalstorage && this.options.localTheme) {
+      this.localstorageService.set('theme', name);
+    }
+    this.theme = name;
+    return document.body.setAttribute('data-theme', this.theme);
+  }
+
+  changeHTMLLang(code = 'en') {
     return document.documentElement.setAttribute('lang', code);
   }
-
-  changeTheme(name?: string) {
-    this.data.theme = name;
-    return name
-      ? document.body.setAttribute('data-theme', name)
-      : document.body.removeAttribute('data-theme');
-  }
-
+  
   changePageTitle(title: string) {
     return this.title.setTitle(title);
   }
@@ -83,11 +138,44 @@ export class AppService {
     this.changePageTitle(metas.title || 'App');
     this.changeMetaTags(metas);
   }
-  
+
+  shareApp() {
+    const {title, description: text, url} = this.defaultMetas;
+    if (title && text && url) {
+      if (navigator.share) {
+        return navigator.share({ title, text, url });
+      } else {
+        return window.prompt('Please copy and share the url:', url);
+      }
+    } else {
+      throw new Error('No title or description or url for sharing.');
+    }
+  }
+
+  getSplashScreenElement() {
+    const elm = document.getElementById('app-splash-screen');
+    if (!elm) {
+      throw new Error('No #app-splash-screen');
+    }
+    return elm;
+  }
+
+  showSplashScreen() {
+    const elm = this.getSplashScreenElement();
+    elm.classList.remove('hidden');
+    elm.style.display = 'flex';
+  }
+
+  hideSplashScreen() {
+    const elm = this.getSplashScreenElement();
+    elm.classList.add('hidden');
+    setTimeout(() => elm.style.display = 'none', 1000);
+  }
+
   private setViewPortAuto() {
     const setViewportHandler = () => {
-      this.data.viewWidth = window.innerWidth;
-      this.data.viewHeight = window.innerHeight;
+      this.viewWidth = window.innerWidth;
+      this.viewHeight = window.innerHeight;
     };
     window.addEventListener('resize', setViewportHandler);
     setViewportHandler();
@@ -96,10 +184,10 @@ export class AppService {
   private setHostAuto() {
     const baseHref = ((document.getElementsByTagName('base')[0] || {})['href'] || '').slice(0, -1);
     if (baseHref) {
-      this.data.host = baseHref;
+      this.host = baseHref;
     } else {
       const hrefSplit = window.location.href.split('/').filter(Boolean);
-      this.data.host = hrefSplit[0] + '//' + hrefSplit[1];
+      this.host = hrefSplit[0] + '//' + hrefSplit[1];
     }
   }
 

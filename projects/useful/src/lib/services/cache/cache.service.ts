@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { mergeMap, catchError } from 'rxjs/operators';
 
+import { HelperService } from '../helper/helper.service';
 import {
   LocalstorageService,
   LocalstorageConfigs,
@@ -18,7 +19,10 @@ export class CacheService {
 
   private localstorage?: LocalstorageService;
 
-  constructor(private localstorageService: LocalstorageService) {}
+  constructor(
+    private helperService: HelperService,
+    private localstorageService: LocalstorageService
+  ) {}
 
   init(storageConfigs: LocalstorageConfigs = {}) {
     this.localstorage = this.localstorageService.extend({
@@ -36,7 +40,7 @@ export class CacheService {
   }
 
   extend(storageConfigs: LocalstorageConfigs) {
-    return new CacheService(this.localstorageService)
+    return new CacheService(this.helperService, this.localstorageService)
       .init(storageConfigs);
   }
 
@@ -62,10 +66,6 @@ export class CacheService {
     cacheTime = 0,
     keyBuilder?: (data: Data) => string
   ) {
-    const observableResponder = (value: unknown) => new Observable(observer => {
-      observer.next(value);
-      observer.complete();
-    });
     return this.localstorageService
     .get<number>(key + '__expiration')
     .pipe(
@@ -81,17 +81,17 @@ export class CacheService {
         }
         // no cached
         else {
-          return observableResponder(null);
+          return this.helperService.observableResponder(null);
         }
       }),
       // result
       mergeMap(data => !data
         // no data
-        ? observableResponder(null)
+        ? this.helperService.observableResponder(null)
         // has data
         : cacheTime === 0
         // return value if cache time = 0
-        ? observableResponder(data)
+        ? this.helperService.observableResponder(data)
         // save cache and return value
         : this.set(
             keyBuilder ? keyBuilder(data as Data) : key,
@@ -104,7 +104,7 @@ export class CacheService {
         // use cached any value
         ? this.localstorageService.get<Data>(key)
         // null
-        : observableResponder(null)
+        : this.helperService.observableResponder(null)
       ),
     );
   }

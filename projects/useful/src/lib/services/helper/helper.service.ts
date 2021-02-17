@@ -30,6 +30,13 @@ export class HelperService {
     return orderBy(collection, iteratees, orders, guard);
   }
 
+  observableResponder(value: unknown) {
+    return new Observable(observer => {
+      observer.next(value);
+      observer.complete();
+    });
+  }
+
   retryInterval(
     matched: () => boolean,
     interval = 1,

@@ -33,28 +33,37 @@ export interface NavMenuItem extends NavItem {
 export type NavMetaModifier =
   | string
   | { (input: Record<string, unknown>): string };
+  
+export interface NavOptions {
+  loadingIndicator?: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class NavService {
   private router?: Router;
+  private options: NavOptions = {};
   private routingData: Record<string, unknown> = {};
   private routingMetaRecords: Record<string, AppCustomMetas> = {};
 
   private loading = false;
   private previousUrls: string[] = [];
+  private isMenuVisible = false; // secondary/mobile menu
 
   constructor(private appService: AppService) {}
 
   init(
     router: Router,
+    options: NavOptions = {},
     hooks: {
       [key in NavRouterEventHooks]?: (event: Event) => void;
     } = {},
   ) {
     // set router
     this.router = router;
+    // set options
+    this.options = options;
     // register events
     this.router
       .events
@@ -63,9 +72,19 @@ export class NavService {
       if (event instanceof RouteConfigLoadStart) {
         eventName = 'RouteConfigLoadStart';
         this.loading = true;
+        // show loading
+        if (this.options.loadingIndicator) {
+          this.showLoading();
+        }
       } else if (event instanceof RouteConfigLoadEnd) {
         eventName = 'RouteConfigLoadEnd';
-        setTimeout(() => { this.loading = false; }, 1000);
+        setTimeout(() => {
+          this.loading = false;
+          // hide loadding
+          if (this.options.loadingIndicator) {
+            this.hideLoading();
+          }
+        }, 1000);
       } else if (event instanceof NavigationEnd) {
         eventName = 'NavigationEnd';
         // record urls for backing navigation
@@ -88,11 +107,46 @@ export class NavService {
     return this as NavService;
   }
 
-  getRouter() {
+  get ROUTER() {
     if (!this.router) {
       throw new Error('No router, please set first!');
     }
     return this.router;
+  }
+
+  get OPTIONS() {
+    return this.options;
+  }
+
+  get DATA() {
+    return this.routingData;
+  }
+
+  get IS_LOADING() {
+    return this.loading;
+  }
+
+  get IS_BACKABLE() {
+    return this.router
+      && this.previousUrls.length > 1
+      && this.router.url !== ''
+      && this.router.url !== '/';
+  }
+  
+  get IS_MENU_VISIBLE() {
+    return this.isMenuVisible;
+  }
+
+  get MENU_ICON() {
+    return this.menuIcon();
+  }
+
+  menuIcon(menuCls = 'icon-menu', backCls = 'icon-back') {
+    return this.IS_BACKABLE ? backCls : menuCls;
+  }
+
+  get(key?: string) {
+    return key ? this.routingData[key] : this.routingData;
   }
 
   setMeta(
@@ -106,19 +160,14 @@ export class NavService {
     return this as NavService;
   }
 
-  get(key?: string) {
-    return key ? this.routingData[key] : this.routingData;
+  menuAction() {
+    return this.IS_BACKABLE
+      ? this.back()
+      : this.toggleMenu();
   }
 
-  isLoading() {
-    return this.loading;
-  }
-
-  isBacking() {
-    return this.router
-      && this.previousUrls.length > 1
-      && this.router.url !== ''
-      && this.router.url !== '/';
+  toggleMenu() {
+    this.isMenuVisible = !this.isMenuVisible;
   }
 
   back() {
@@ -141,15 +190,14 @@ export class NavService {
   navigate(
     route: string[],
     data: Record<string, unknown> = {},
-    navigationExtras: NavigationExtras,
+    navigationExtras?: NavigationExtras,
   ) {
     this.routingData = data; // set route data
-    return this.getRouter().navigate(route, navigationExtras);
+    return this.ROUTER.navigate(route, navigationExtras);
   }
 
   scrollToTop() {
-    const bodyElm = document.getElementsByTagName('body').item(0);
-    return this.scrollTo(bodyElm as HTMLElement);
+    return this.scrollTo(document.body);
   }
 
   scrollTo(input: string | HTMLElement) {
@@ -157,6 +205,24 @@ export class NavService {
       ? document.getElementById(input)
       : input;
     return elm?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  getLoadingElement() {
+    const elm = document.getElementById('nav-loading-indicator');
+    if (!elm) {
+      throw new Error('No #nav-loading-indicator');
+    }
+    return elm;
+  }
+
+  showLoading() {
+    const elm = this.getLoadingElement();
+    elm.classList.add('show');
+  }
+
+  hideLoading() {
+    const elm = this.getLoadingElement();
+    elm.classList.remove('show');
   }
 
   private extractCustomMetas(
