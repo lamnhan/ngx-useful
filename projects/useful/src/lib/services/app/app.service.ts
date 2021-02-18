@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
-import { mergeMap, catchError } from 'rxjs/operators';
+import { mergeMap } from 'rxjs/operators';
 
 import { HelperService } from '../helper/helper.service';
 import { LocalstorageService } from '../localstorage/localstorage.service';
@@ -24,8 +24,9 @@ export interface AppMetas extends AppCustomMetas {
 }
 
 export interface AppOptions {
-  localTheme?: boolean;
   splashScreen?: boolean;
+  localTheme?: boolean;
+  viewSizing?: boolean;
 }
 
 @Injectable({
@@ -57,12 +58,17 @@ export class AppService {
     customData: Record<string, unknown> = {},
     defaultMetas: AppMetas = {},
   ) {
-    this.options = options;
-    this.data = { ...this.data, ...customData };
+    this.options = {
+      viewSizing: true,
+      ...options
+    };
+    this.data = customData;
     this.defaultMetas = defaultMetas;
-    // built-in data
-    this.setViewPortAuto();
-    this.setHostAuto();
+    // host
+    this.setHost();
+    // view port
+    window.addEventListener('resize', () => this.setViewport());
+    this.setViewport();
     // handle loading
     this.helperService
       .observableResponder(true)
@@ -169,19 +175,21 @@ export class AppService {
   hideSplashScreen() {
     const elm = this.getSplashScreenElement();
     elm.classList.add('hidden');
-    setTimeout(() => elm.style.display = 'none', 1000);
+    setTimeout(() => elm.style.display = 'none', 700);
   }
 
-  private setViewPortAuto() {
-    const setViewportHandler = () => {
-      this.viewWidth = window.innerWidth;
-      this.viewHeight = window.innerHeight;
-    };
-    window.addEventListener('resize', setViewportHandler);
-    setViewportHandler();
+  private setViewport() {
+    this.viewWidth = window.innerWidth;
+    this.viewHeight = window.innerHeight;
+    if (this.options.viewSizing) {
+      document.documentElement.style
+        .setProperty('--app-view-width', `${this.viewWidth}px`);
+      document.documentElement.style
+        .setProperty('--app-view-height', `${this.viewHeight}px`);
+    }
   }
 
-  private setHostAuto() {
+  private setHost() {
     const baseHref = ((document.getElementsByTagName('base')[0] || {})['href'] || '').slice(0, -1);
     if (baseHref) {
       this.host = baseHref;

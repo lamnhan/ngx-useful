@@ -84,7 +84,7 @@ export class NavService {
           if (this.options.loadingIndicator) {
             this.hideLoading();
           }
-        }, 1000);
+        }, 700);
       } else if (event instanceof NavigationEnd) {
         eventName = 'NavigationEnd';
         // record urls for backing navigation
