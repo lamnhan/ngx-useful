@@ -25,10 +25,11 @@ export interface AppMetas extends AppCustomMetas {
 
 export interface AppOptions {
   splashScreen?: boolean;
-  splashScreenManually?: boolean;
+  splashScreenManually?: boolean; // TODO: ...
   localTheme?: boolean;
   browserTheme?: boolean;
   viewSizing?: boolean;
+  pwaInstallReminder?: boolean;
 }
 
 @Injectable({
@@ -106,6 +107,10 @@ export class AppService {
         this.loading = false;
         if (this.options.splashScreen) {
           this.hideSplashScreen();
+        }
+        // ask for installing PWA
+        if (this.options.pwaInstallReminder) {
+          setTimeout(() => this.showPWAInstallReminder(), 1000);
         }
       });
   }
@@ -192,6 +197,47 @@ export class AppService {
     const elm = this.getSplashScreenElement();
     elm.classList.add('hidden');
     setTimeout(() => elm.style.display = 'none', 700);
+  }
+
+  getPWAInstallReminderElement() {
+    const elm = document.getElementById('pwa-install-reminder');
+    if (!elm) {
+      throw new Error('No #pwa-install-reminder');
+    }
+    return elm;
+  }
+
+  showPWAInstallReminder() {
+    const elm = this.getPWAInstallReminderElement();
+    if (
+      !(navigator as any).standalone
+      && !window.matchMedia('(display-mode: standalone)').matches
+    ) {
+      const userAgent = window.navigator.userAgent.toLowerCase();
+      if (/iphone|ipad|ipod/.test(userAgent)) {
+        if (
+          !(/crios/).test(userAgent) &&
+          !(/fxios/).test(userAgent) &&
+          !(/opios/).test(userAgent)
+        ) {
+          elm.classList.add('ios-safari', 'show');
+        } else {
+          elm.classList.add('ios-any', 'show');
+        }
+      } else if (/windows|macintosh/.test(userAgent)) {
+        if (/chrome/.test(userAgent)) {
+          elm.classList.add('desktop-chrome', 'show');
+        } else {
+          elm.classList.add('desktop-any', 'show');
+        }
+      }
+    }
+    // close button
+    const dismissalElm = elm.querySelector('.dismissal');
+    if (dismissalElm) {
+      // TODO: don't show every times
+      dismissalElm.addEventListener('click', () => elm.classList.remove('show'));
+    }
   }
 
   private setViewport() {
