@@ -25,7 +25,9 @@ export interface AppMetas extends AppCustomMetas {
 
 export interface AppOptions {
   splashScreen?: boolean;
+  splashScreenManually?: boolean;
   localTheme?: boolean;
+  browserTheme?: boolean;
   viewSizing?: boolean;
 }
 
@@ -59,6 +61,7 @@ export class AppService {
     defaultMetas: AppMetas = {},
   ) {
     this.options = {
+      browserTheme: true,
       viewSizing: true,
       ...options
     };
@@ -79,6 +82,16 @@ export class AppService {
           this.options.localTheme
             ? this.localstorageService.get('theme')
             : this.helperService.observableResponder(null)
+        ),
+        // browser dark mode
+        mergeMap(localTheme =>
+          localTheme
+            ? this.helperService.observableResponder(localTheme)
+            : !this.options.browserTheme
+            ? this.helperService.observableResponder(null)
+            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            ? this.helperService.observableResponder('dark')
+            : this.helperService.observableResponder('light')
         )
       )
       .subscribe(theme => {
