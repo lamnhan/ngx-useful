@@ -69,10 +69,13 @@ export class AppService {
     this.defaultMetas = defaultMetas;
     // host
     this.setHost();
-    // view port
+    // viewport
     window.addEventListener('resize', () => this.setViewport());
     this.setViewport();
-    // handle loading
+    // splash screen
+    if (this.options.splashScreen) {
+      this.getSplashScreenElement().classList.add('has-app');
+    }
     this.helperService
       .observableResponder(true)
       .pipe(
