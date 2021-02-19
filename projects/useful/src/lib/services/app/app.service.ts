@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
+import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
 import { HelperService } from '../helper/helper.service';
@@ -24,30 +25,64 @@ export interface AppMetas extends AppCustomMetas {
 }
 
 export interface AppOptions {
+  customData?: Record<string, unknown>;
+  /**
+   * Support local settings
+   */
+  local?: boolean;
+  /**
+   * If your app has in-app splash screen
+   */
   splashScreen?: boolean;
-  splashScreenManually?: boolean; // TODO: ...
-  localTheme?: boolean;
+  /**
+   * Set theme based on browser color schema
+   */
   browserTheme?: boolean;
-  viewSizing?: boolean;
-  pwaInstallReminder?: boolean;
+  /**
+   * Anable PWA supports
+   */
+  pwa?: boolean;
+  pwaReminder?: boolean | number;
+  pwaReminderThreshold?: number;
 }
+
+export type PWAStatus =
+  | 'installed' // standalone or implicit installed
+  | 'available' // can be asked now
+
+export interface BuiltinSettings {
+  pwaStatus?: PWAStatus;
+}
+
+export interface BuiltinUISettings {
+  theme?: string;
+}
+
+export interface AppSettings extends BuiltinSettings, BuiltinUISettings {}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppService {
+  private readonly ___PWA_INSTALL_REMINDER_TIMESTAMP = 'pwa_install_reminder_timestamp';
+  private readonly ___PWA_INSTALL_REMINDER_COUNT = 'pwa_install_reminder_count';
+
+  // app options
   private options: AppOptions = {};
-  private data: {[key: string]: unknown} = {};
+
+  // default meta values
   private defaultMetas: AppMetas = {};
 
-  // splash screen
-  private loading = true;
-
-  // commonly data
+  // built-in data
+  private host = '';
   private viewWidth = 0;
   private viewHeight = 0;
-  private host = '';
-  private theme = 'default';
+
+  // UI intensive settings
+  private theme?: string;
+
+  // app settings
+  private pwaStatus?: PWAStatus;
 
   constructor(
     private title: Title,
@@ -58,69 +93,80 @@ export class AppService {
 
   init(
     options: AppOptions = {},
-    customData: Record<string, unknown> = {},
     defaultMetas: AppMetas = {},
+    customSettingsLoader?: () => Observable<BuiltinSettings>,
+    customUISettingsLoader?: () => Observable<BuiltinUISettings>,
   ) {
     this.options = {
       browserTheme: true,
-      viewSizing: true,
       ...options
     };
-    this.data = customData;
     this.defaultMetas = defaultMetas;
-    // host
-    this.setHost();
-    // viewport
-    window.addEventListener('resize', () => this.setViewport());
-    this.setViewport();
-    // splash screen
+    // mark app loaded ok (prevent timeout - unsupported message)
     if (this.options.splashScreen) {
       this.getSplashScreenElement().classList.add('has-app');
     }
-    this.helperService
-      .observableResponder(true)
-      .pipe(
-        // TODO: support loading waiters
-        // local theme
-        mergeMap(() =>
-          this.options.localTheme
-            ? this.localstorageService.get('theme')
-            : this.helperService.observableResponder(null)
-        ),
-        // browser dark mode
-        mergeMap(localTheme =>
-          localTheme
-            ? this.helperService.observableResponder(localTheme)
-            : !this.options.browserTheme
-            ? this.helperService.observableResponder(null)
-            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-            ? this.helperService.observableResponder('dark')
-            : this.helperService.observableResponder('light')
-        )
-      )
-      .subscribe(theme => {
-        // set theme
-        if (theme) {
-          this.changeTheme(theme as string, false);
-        }
-        // update loading
-        this.loading = false;
-        if (this.options.splashScreen) {
-          this.hideSplashScreen();
-        }
-        // ask for installing PWA
-        if (this.options.pwaInstallReminder) {
-          setTimeout(() => this.showPWAInstallReminder(), 1000);
-        }
-      });
+    // set app host
+    this.setHost();
+    // set viewport
+    window.addEventListener('resize', () => this.setViewport());
+    this.setViewport();
+
+    // =======================================================
+    // NOTE: Settings flow
+    // + Load: Remote (auth user) -> Local (if enabled) -> App default -> Handler
+    // + Update: Handler -> App -> Local (if enabled) -> Remote (TO DO)
+    // =======================================================
+
+    // handle UI intensive settings
+    if (!customUISettingsLoader) {
+      customUISettingsLoader = (): any => this.helperService.observableResponder({});
+    }
+    customUISettingsLoader()
+    .pipe(
+      mergeMap(uiSettings => this.localUISettingsLoader(uiSettings)),
+      mergeMap(uiSettings => this.appUISettingsLoader(uiSettings)),
+    )
+    .subscribe(uiSettings => {
+      const {theme} = uiSettings;
+      // change theme
+      if (theme) {
+        this.changeTheme(theme);
+      }
+      // hide splash screen
+      if (this.options.splashScreen) {
+        this.hideSplashScreen();
+      }
+    });
+
+    // handle other settings
+    if (!customSettingsLoader) {
+      customSettingsLoader = (): any => this.helperService.observableResponder({});
+    }
+    customSettingsLoader()
+    .pipe(
+      mergeMap(settings => this.localSettingsLoader(settings)),
+      mergeMap(settings => this.appSettingsLoader(settings)),
+    )
+    .subscribe(settings => {
+      const {pwaStatus} = settings;
+      // change PWA status
+      if (pwaStatus) {
+        this.changePWAStatus(pwaStatus);
+      }
+    });
   }
 
   get OPTIONS() {
     return this.options;
   }
 
-  get DATA() {
-    return this.data;
+  get CUSTOM_DATA() {
+    return this.options.customData;
+  }
+
+  get HOST() {
+    return this.host;
   }
 
   get VIEW_WIDTH() {
@@ -131,32 +177,31 @@ export class AppService {
     return this.viewHeight;
   }
 
-  get HOST() {
-    return this.host;
-  }
-
   get THEME() {
     return this.theme;
   }
 
-  get IS_LOADING() {
-    return this.loading;
+  get IS_PWA_INSTALLED() {
+    return this.pwaStatus === 'installed';
   }
 
-  changeTheme(name = 'default', withLocalstorage = true) {
-    if (withLocalstorage && this.options.localTheme) {
-      this.localstorageService.set('theme', name);
-    }
-    this.theme = name;
-    return document.body.setAttribute('data-theme', this.theme);
+  get IS_PWA_AVAILABLE() {
+    return this.pwaStatus === 'available';
+  }
+
+  addData(data: Record<string, unknown>) {
+    this.options.customData = {...data, ...(this.options.customData || {})};
+    return this as AppService;
   }
 
   changeHTMLLang(code = 'en') {
-    return document.documentElement.setAttribute('lang', code);
+    document.documentElement.setAttribute('lang', code);
+    return this as AppService;
   }
   
   changePageTitle(title: string) {
-    return this.title.setTitle(title);
+    this.title.setTitle(title);
+    return this as AppService;
   }
 
   changePageMetas(customMetas: AppCustomMetas) {
@@ -164,6 +209,39 @@ export class AppService {
     // set title and meta tags
     this.changePageTitle(metas.title || 'App');
     this.changeMetaTags(metas);
+    return this as AppService;
+  }
+  
+  changeTheme(name: string) {
+    // handler
+    document.body.setAttribute('data-theme', name);
+    // in app
+    this.theme = name;
+    // local
+    if (this.options.local) {
+      this.localstorageService.set('theme', name);
+    }
+    // TODO: remote
+  }
+
+  changePWAStatus(status: PWAStatus) {
+    // handler
+    if (status === 'available') {
+      this.showPWAReminder();
+      if (this.options.local) {
+        this.localstorageService
+          .set(this.___PWA_INSTALL_REMINDER_TIMESTAMP, new Date().getTime());
+        this.localstorageService
+          .increase(this.___PWA_INSTALL_REMINDER_COUNT);
+      }
+    }
+    // in app
+    this.pwaStatus = status;
+    // local
+    if (this.options.local) {
+      this.localstorageService.set('pwaStatus', status);
+    }
+    // TODO: remote
   }
 
   shareApp() {
@@ -179,14 +257,6 @@ export class AppService {
     }
   }
 
-  getSplashScreenElement() {
-    const elm = document.getElementById('app-splash-screen');
-    if (!elm) {
-      throw new Error('No #app-splash-screen');
-    }
-    return elm;
-  }
-
   showSplashScreen() {
     const elm = this.getSplashScreenElement();
     elm.classList.remove('hidden');
@@ -199,56 +269,65 @@ export class AppService {
     setTimeout(() => elm.style.display = 'none', 700);
   }
 
-  getPWAInstallReminderElement() {
-    const elm = document.getElementById('pwa-install-reminder');
-    if (!elm) {
-      throw new Error('No #pwa-install-reminder');
+  showPWAReminder() {
+    const elm = this.getPWAReminderElement();
+    // get ua
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(userAgent)) {
+      if (
+        !(/crios/).test(userAgent) &&
+        !(/fxios/).test(userAgent) &&
+        !(/opios/).test(userAgent)
+      ) {
+        elm.classList.add('ios-safari', 'show');
+      } else {
+        elm.classList.add('ios-any', 'show');
+      }
+    } else if (/windows|macintosh/.test(userAgent)) {
+      if (/chrome/.test(userAgent)) {
+        elm.classList.add('desktop-chrome', 'show');
+      } else {
+        elm.classList.add('desktop-any', 'show');
+      }
+    }
+    // close button
+    const close = elm.querySelector('.close');
+    if (close) {
+      close.addEventListener('click', () => this.hidePWAReminder(), {once: true});
+    }
+    // dismissal
+    const dismiss = elm.querySelector('.dismiss');
+    if (dismiss) {
+      dismiss.addEventListener('click', () => {
+        this.hidePWAReminder();
+        this.dismissPWAReminder();
+      }, {once: true});
+    }
+  }
+
+  hidePWAReminder() {
+    const elm = this.getPWAReminderElement();
+    elm.classList.remove('show');
+  }
+
+  dismissPWAReminder() {
+    this.changePWAStatus('installed');
+  }
+
+  private getSplashScreenElement() {
+    const elm = document.getElementById('app-splash-screen');
+    if (!this.options.splashScreen || !elm) {
+      throw new Error('No #app-splash-screen');
     }
     return elm;
   }
 
-  showPWAInstallReminder() {
-    const elm = this.getPWAInstallReminderElement();
-    if (
-      !(navigator as any).standalone
-      && !window.matchMedia('(display-mode: standalone)').matches
-    ) {
-      const userAgent = window.navigator.userAgent.toLowerCase();
-      if (/iphone|ipad|ipod/.test(userAgent)) {
-        if (
-          !(/crios/).test(userAgent) &&
-          !(/fxios/).test(userAgent) &&
-          !(/opios/).test(userAgent)
-        ) {
-          elm.classList.add('ios-safari', 'show');
-        } else {
-          elm.classList.add('ios-any', 'show');
-        }
-      } else if (/windows|macintosh/.test(userAgent)) {
-        if (/chrome/.test(userAgent)) {
-          elm.classList.add('desktop-chrome', 'show');
-        } else {
-          elm.classList.add('desktop-any', 'show');
-        }
-      }
+  private getPWAReminderElement() {
+    const elm = document.getElementById('pwa-install-reminder');
+    if (!this.options.pwaReminder || !elm) {
+      throw new Error('No #pwa-install-reminder');
     }
-    // close button
-    const dismissalElm = elm.querySelector('.dismissal');
-    if (dismissalElm) {
-      // TODO: don't show every times
-      dismissalElm.addEventListener('click', () => elm.classList.remove('show'));
-    }
-  }
-
-  private setViewport() {
-    this.viewWidth = window.innerWidth;
-    this.viewHeight = window.innerHeight;
-    if (this.options.viewSizing) {
-      document.documentElement.style
-        .setProperty('--app-view-width', `${this.viewWidth}px`);
-      document.documentElement.style
-        .setProperty('--app-view-height', `${this.viewHeight}px`);
-    }
+    return elm;
   }
 
   private setHost() {
@@ -259,6 +338,153 @@ export class AppService {
       const hrefSplit = window.location.href.split('/').filter(Boolean);
       this.host = hrefSplit[0] + '//' + hrefSplit[1];
     }
+  }
+
+  private setViewport() {
+    this.viewWidth = window.innerWidth;
+    this.viewHeight = window.innerHeight;
+    document.documentElement.style
+      .setProperty('--app-view-width', `${this.viewWidth}px`);
+    document.documentElement.style
+      .setProperty('--app-view-height', `${this.viewHeight}px`);
+  }
+
+  private localUISettingsLoader(uiSettings: BuiltinUISettings) {
+    return this.helperService.observableResponder(uiSettings)
+    .pipe(
+      // .theme
+      mergeMap(({ theme }) =>
+        // pass value down
+        theme
+          ? this.helperService.observableResponder(theme)
+          // get from local
+          : this.options.local
+            ? this.localstorageService.get<string>('theme')
+            // no local option
+            : this.helperService.observableResponder(null)
+      ),
+      mergeMap(theme =>
+        this.helperService.observableResponder({...uiSettings, theme} as BuiltinUISettings)
+      ),
+      // other ui settings
+      // mergeMap(uiSettings => {})
+    );
+  }
+  
+  private appUISettingsLoader(uiSettings: BuiltinUISettings) {
+    return this.helperService.observableResponder(uiSettings)
+    .pipe(
+      // .theme
+      mergeMap(uiSettings =>
+        this.helperService.observableResponder(
+          // pass down
+          uiSettings.theme
+          ? uiSettings.theme
+          // default theme
+          : !this.options.browserTheme
+            ? null
+            // browser scheme colors
+            : (
+              window.matchMedia
+              && window.matchMedia('(prefers-color-scheme: dark)').matches
+            )
+              ? 'dark'
+              : 'light'
+        )
+      ),
+      mergeMap(theme =>
+        this.helperService.observableResponder({...uiSettings, theme} as BuiltinUISettings)
+      ),
+      // other ui settings
+      // mergeMap(uiSettings => {})
+    );
+  }
+
+  private localSettingsLoader(settings: BuiltinSettings) {
+    return this.helperService.observableResponder(settings)
+    .pipe(
+      // .pwaStatus
+      mergeMap(({ pwaStatus }) =>
+        !this.options.pwa || !this.options.local
+          ? this.helperService.observableResponder(undefined) 
+          // pass down
+          : pwaStatus
+            ? this.helperService.observableResponder(pwaStatus)
+            // by local metric
+            : this.getPWAStatusLocally()
+      ),
+      mergeMap(pwaStatus =>
+        this.helperService.observableResponder({...settings, pwaStatus} as BuiltinSettings)
+      ),
+      // other settings
+      // mergeMap(settings => {})
+    );
+  }
+
+  private appSettingsLoader(settings: BuiltinSettings) {
+    return this.helperService.observableResponder(settings)
+    .pipe(
+      // .pwaStatus
+      mergeMap(settings =>
+        this.helperService.observableResponder(settings)
+      ),
+      // other settings
+      // mergeMap(settings => {})
+    );
+  }
+
+  private getPWAStatusLocally() {
+    return this.localstorageService.get<string>('theme')
+    .pipe(
+      mergeMap(pwaStatus =>
+        // has value
+        pwaStatus
+          ? this.helperService.observableResponder(pwaStatus)
+          // decode local metrics
+          : this.localstorageService.getBulk([
+              this.___PWA_INSTALL_REMINDER_TIMESTAMP,
+              this.___PWA_INSTALL_REMINDER_COUNT
+            ])
+      ),
+      mergeMap(result => {
+        // has value
+        if (typeof result === 'string') {
+          return this.helperService.observableResponder(result);
+        }
+        // by metrics
+        const [timestamp = 0, count = 0] = result;
+        const isInstalled = 
+          // user click dismiss
+          (timestamp && +(timestamp as string | number) === -1)
+          // standalone
+          || (navigator as any).standalone
+          || window.matchMedia('(display-mode: standalone)').matches;
+        const isAvailable =
+          this.options.pwaReminder
+          // must not pass the threshold
+          && (
+            (count as number) < (this.options.pwaReminderThreshold || 3) // default: 3 times
+          )
+          // must expired
+          && (
+            (
+              this.options.pwaReminder === true
+                ? 43200000 // default: 12 hours
+                : (this.options.pwaReminder * 60000)
+            ) < (
+              new Date().getTime()
+              - new Date(timestamp as number).getTime()
+            )
+          );
+        return this.helperService.observableResponder(
+          isInstalled
+            ? 'installed'
+            : isAvailable
+              ? 'available'
+              : undefined
+        );
+      })
+    );
   }
 
   private processMetaData(customMetas: AppCustomMetas) {

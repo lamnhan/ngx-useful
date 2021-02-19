@@ -30,7 +30,7 @@ export class HelperService {
     return orderBy(collection, iteratees, orders, guard);
   }
 
-  observableResponder(value: unknown) {
+  observableResponder<Value>(value: Value): Observable<Value> {
     return new Observable(observer => {
       observer.next(value);
       observer.complete();

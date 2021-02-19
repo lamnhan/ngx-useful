@@ -207,22 +207,23 @@ export class NavService {
     return elm?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  getLoadingElement() {
-    const elm = document.getElementById('nav-loading-indicator');
-    if (!elm) {
-      throw new Error('No #nav-loading-indicator');
-    }
-    return elm;
-  }
-
   showLoading() {
     const elm = this.getLoadingElement();
+    elm.addEventListener('click', () => this.hideLoading(), {once: true});
     elm.classList.add('show');
   }
 
   hideLoading() {
     const elm = this.getLoadingElement();
     elm.classList.remove('show');
+  }
+
+  private getLoadingElement() {
+    const elm = document.getElementById('nav-loading-indicator');
+    if (!this.options.loadingIndicator || !elm) {
+      throw new Error('No #nav-loading-indicator');
+    }
+    return elm;
   }
 
   private extractCustomMetas(

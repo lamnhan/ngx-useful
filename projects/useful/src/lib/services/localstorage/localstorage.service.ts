@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { from } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import {createInstance} from 'localforage';
 
 import { LocalForage } from '../../vendors/localforage.vendor';
@@ -56,8 +56,30 @@ export class LocalstorageService {
     return from(this.getLocalforage().setItem(key, data));
   }
 
+  increase(key: string, by = 1) {
+    const handler = async (_key: string, _by: number) => {
+      const value = await this.getLocalforage().getItem<number>(_key);
+      const newValue = +(value || 0) + _by;
+      await this.getLocalforage().setItem(_key, newValue);
+      return newValue;
+    };
+    return from(handler(key, by));
+  }
+
   get<Data>(key: string) {
     return from(this.getLocalforage().getItem<Data>(key));
+  }
+
+  getBulk(keys: string[]) {
+    const handler = async (_keys: string[]) => {
+      const result = [] as unknown[];
+      for (let i = 0; i < _keys.length; i++) {
+        const value = await this.getLocalforage().getItem(_keys[i]);
+        result.push(value);
+      }
+      return result;
+    };
+    return from(handler(keys));
   }
 
   iterate<Data>(handler: LocalstorageIterateHandler<Data>) {
