@@ -49,6 +49,7 @@ export interface AppOptions {
 export type PWAStatus =
   | 'installed' // standalone or implicit installed
   | 'available' // can be asked now
+  | 'unavailable'; // already asked
 
 export interface BuiltinSettings {
   pwaStatus?: PWAStatus;
@@ -235,13 +236,12 @@ export class AppService {
           .increase(this.___PWA_INSTALL_REMINDER_COUNT);
       }
     }
+    if (status === 'installed') {
+      this.localstorageService
+        .set(this.___PWA_INSTALL_REMINDER_TIMESTAMP, -1);
+    }
     // in app
     this.pwaStatus = status;
-    // local
-    if (this.options.local) {
-      this.localstorageService.set('pwaStatus', status);
-    }
-    // TODO: remote
   }
 
   shareApp() {
@@ -406,12 +406,12 @@ export class AppService {
       // .pwaStatus
       mergeMap(({ pwaStatus }) =>
         !this.options.pwa || !this.options.local
-          ? this.helperService.observableResponder(undefined) 
-          // pass down
+          ? this.helperService.observableResponder('unavailable')
+          // pass down (implicit installed)
           : pwaStatus
             ? this.helperService.observableResponder(pwaStatus)
             // by local metric
-            : this.getPWAStatusLocally()
+            : this.getPWAStatusByLocalMetrics()
       ),
       mergeMap(pwaStatus =>
         this.helperService.observableResponder({...settings, pwaStatus} as BuiltinSettings)
@@ -433,26 +433,13 @@ export class AppService {
     );
   }
 
-  private getPWAStatusLocally() {
-    return this.localstorageService.get<string>('theme')
+  private getPWAStatusByLocalMetrics() {
+    return this.localstorageService.getBulk([
+      this.___PWA_INSTALL_REMINDER_TIMESTAMP,
+      this.___PWA_INSTALL_REMINDER_COUNT
+    ])
     .pipe(
-      mergeMap(pwaStatus =>
-        // has value
-        pwaStatus
-          ? this.helperService.observableResponder(pwaStatus)
-          // decode local metrics
-          : this.localstorageService.getBulk([
-              this.___PWA_INSTALL_REMINDER_TIMESTAMP,
-              this.___PWA_INSTALL_REMINDER_COUNT
-            ])
-      ),
-      mergeMap(result => {
-        // has value
-        if (typeof result === 'string') {
-          return this.helperService.observableResponder(result);
-        }
-        // by metrics
-        const [timestamp = 0, count = 0] = result;
+      mergeMap(([timestamp = 0, count = 0]) => {
         const isInstalled = 
           // user click dismiss
           (timestamp && +(timestamp as string | number) === -1)
@@ -481,7 +468,7 @@ export class AppService {
             ? 'installed'
             : isAvailable
               ? 'available'
-              : undefined
+              : 'unavailable'
         );
       })
     );
