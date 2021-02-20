@@ -25,11 +25,14 @@ export interface AppMetas extends AppCustomMetas {
 }
 
 export interface AppOptions {
+  /**
+   * Custom data to use in app
+   */
   customData?: Record<string, unknown>;
   /**
    * Support local settings
    */
-  local?: boolean;
+  localSettings?: boolean;
   /**
    * If your app has in-app splash screen
    */
@@ -37,17 +40,35 @@ export interface AppOptions {
   /**
    * Set theme based on browser color schema
    */
-  browserTheme?: boolean;
+  browserColor?: boolean;
   /**
-   * Anable PWA supports
+   * Enable PWA supports
    */
   pwa?: boolean;
-  pwaReminder?: boolean | number;
-  pwaReminderThreshold?: number;
+  /**
+   * App has PWA installing reminder
+   */
+  pwaReminder?: boolean;
+  /**
+   * Don't show again for X minutes, default: 12 hours
+   */
+  pwaReminderEvery?: number;
+  /**
+   * Don't annoy your user, only ask for certain times
+   */
+  pwaReminderMax?: number;
+  /**
+   * Custom normal settings loader
+   */
+  settingsLoader?: () => Observable<BuiltinSettings>,
+  /**
+   * Custom UI intensive settings
+   */
+  settingsLoaderUI?: () => Observable<BuiltinUISettings>,
 }
 
 export type PWAStatus =
-  | 'installed' // standalone or implicit installed
+  | 'installed' // standalone or installed implicitly
   | 'available' // can be asked now
   | 'unavailable'; // already asked
 
@@ -65,8 +86,10 @@ export interface AppSettings extends BuiltinSettings, BuiltinUISettings {}
   providedIn: 'root'
 })
 export class AppService {
-  private readonly ___PWA_INSTALL_REMINDER_TIMESTAMP = 'pwa_install_reminder_timestamp';
-  private readonly ___PWA_INSTALL_REMINDER_COUNT = 'pwa_install_reminder_count';
+  private readonly LSK_PWA_REMINDER_TIMESTAMP = 'pwa_reminder_timestamp';
+  private readonly LSK_PWA_REMINDER_COUNT = 'pwa_reminder_count';
+  private readonly LSK_THEME = 'theme';
+  private readonly LSK_PWA_STATUS = 'pwa_status';
 
   // app options
   private options: AppOptions = {};
@@ -94,14 +117,9 @@ export class AppService {
 
   init(
     options: AppOptions = {},
-    defaultMetas: AppMetas = {},
-    customSettingsLoader?: () => Observable<BuiltinSettings>,
-    customUISettingsLoader?: () => Observable<BuiltinUISettings>,
+    defaultMetas: AppMetas = {}
   ) {
-    this.options = {
-      browserTheme: true,
-      ...options
-    };
+    this.options = options;
     this.defaultMetas = defaultMetas;
     // mark app loaded ok (prevent timeout - unsupported message)
     if (this.options.splashScreen) {
@@ -115,15 +133,17 @@ export class AppService {
 
     // =======================================================
     // NOTE: Settings flow
-    // + Load: Remote (auth user) -> Local (if enabled) -> App default -> Handler
-    // + Update: Handler -> App -> Local (if enabled) -> Remote (TO DO)
+    // + Get: Remote (auth user) -> Local storage (if enabled) -> AppService -> Apply
+    // + Set: Apply -> AppService -> Local storage (if enabled) -> Remote (maybe?)
     // =======================================================
 
+    const {
+      settingsLoaderUI = () => this.helperService.observableResponder({}),
+      settingsLoader = () => this.helperService.observableResponder({}),
+    } = this.options;
+
     // handle UI intensive settings
-    if (!customUISettingsLoader) {
-      customUISettingsLoader = (): any => this.helperService.observableResponder({});
-    }
-    customUISettingsLoader()
+    settingsLoaderUI()
     .pipe(
       mergeMap(uiSettings => this.localUISettingsLoader(uiSettings)),
       mergeMap(uiSettings => this.appUISettingsLoader(uiSettings)),
@@ -141,10 +161,7 @@ export class AppService {
     });
 
     // handle other settings
-    if (!customSettingsLoader) {
-      customSettingsLoader = (): any => this.helperService.observableResponder({});
-    }
-    customSettingsLoader()
+    settingsLoader()
     .pipe(
       mergeMap(settings => this.localSettingsLoader(settings)),
       mergeMap(settings => this.appSettingsLoader(settings)),
@@ -183,11 +200,15 @@ export class AppService {
   }
 
   get IS_PWA_INSTALLED() {
-    return this.pwaStatus === 'installed';
+    return !!(this.options.pwa && this.pwaStatus === 'installed');
   }
 
   get IS_PWA_AVAILABLE() {
-    return this.pwaStatus === 'available';
+    return !!(this.options.pwa && this.pwaStatus === 'available');
+  }
+
+  getData<Value>(key: string) {
+    return (this.options.customData || {})[key] as Value;
   }
 
   addData(data: Record<string, unknown>) {
@@ -212,37 +233,6 @@ export class AppService {
     this.changeMetaTags(metas);
     return this as AppService;
   }
-  
-  changeTheme(name: string) {
-    // handler
-    document.body.setAttribute('data-theme', name);
-    // in app
-    this.theme = name;
-    // local
-    if (this.options.local) {
-      this.localstorageService.set('theme', name);
-    }
-    // TODO: remote
-  }
-
-  changePWAStatus(status: PWAStatus) {
-    // handler
-    if (status === 'available') {
-      this.showPWAReminder();
-      if (this.options.local) {
-        this.localstorageService
-          .set(this.___PWA_INSTALL_REMINDER_TIMESTAMP, new Date().getTime());
-        this.localstorageService
-          .increase(this.___PWA_INSTALL_REMINDER_COUNT);
-      }
-    }
-    if (status === 'installed') {
-      this.localstorageService
-        .set(this.___PWA_INSTALL_REMINDER_TIMESTAMP, -1);
-    }
-    // in app
-    this.pwaStatus = status;
-  }
 
   shareApp() {
     const {title, description: text, url} = this.defaultMetas;
@@ -255,6 +245,42 @@ export class AppService {
     } else {
       throw new Error('No title or description or url for sharing.');
     }
+  }
+
+  changeTheme(name: string) {
+    // handler
+    document.body.setAttribute('data-theme', name);
+    // in app
+    this.theme = name;
+    // local
+    if (this.options.localSettings) {
+      this.localstorageService.set(this.LSK_THEME, name);
+    }
+    // remote
+    // ...
+  }
+
+  changePWAStatus(status: PWAStatus) {
+    // handler
+    if (status === 'available') {
+      this.showPWAReminder();
+    }
+    // in app
+    this.pwaStatus = status;
+    // local
+    if (this.options.localSettings) {
+      // if available
+      if (status === 'available') {
+        this.localstorageService.set(this.LSK_PWA_REMINDER_TIMESTAMP, new Date().getTime());
+        this.localstorageService.increase(this.LSK_PWA_REMINDER_COUNT);
+      }
+      // if installed
+      if (status === 'installed') {
+        this.localstorageService.set(this.LSK_PWA_STATUS, status);
+      }
+    }
+    // remote
+    // if (status === 'installed') {}
   }
 
   showSplashScreen() {
@@ -350,16 +376,15 @@ export class AppService {
   }
 
   private localUISettingsLoader(uiSettings: BuiltinUISettings) {
-    return this.helperService.observableResponder(uiSettings)
-    .pipe(
+    return this.helperService.observableResponder(uiSettings).pipe(
       // .theme
       mergeMap(({ theme }) =>
         // pass value down
         theme
           ? this.helperService.observableResponder(theme)
           // get from local
-          : this.options.local
-            ? this.localstorageService.get<string>('theme')
+          : this.options.localSettings
+            ? this.localstorageService.get<string>(this.LSK_THEME)
             // no local option
             : this.helperService.observableResponder(null)
       ),
@@ -372,24 +397,23 @@ export class AppService {
   }
   
   private appUISettingsLoader(uiSettings: BuiltinUISettings) {
-    return this.helperService.observableResponder(uiSettings)
-    .pipe(
+    return this.helperService.observableResponder(uiSettings).pipe(
       // .theme
-      mergeMap(uiSettings =>
+      mergeMap(({ theme }) =>
         this.helperService.observableResponder(
           // pass down
-          uiSettings.theme
-          ? uiSettings.theme
-          // default theme
-          : !this.options.browserTheme
-            ? null
-            // browser scheme colors
-            : (
-              window.matchMedia
-              && window.matchMedia('(prefers-color-scheme: dark)').matches
-            )
-              ? 'dark'
-              : 'light'
+          theme
+            ? theme
+            // default theme
+            : !this.options.browserColor
+              ? null
+              // browser scheme colors
+              : (
+                window.matchMedia
+                && window.matchMedia('(prefers-color-scheme: dark)').matches
+              )
+                ? 'dark'
+                : 'light'
         )
       ),
       mergeMap(theme =>
@@ -401,15 +425,25 @@ export class AppService {
   }
 
   private localSettingsLoader(settings: BuiltinSettings) {
-    return this.helperService.observableResponder(settings)
-    .pipe(
+    return this.helperService.observableResponder(settings).pipe(
       // .pwaStatus
       mergeMap(({ pwaStatus }) =>
-        !this.options.pwa || !this.options.local
-          ? this.helperService.observableResponder('unavailable')
-          // pass down (implicit installed)
-          : pwaStatus
-            ? this.helperService.observableResponder(pwaStatus)
+        // pass down remote (implicit installed only)
+        pwaStatus && pwaStatus === 'installed'
+          ? this.helperService.observableResponder(pwaStatus)
+          // no local settings
+          : !this.options.localSettings
+            ? this.helperService.observableResponder(undefined)
+              // local storage
+              : this.localstorageService.get<string>(this.LSK_PWA_STATUS)
+      ),
+      mergeMap(pwaStatus =>
+        // pass down local (installed & unavailable)
+        pwaStatus && pwaStatus !== 'available'
+          ? this.helperService.observableResponder(pwaStatus)
+          // no local settings (undefined || available)
+          : !this.options.localSettings
+            ? this.helperService.observableResponder(undefined)
             // by local metric
             : this.getPWAStatusByLocalMetrics()
       ),
@@ -422,11 +456,13 @@ export class AppService {
   }
 
   private appSettingsLoader(settings: BuiltinSettings) {
-    return this.helperService.observableResponder(settings)
-    .pipe(
+    return this.helperService.observableResponder(settings).pipe(
       // .pwaStatus
-      mergeMap(settings =>
-        this.helperService.observableResponder(settings)
+      mergeMap(({ pwaStatus }) =>
+        this.helperService.observableResponder(pwaStatus || 'unavailable')
+      ),
+      mergeMap(pwaStatus =>
+        this.helperService.observableResponder({...settings, pwaStatus} as BuiltinSettings)
       ),
       // other settings
       // mergeMap(settings => {})
@@ -435,40 +471,28 @@ export class AppService {
 
   private getPWAStatusByLocalMetrics() {
     return this.localstorageService.getBulk([
-      this.___PWA_INSTALL_REMINDER_TIMESTAMP,
-      this.___PWA_INSTALL_REMINDER_COUNT
+      this.LSK_PWA_REMINDER_TIMESTAMP,
+      this.LSK_PWA_REMINDER_COUNT
     ])
     .pipe(
       mergeMap(([timestamp = 0, count = 0]) => {
+        const {pwaReminder, pwaReminderEvery, pwaReminderMax} = this.options;
+        // is standalone
         const isInstalled = 
-          // user click dismiss
-          (timestamp && +(timestamp as string | number) === -1)
-          // standalone
-          || (navigator as any).standalone
-          || window.matchMedia('(display-mode: standalone)').matches;
+          (navigator as any).standalone || window.matchMedia('(display-mode: standalone)').matches;
+        // is available (for reminder)
         const isAvailable =
-          this.options.pwaReminder
-          // must not pass the threshold
-          && (
-            (count as number) < (this.options.pwaReminderThreshold || 3) // default: 3 times
-          )
+          // must have the reminder
+          pwaReminder
+          // must not pass the maximum (if defined)
+          && (!pwaReminderMax || (count as number) < pwaReminderMax)
           // must expired
           && (
-            (
-              this.options.pwaReminder === true
-                ? 43200000 // default: 12 hours
-                : (this.options.pwaReminder * 60000)
-            ) < (
-              new Date().getTime()
-              - new Date(timestamp as number).getTime()
-            )
+            (pwaReminderEvery ? (pwaReminderEvery * 60000) : 43200000 /* 12 hours */)
+            < (new Date().getTime() - new Date(timestamp as number).getTime())
           );
         return this.helperService.observableResponder(
-          isInstalled
-            ? 'installed'
-            : isAvailable
-              ? 'available'
-              : 'unavailable'
+          isInstalled ? 'installed' : isAvailable ? 'available' : 'unavailable'
         );
       })
     );
