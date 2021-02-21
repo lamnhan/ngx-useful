@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { md5 } from '../../vendors/md5.vendor';
+import {md5} from '../../vendors/md5.vendor';
 import {orderBy} from '../../vendors/orderby.vendor';
 
 export interface PopupConfigs {
@@ -28,13 +28,6 @@ export class HelperService {
     guard?: unknown
   ) {
     return orderBy(collection, iteratees, orders, guard);
-  }
-
-  observableResponder<Value>(value: Value): Observable<Value> {
-    return new Observable(observer => {
-      observer.next(value);
-      observer.complete();
-    });
   }
 
   retryInterval(

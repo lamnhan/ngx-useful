@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
-import { Observable } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
-import { HelperService } from '../helper/helper.service';
 import { LocalstorageService } from '../localstorage/localstorage.service';
 
 export interface AppCustomMetas {
@@ -111,7 +110,6 @@ export class AppService {
   constructor(
     private title: Title,
     private meta: Meta,
-    private helperService: HelperService,
     private localstorageService: LocalstorageService,
   ) {}
 
@@ -138,8 +136,8 @@ export class AppService {
     // =======================================================
 
     const {
-      settingsLoaderUI = () => this.helperService.observableResponder({}),
-      settingsLoader = () => this.helperService.observableResponder({}),
+      settingsLoaderUI = () => of({}),
+      settingsLoader = () => of({}),
     } = this.options;
 
     // handle UI intensive settings
@@ -376,20 +374,20 @@ export class AppService {
   }
 
   private localUISettingsLoader(uiSettings: BuiltinUISettings) {
-    return this.helperService.observableResponder(uiSettings).pipe(
+    return of(uiSettings).pipe(
       // .theme
       mergeMap(({ theme }) =>
         // pass value down
         theme
-          ? this.helperService.observableResponder(theme)
+          ? of(theme)
           // get from local
           : this.options.localSettings
             ? this.localstorageService.get<string>(this.LSK_THEME)
             // no local option
-            : this.helperService.observableResponder(null)
+            : of(null)
       ),
       mergeMap(theme =>
-        this.helperService.observableResponder({...uiSettings, theme} as BuiltinUISettings)
+        of({...uiSettings, theme} as BuiltinUISettings)
       ),
       // other ui settings
       // mergeMap(uiSettings => {})
@@ -397,10 +395,10 @@ export class AppService {
   }
   
   private appUISettingsLoader(uiSettings: BuiltinUISettings) {
-    return this.helperService.observableResponder(uiSettings).pipe(
+    return of(uiSettings).pipe(
       // .theme
       mergeMap(({ theme }) =>
-        this.helperService.observableResponder(
+        of(
           // pass down
           theme
             ? theme
@@ -417,7 +415,7 @@ export class AppService {
         )
       ),
       mergeMap(theme =>
-        this.helperService.observableResponder({...uiSettings, theme} as BuiltinUISettings)
+        of({...uiSettings, theme} as BuiltinUISettings)
       ),
       // other ui settings
       // mergeMap(uiSettings => {})
@@ -425,30 +423,30 @@ export class AppService {
   }
 
   private localSettingsLoader(settings: BuiltinSettings) {
-    return this.helperService.observableResponder(settings).pipe(
+    return of(settings).pipe(
       // .pwaStatus
       mergeMap(({ pwaStatus }) =>
         // pass down remote (implicit installed only)
         pwaStatus && pwaStatus === 'installed'
-          ? this.helperService.observableResponder(pwaStatus)
+          ? of(pwaStatus)
           // no local settings
           : !this.options.localSettings
-            ? this.helperService.observableResponder(undefined)
+            ? of(undefined)
               // local storage
               : this.localstorageService.get<string>(this.LSK_PWA_STATUS)
       ),
       mergeMap(pwaStatus =>
         // pass down local (installed & unavailable)
         pwaStatus && pwaStatus !== 'available'
-          ? this.helperService.observableResponder(pwaStatus)
+          ? of(pwaStatus)
           // no local settings (undefined || available)
           : !this.options.localSettings
-            ? this.helperService.observableResponder(undefined)
+            ? of(undefined)
             // by local metric
             : this.getPWAStatusByLocalMetrics()
       ),
       mergeMap(pwaStatus =>
-        this.helperService.observableResponder({...settings, pwaStatus} as BuiltinSettings)
+        of({...settings, pwaStatus} as BuiltinSettings)
       ),
       // other settings
       // mergeMap(settings => {})
@@ -456,13 +454,13 @@ export class AppService {
   }
 
   private appSettingsLoader(settings: BuiltinSettings) {
-    return this.helperService.observableResponder(settings).pipe(
+    return of(settings).pipe(
       // .pwaStatus
       mergeMap(({ pwaStatus }) =>
-        this.helperService.observableResponder(pwaStatus || 'unavailable')
+        of(pwaStatus || 'unavailable')
       ),
       mergeMap(pwaStatus =>
-        this.helperService.observableResponder({...settings, pwaStatus} as BuiltinSettings)
+        of({...settings, pwaStatus} as BuiltinSettings)
       ),
       // other settings
       // mergeMap(settings => {})
@@ -491,7 +489,7 @@ export class AppService {
             (pwaReminderEvery ? (pwaReminderEvery * 60000) : 43200000 /* 12 hours */)
             < (new Date().getTime() - new Date(timestamp as number).getTime())
           );
-        return this.helperService.observableResponder(
+        return of(
           isInstalled ? 'installed' : isAvailable ? 'available' : 'unavailable'
         );
       })
