@@ -5,9 +5,9 @@ import { mergeMap } from 'rxjs/operators';
 import { LocalstorageService } from '../localstorage/localstorage.service';
 
 export interface PWAOptions {
-  reminder?: boolean | string;
   reminderEvery?: number;
   reminderMax?: number;
+  reminderAnnoying?: number;
 }
 
 export type PWAStatus =
@@ -25,7 +25,10 @@ export class PwaService {
 
   private options: PWAOptions = {};
 
+  private runtime = 'desktop-any';
   private status?: PWAStatus;
+  private timestamp = 0;
+  private count = 0;
 
   constructor(
     private localstorageService: LocalstorageService
@@ -33,9 +36,20 @@ export class PwaService {
 
   init(options: PWAOptions = {}) {
     this.options = options;
+    // get runtime
+    this.setRuntime();
     // checking
-    this.loadStatus()
-      .subscribe(status => this.changeStatus(status as PWAStatus));
+    this.loadLocalData()
+    .subscribe(({ status, timestamp, count }) => {
+      this.timestamp = timestamp as number;
+      this.count = count as number;
+      // change
+      this.changeStatus(status as PWAStatus);
+    });
+  }
+
+  get RUNTIME() {
+    return this.runtime;
   }
 
   get IS_INSTALLED() {
@@ -46,27 +60,44 @@ export class PwaService {
     return this.status === 'available';
   }
 
+  get IS_REMINDER_ANNOYED() {
+    return this.count >= (this.options.reminderAnnoying || 3);
+  }
+
   changeStatus(status: PWAStatus) {
-    // handler
-    if (status === 'available') {
-      this.showReminder();
-    }
     // in app
     this.status = status;
     // if available
-    if (status === 'available') {
-      this.localstorageService.set(this.LSK_REMINDER_TIMESTAMP, new Date().getTime());
-      this.localstorageService.increase(this.LSK_REMINDER_COUNT);
+    if (
+      status === 'available'
+      || (
+          status === 'unavailable'
+          && this.runtime === 'android-chrome'
+        )
+    ) {
+      this.timestamp = new Date().getTime();
+      this.localstorageService.set(this.LSK_REMINDER_TIMESTAMP, this.timestamp);
+      this.localstorageService.set(this.LSK_REMINDER_COUNT, ++this.count);
     }
     // if installed
-    if (status === 'installed') {
+    else if (status === 'installed') {
       this.localstorageService.set(this.LSK_STATUS, status);
     }
   }
 
   showReminder() {
-    const elm = this.getReminderElement();
-    // get ua
+    this.changeStatus('available');
+  }
+
+  hideReminder() {
+    this.changeStatus('unavailable');
+  }
+
+  dismissReminder() {
+    this.changeStatus('installed');
+  }
+
+  private setRuntime() {
     const userAgent = window.navigator.userAgent.toLowerCase();
     if (/iphone|ipad|ipod/.test(userAgent)) {
       if (
@@ -74,53 +105,32 @@ export class PwaService {
         !(/fxios/).test(userAgent) &&
         !(/opios/).test(userAgent)
       ) {
-        elm.classList.add('ios-safari', 'show');
+        this.runtime = 'ios-safari';
       } else {
-        elm.classList.add('ios-any', 'show');
+        this.runtime = 'ios-any';
+      }
+    } else if (/android/.test(userAgent)) {
+      if (
+        /chrome/.test(userAgent) &&
+        !(/edga/).test(userAgent)
+      ) {
+        this.runtime = 'android-chrome';
+      } else {
+        this.runtime = 'android-any';
       }
     } else if (/windows|macintosh/.test(userAgent)) {
-      if (/chrome/.test(userAgent)) {
-        elm.classList.add('desktop-chrome', 'show');
+      if (
+        /chrome/.test(userAgent) &&
+        !(/edg/).test(userAgent)
+      ) {
+        this.runtime = 'desktop-chrome';
       } else {
-        elm.classList.add('desktop-any', 'show');
+        this.runtime = 'desktop-any';
       }
     }
-    // close button
-    const close = elm.querySelector('.close');
-    if (close) {
-      close.addEventListener('click', () => this.hideReminder(), {once: true});
-    }
-    // dismissal
-    const dismiss = elm.querySelector('.dismiss');
-    if (dismiss) {
-      dismiss.addEventListener('click', () => {
-        this.hideReminder();
-        this.dismissReminder();
-      }, {once: true});
-    }
   }
 
-  hideReminder() {
-    const elm = this.getReminderElement();
-    elm.classList.remove('show');
-  }
-
-  dismissReminder() {
-    this.changeStatus('installed');
-  }
-  
-  private getReminderElement() {
-    const id = typeof this.options.reminder === 'string'
-      ? this.options.reminder
-      : 'pwa-install-reminder';
-    const elm = document.getElementById(id);
-    if (!this.options.reminder || !elm) {
-      throw new Error('No PWA installing reminder by the id #' + id);
-    }
-    return elm;
-  }
-
-  private loadStatus() {
+  private loadLocalData() {
     return this.localstorageService.getBulk([
       this.LSK_STATUS,
       this.LSK_REMINDER_TIMESTAMP,
@@ -128,29 +138,32 @@ export class PwaService {
     ])
     .pipe(
       mergeMap(([status, timestamp = 0, count = 0]) => {
-        // pass down local (installed & unavailable)
-        if (status && status !== 'available') {
-          return of(status);
-        } else {
-          const {reminder, reminderEvery, reminderMax} = this.options;
+        const result = { status, timestamp, count };
+        // check local metrics
+        if (!status || status === 'available') {
+          const {reminderEvery, reminderMax} = this.options;
           // is standalone
           const isInstalled = 
             (navigator as any).standalone || window.matchMedia('(display-mode: standalone)').matches;
           // is available (for reminder)
           const isAvailable =
-            // must have the reminder
-            reminder
             // must not pass the maximum (if defined)
-            && (!reminderMax || (count as number) < reminderMax)
+            (!reminderMax || (count as number) < reminderMax)
             // must expired
             && (
               (reminderEvery ? (reminderEvery * 60000) : 43200000 /* 12 hours */)
               < (new Date().getTime() - new Date(timestamp as number).getTime())
+            )
+            // not first time on chrome on Android
+            && !(
+              this.runtime === 'android-chrome'
+              && (!count || count === 0)
             );
-          return of(
+          result.status = (
             isInstalled ? 'installed' : isAvailable ? 'available' : 'unavailable'
           );
         }
+        return of(result);
       })
     );
   }

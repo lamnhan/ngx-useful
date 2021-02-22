@@ -1,4 +1,4 @@
-#nav-loading-indicator {
+.component-nav-indicator {
   z-index: 7;
   position: fixed;
   width: 200px;
@@ -13,7 +13,7 @@
   transition: .5s all ease;
 
   &.show {
-    bottom: calc(64px + 1rem);
+    bottom: 1rem;
   }
 
   & .body {

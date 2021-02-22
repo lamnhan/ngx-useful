@@ -1,0 +1,23 @@
+<div
+  class="component-pwa-box"
+  *ngIf="pwa && !pwa.IS_INSTALLED"
+>
+
+  <div class="head">
+    <button class="close">✕</button>
+  </div>
+
+  <div class="body">
+    <img class="icon" [src]="icon" alt="title">
+    <div class="text">
+      <strong>{{title}}</strong>
+      <span>{{description}}</span>
+    </div>
+  </div>
+
+  <div class="foot">
+    <button class="action" (click)="pwa.showReminder()">{{actionText}}</button>
+    <button class="dismiss" (click)="pwa.dismissReminder()">{{dismissText}}</button>
+  </div>
+
+</div>

@@ -33,17 +33,12 @@ export interface NavMenuItem extends NavItem {
 export type NavMetaModifier =
   | string
   | { (input: Record<string, unknown>): string };
-  
-export interface NavOptions {
-  loadingIndicator?: boolean | string;
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class NavService {
   private router?: Router;
-  private options: NavOptions = {};
   private routingData: Record<string, unknown> = {};
   private routingMetaRecords: Record<string, AppCustomMetas> = {};
 
@@ -56,15 +51,12 @@ export class NavService {
 
   init(
     router: Router,
-    options: NavOptions = {},
     hooks: {
       [key in NavRouterEventHooks]?: (event: Event) => void;
     } = {},
   ) {
     // set router
     this.router = router;
-    // set options
-    this.options = options;
     // register events
     this.router
       .events
@@ -72,17 +64,13 @@ export class NavService {
       let eventName = '' as NavRouterEventHooks; // event name
       if (event instanceof RouteConfigLoadStart) {
         eventName = 'RouteConfigLoadStart';
-        this.loading = true;
         // show loading indicator (longer than 1s)
-        if (this.options.loadingIndicator) {
-          this.loadingIndicatorTimeout =
-            setTimeout(() => this.showLoadingIndicator(), 1000);
-        }
+        this.loadingIndicatorTimeout =
+          setTimeout(() => this.showLoadingIndicator(), 1000);
       } else if (event instanceof RouteConfigLoadEnd) {
         eventName = 'RouteConfigLoadEnd';
-        this.loading = false;
         // hide loadding
-        if (this.options.loadingIndicator && this.loadingIndicatorTimeout) {
+        if (this.loadingIndicatorTimeout) {
           clearTimeout(this.loadingIndicatorTimeout);
           setTimeout(() => this.hideLoadingIndicator(), 1000);
         }
@@ -113,10 +101,6 @@ export class NavService {
       throw new Error('No router, please set first!');
     }
     return this.router;
-  }
-
-  get OPTIONS() {
-    return this.options;
   }
 
   get DATA() {
@@ -159,6 +143,14 @@ export class NavService {
       this.routingMetaRecords[this.router.url] = customMetas;
     }
     return this as NavService;
+  }
+
+  showLoadingIndicator() {
+    this.loading = true;
+  }
+
+  hideLoadingIndicator() {
+    this.loading = false;
   }
 
   menuAction() {
@@ -206,28 +198,6 @@ export class NavService {
       ? document.getElementById(input)
       : input;
     return elm?.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  showLoadingIndicator() {
-    const elm = this.getLoadingElement();
-    elm.addEventListener('click', () => this.hideLoadingIndicator(), {once: true});
-    elm.classList.add('show');
-  }
-
-  hideLoadingIndicator() {
-    const elm = this.getLoadingElement();
-    elm.classList.remove('show');
-  }
-
-  private getLoadingElement() {
-    const id = typeof this.options.loadingIndicator === 'string'
-      ? this.options.loadingIndicator
-      : 'nav-loading-indicator';
-    const elm = document.getElementById(id);
-    if (!this.options.loadingIndicator || !elm) {
-      throw new Error('No nav loading indicator by the id #' + id);
-    }
-    return elm;
   }
 
   private extractCustomMetas(

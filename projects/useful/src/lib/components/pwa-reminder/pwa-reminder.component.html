@@ -1,20 +1,25 @@
-<div id="pwa-install-reminder">
+<div
+  class="component-pwa-reminder"
+  *ngIf="pwa && !pwa.IS_INSTALLED"
+  [class]="pwa.RUNTIME"
+  [class.show]="pwa.IS_AVAILABLE"
+  [class.annoyed]="pwa.IS_REMINDER_ANNOYED"
+>
 
-  <div class="ios-safari-message">
-    IOS/Safari
+  <div class="head">
+    <div class="title">
+      <img class="icon" [src]="icon" alt="title">
+      <strong>{{title}}</strong>
+    </div>
+    <button class="close" (click)="pwa.hideReminder()">✕</button>
   </div>
 
-  <div class="ios-any-message">
-    IOS/Any
+  <div class="body">
+    <div [class]="pwa.RUNTIME + '-message'" [innerHtml]="getMessage()"></div>
   </div>
 
-  <div class="desktop-chrome-message">
-    Desktop/Chrome
+  <div class="foot">
+    <button class="dismiss" (click)="pwa.dismissReminder()">{{dismissText}}</button>
+    <button class="hide" (click)="pwa.hideReminder()">{{hideText}}</button>
   </div>
-
-  <div class="desktop-any-message">
-    Desktop/Any
-  </div>
-
-  <button class="close">X</button>
 </div>

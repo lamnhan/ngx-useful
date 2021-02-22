@@ -1,4 +1,8 @@
-<div id="nav-loading-indicator">
+<div
+  class="component-nav-indicator"
+  *ngIf="nav"
+  [class.show]="nav.IS_LOADING"
+>
   <div class="body">
     <img [src]="icon">
     <span [innerHtml]="text"></span>

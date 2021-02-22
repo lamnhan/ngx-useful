@@ -1,17 +1,17 @@
 import {NgModule} from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import {PwaReminderComponent} from './pwa-reminder.component';
+import {PwaBoxComponent} from './pwa-box.component';
 
 @NgModule({
   declarations: [
-    PwaReminderComponent,
+    PwaBoxComponent,
   ],
   imports: [
     CommonModule,
   ],
   exports: [
-    PwaReminderComponent,
+    PwaBoxComponent,
   ]
 })
-export class PwaReminderComponentModule {}
+export class PwaBoxComponentModule {}

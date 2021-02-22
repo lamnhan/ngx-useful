@@ -1,4 +1,5 @@
 import {NgModule} from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import {NavIndicatorComponent} from './nav-indicator.component';
 
@@ -6,7 +7,9 @@ import {NavIndicatorComponent} from './nav-indicator.component';
   declarations: [
     NavIndicatorComponent,
   ],
-  imports: [],
+  imports: [
+    CommonModule
+  ],
   exports: [
     NavIndicatorComponent,
   ]

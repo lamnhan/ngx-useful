@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { OauthPopupComponentModule } from './components/oauth-popup/oauth-popup.module';
 import { NavIndicatorComponentModule } from './components/nav-indicator/nav-indicator.module';
 import { PwaReminderComponentModule } from './components/pwa-reminder/pwa-reminder.module';
+import { PwaBoxComponentModule } from './components/pwa-box/pwa-box.module';
 
 import { O2aPipeModule } from './pipes/o2a/o2a.module';
 import { FilterPipeModule } from './pipes/filter/filter.module';
@@ -33,6 +34,7 @@ import {PlayerService} from './services/player/player.service';
     OauthPopupComponentModule,
     NavIndicatorComponentModule,
     PwaReminderComponentModule,
+    PwaBoxComponentModule,
     O2aPipeModule,
     FilterPipeModule,
     SafePipeModule,
@@ -61,6 +63,7 @@ import {PlayerService} from './services/player/player.service';
     OauthPopupComponentModule,
     NavIndicatorComponentModule,
     PwaReminderComponentModule,
+    PwaBoxComponentModule,
     O2aPipeModule,
     FilterPipeModule,
     SafePipeModule,
