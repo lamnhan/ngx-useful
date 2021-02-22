@@ -35,7 +35,7 @@ export type NavMetaModifier =
   | { (input: Record<string, unknown>): string };
   
 export interface NavOptions {
-  loadingIndicator?: boolean;
+  loadingIndicator?: boolean | string;
 }
 
 @Injectable({
@@ -48,6 +48,7 @@ export class NavService {
   private routingMetaRecords: Record<string, AppCustomMetas> = {};
 
   private loading = false;
+  private loadingIndicatorTimeout?: any;
   private previousUrls: string[] = [];
   private isMenuVisible = false; // secondary/mobile menu
 
@@ -72,19 +73,19 @@ export class NavService {
       if (event instanceof RouteConfigLoadStart) {
         eventName = 'RouteConfigLoadStart';
         this.loading = true;
-        // show loading
+        // show loading indicator (longer than 1s)
         if (this.options.loadingIndicator) {
-          this.showLoading();
+          this.loadingIndicatorTimeout =
+            setTimeout(() => this.showLoadingIndicator(), 1000);
         }
       } else if (event instanceof RouteConfigLoadEnd) {
         eventName = 'RouteConfigLoadEnd';
-        setTimeout(() => {
-          this.loading = false;
-          // hide loadding
-          if (this.options.loadingIndicator) {
-            this.hideLoading();
-          }
-        }, 700);
+        this.loading = false;
+        // hide loadding
+        if (this.options.loadingIndicator && this.loadingIndicatorTimeout) {
+          clearTimeout(this.loadingIndicatorTimeout);
+          setTimeout(() => this.hideLoadingIndicator(), 1000);
+        }
       } else if (event instanceof NavigationEnd) {
         eventName = 'NavigationEnd';
         // record urls for backing navigation
@@ -207,21 +208,24 @@ export class NavService {
     return elm?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  showLoading() {
+  showLoadingIndicator() {
     const elm = this.getLoadingElement();
-    elm.addEventListener('click', () => this.hideLoading(), {once: true});
+    elm.addEventListener('click', () => this.hideLoadingIndicator(), {once: true});
     elm.classList.add('show');
   }
 
-  hideLoading() {
+  hideLoadingIndicator() {
     const elm = this.getLoadingElement();
     elm.classList.remove('show');
   }
 
   private getLoadingElement() {
-    const elm = document.getElementById('nav-loading-indicator');
+    const id = typeof this.options.loadingIndicator === 'string'
+      ? this.options.loadingIndicator
+      : 'nav-loading-indicator';
+    const elm = document.getElementById(id);
     if (!this.options.loadingIndicator || !elm) {
-      throw new Error('No #nav-loading-indicator');
+      throw new Error('No nav loading indicator by the id #' + id);
     }
     return elm;
   }
