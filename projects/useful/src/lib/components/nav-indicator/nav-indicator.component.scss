@@ -1,0 +1,36 @@
+#nav-loading-indicator {
+  z-index: 7;
+  position: fixed;
+  width: 200px;
+  left: 50%;
+  margin-left: -100px;
+  bottom: -5rem;
+  background: none;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  transition: .5s all ease;
+
+  &.show {
+    bottom: calc(64px + 1rem);
+  }
+
+  & .body {
+    display: flex;
+    align-items: center;
+    background: var(--app-color-foreground, #f4f5f8);
+    padding: .5rem 1rem;
+    border-radius: 100px;
+
+    & img {
+      width: 2rem;
+    }
+
+    & span {
+      display: inline-block;
+      color: var(--app-color-background, #222428);
+      margin-left: 1rem;
+    }
+  }
+}

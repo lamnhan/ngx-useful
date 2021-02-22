@@ -11,4 +11,4 @@ import {OauthPopupComponent} from './oauth-popup.component';
     OauthPopupComponent,
   ]
 })
-export class OauthPopupComponentModule { }
+export class OauthPopupComponentModule {}

@@ -1,0 +1,87 @@
+#pwa-install-reminder {
+  z-index: 7;
+  position: fixed;
+  padding: 1rem;
+  bottom: -10rem;
+  transition: all .5s ease;
+
+  .ios-safari-message,
+  .ios-any-message,
+  .desktop-chrome-message,
+  .desktop-any-message
+  {
+    display: none;
+  }
+
+  &.ios-safari {
+    width: calc(100% - 2rem);
+    left: 1rem;
+    margin-right: 1rem;
+    border-radius: 12px;
+    background: rgba(var(--app-color-foreground-rgb), .9);
+    color: var(--app-color-background);
+
+    &.show {
+      bottom: calc(64px + 1rem);
+    }
+
+    .ios-safari-message {
+      display: block;
+    }
+
+    .close {
+      // close button
+    }
+  }
+
+  &.ios-any {
+
+    &.show {
+      bottom: calc(64px + 1rem);
+    }
+
+    .ios-any-message {
+      display: block;
+    }
+
+    .close {
+      // close button
+    }
+  }
+
+  &.desktop-chrome {
+    top: 0;
+    right: -10rem;
+    transition: all .5s ease;
+
+    &.show {
+      right: 1rem;
+    }
+
+    .desktop-chrome-message {
+      display: block;
+    }
+
+    .close {
+      // close button
+    }
+  }
+
+  &.desktop-any {
+    top: 0;
+    right: -10rem;
+    transition: all .5s ease;
+
+    &.show {
+      right: 1rem;
+    }
+
+    .desktop-any-message {
+      display: block;
+    }
+
+    .close {
+      // close button
+    }
+  }
+}

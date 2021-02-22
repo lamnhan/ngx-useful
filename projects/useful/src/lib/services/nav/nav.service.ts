@@ -8,7 +8,7 @@ import {
   NavigationExtras
 } from '@angular/router';
 
-import { AppService, AppCustomMetas } from '../app/app.service';
+import { MetaService, AppCustomMetas } from '../meta/meta.service';
 
 export type NavRouterEventHooks = 'RouteConfigLoadStart' | 'RouteConfigLoadEnd' | 'NavigationEnd';
 
@@ -52,7 +52,7 @@ export class NavService {
   private previousUrls: string[] = [];
   private isMenuVisible = false; // secondary/mobile menu
 
-  constructor(private appService: AppService) {}
+  constructor(private metaService: MetaService) {}
 
   init(
     router: Router,
@@ -97,7 +97,7 @@ export class NavService {
           this.previousUrls.pop();
         }
         // set title & meta
-        this.appService.changePageMetas(
+        this.metaService.changePageMetas(
           this.routingMetaRecords[(this.router as Router).url] || {}
         );
       }
