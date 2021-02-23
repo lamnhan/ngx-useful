@@ -7,9 +7,10 @@
 >
 
   <div class="head">
-    <div class="title">
-      <img class="icon" [src]="icon" alt="title">
+    <img class="icon" [src]="icon" alt="title">
+    <div class="text">
       <strong>{{title}}</strong>
+      <span>{{message}}</span>
     </div>
     <button class="close" (click)="pwa.hideReminder()">✕</button>
   </div>
@@ -19,7 +20,7 @@
   </div>
 
   <div class="foot">
-    <button class="dismiss" (click)="pwa.dismissReminder()">{{dismissText}}</button>
-    <button class="hide" (click)="pwa.hideReminder()">{{hideText}}</button>
+    <button class="dismiss button-link" (click)="pwa.dismissReminder()">{{dismissText}}</button>
+    <button class="hide button-sm" (click)="pwa.hideReminder()">{{hideText}}</button>
   </div>
 </div>

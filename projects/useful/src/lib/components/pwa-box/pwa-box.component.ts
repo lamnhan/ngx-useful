@@ -12,11 +12,10 @@ export class PwaBoxComponent implements OnInit {
 
   @Input() title = 'Install app?';
 
-  @Input() icon = '/icons/icon-96x96.png';
-  @Input() name = 'App';
+  @Input() icon = '/icons/icon-72x72.png';
+  @Input() name = 'Install now';
   @Input() tagline = 'Add app to your home screen';
 
-  @Input() actionText = 'Show me how';
   @Output() action: EventEmitter<void> = new EventEmitter();
   @Output() dismiss: EventEmitter<void> = new EventEmitter();
 

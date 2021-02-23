@@ -1,0 +1,49 @@
+.component-pwa-box {
+  width: 100%;
+  padding: 1rem 1rem 1.5rem;
+
+  .head {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    padding-bottom: .5rem;
+
+    .title {
+      flex: 1;
+    }
+
+    button.close {
+      background: none;
+      border: none;
+      color: var(--app-color-medium);
+
+      &:hover, &:focus, &:active {
+        outline: 0;
+      }
+    }
+  }
+
+  .body {
+    display: flex;
+    flex-wrap: nowrap;
+  
+    img.thumbnail {
+      width: 64px;
+      height: 64px;
+    }
+
+    .text {
+      flex: 1;
+      margin-left: 1rem;
+
+      strong, span {
+        display: block;
+      }
+
+      span {
+        font-size: .9rem;
+        color: var(--app-color-medium);
+      }
+    }
+  }
+}

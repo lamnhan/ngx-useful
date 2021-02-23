@@ -34,16 +34,15 @@ export class PwaService {
 
   init(options: PWAOptions = {}) {
     this.options = options;
-    // get runtime
     this.setRuntime();
-    // checking
     this.loadLocalMetrics()
     .subscribe(({ installed, reminderCount, reminderTimestamp, reminderShowed }) => {
+      // installing status
       this.installed = installed;
-      // handle reminder
+      // reminder
       this.reminderCount = reminderCount;
       this.reminderTimestamp = reminderTimestamp;
-      if (this.options.reminder && reminderShowed) {
+      if (!this.installed && this.options.reminder && reminderShowed) {
         setTimeout(
           () => this.showReminder(),
           this.options.reminder === true ? 0 : (this.options.reminder * 1000)
@@ -69,32 +68,38 @@ export class PwaService {
   }
 
   get IS_REMINDER_ANNOYED() {
-    return this.reminderCount > (this.options.reminderAnnoying || 3);
+    return this.reminderCount >= (this.options.reminderAnnoying || 3);
   }
 
   showReminder(manualShowed?: boolean) {
-    const isAndroidChromeFirstTime = this.runtime === 'android-chrome' && this.reminderCount === 0;
-    // not the first time on Chrome on Android
-    // use native propmt instead
-    this.reminderShowed = !isAndroidChromeFirstTime;
-    // save metrics
-    if (isAndroidChromeFirstTime || !manualShowed) {
-      this.reminderCount++;
-      this.reminderTimestamp = new Date().getTime();
-      this.localstorageService.set(this.LSK_REMINDER_COUNT, this.reminderCount);
-      this.localstorageService.set(this.LSK_REMINDER_TIMESTAMP, this.reminderTimestamp);
+    if (!this.installed && this.options.reminder) {
+      const isAndroidChromeFirstTime = this.runtime === 'android-chrome' && this.reminderCount === 0;
+      // not the first time on Chrome on Android
+      // use native propmt instead
+      this.reminderShowed = !isAndroidChromeFirstTime;
+      // save metrics
+      if (isAndroidChromeFirstTime || !manualShowed) {
+        this.reminderCount++;
+        this.reminderTimestamp = new Date().getTime();
+        this.localstorageService.set(this.LSK_REMINDER_COUNT, this.reminderCount);
+        this.localstorageService.set(this.LSK_REMINDER_TIMESTAMP, this.reminderTimestamp);
+      }
     }
   }
 
   hideReminder() {
-    this.reminderShowed = false;
+    if (!this.installed && this.options.reminder) {
+      this.reminderShowed = false;
+    }
   }
 
   dismissReminder() {
-    this.hideReminder();
-    // set installed
-    this.installed = true;
-    this.localstorageService.set(this.LSK_INSTALLED, this.installed);
+    if (!this.installed && this.options.reminder) {
+      this.hideReminder();
+      // set installed
+      this.installed = true;
+      this.localstorageService.set(this.LSK_INSTALLED, this.installed);
+    }
   }
 
   private setRuntime() {
@@ -138,15 +143,14 @@ export class PwaService {
     ])
     .pipe(
       mergeMap(([installed, reminderCount, reminderTimestamp, reminderShowed]) => {
-        installed = installed || false;
+        installed =
+        // implicit installed
+          installed
+          // standalone
+          || (navigator as any).standalone || window.matchMedia('(display-mode: standalone)').matches;
         reminderCount = reminderCount || 0;
         reminderTimestamp = reminderTimestamp || 0;
         reminderShowed = reminderShowed || false;
-        // is standalone
-        if (!installed) {
-          installed = 
-            (navigator as any).standalone || window.matchMedia('(display-mode: standalone)').matches;
-        }
         // is reminder available
         const {reminderEvery, reminderMax} = this.options;
         reminderShowed =

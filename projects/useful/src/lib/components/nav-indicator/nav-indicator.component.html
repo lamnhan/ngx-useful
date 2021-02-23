@@ -3,7 +3,7 @@
   *ngIf="nav"
   [class.show]="nav.IS_LOADING"
 >
-  <div class="body">
+  <div class="body" (click)="nav.hideLoadingIndicator()">
     <img [src]="icon">
     <span [innerHtml]="text"></span>
   </div>

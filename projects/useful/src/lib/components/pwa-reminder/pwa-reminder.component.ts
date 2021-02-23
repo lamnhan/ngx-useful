@@ -10,8 +10,9 @@ import {PwaService} from '../../services/pwa/pwa.service';
 export class PwaReminderComponent implements OnInit {
   @Input('pwaService') pwa?: PwaService;
 
-  @Input() icon = '/icons/icon-32x32.png';
+  @Input() icon = '/icons/icon-72x72.png';
   @Input() title = 'Install app?';
+  @Input() message = 'Add app to your home screen';
 
   @Input() iosSafariMessage: string | string[];
   @Input() iosAnyMessage: string | string[];
@@ -22,12 +23,12 @@ export class PwaReminderComponent implements OnInit {
   @Input() desktopChromeMessage: string | string[];
   @Input() desktopAnyMessage: string | string[];
 
-  @Input() dismissText = 'Don\'t show again';
+  @Input() dismissText = 'Already installed';
   @Input() hideText = 'Remind me later';
 
   constructor() {
     this.iosSafariMessage = [
-      'Click the share button',
+      'Click the Share button',
       'Then, Add to home screen',
     ];
     this.iosAnyMessage = [
@@ -46,7 +47,7 @@ export class PwaReminderComponent implements OnInit {
 
     this.desktopChromeMessage = [
       'Click the Install button in the address bar',
-      'Then, OK to install',
+      'Then, Install',
     ];
     this.desktopAnyMessage = [
       'Open this website using the Chrome browser',

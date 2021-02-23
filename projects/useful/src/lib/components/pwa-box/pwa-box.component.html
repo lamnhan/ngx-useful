@@ -1,20 +1,16 @@
-<div class="component-pwa-box" *ngIf="pwa">
+<div class="component-pwa-box" *ngIf="pwa && !pwa.IS_INSTALLED">
 
   <div class="head">
     <span class="title">{{title}}</span>
     <button class="close" (click)="dismiss.emit()">✕</button>
   </div>
 
-  <div class="body">
+  <div class="body" (click)="action.emit()">
     <img class="thumbnail" [src]="icon" alt="name">
     <div class="text">
       <strong>{{name}}</strong>
       <span>{{tagline}}</span>
     </div>
-  </div>
-
-  <div class="foot">
-    <button class="action" (click)="action.emit()">{{actionText}}</button>
   </div>
 
 </div>
