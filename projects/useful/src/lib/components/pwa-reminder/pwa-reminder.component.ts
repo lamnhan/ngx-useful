@@ -11,7 +11,7 @@ export class PwaReminderComponent implements OnInit {
   @Input('pwaService') pwa?: PwaService;
 
   @Input() icon = '/icons/icon-32x32.png';
-  @Input() title = 'Install app now!';
+  @Input() title = 'Install app?';
 
   @Input() iosSafariMessage: string | string[];
   @Input() iosAnyMessage: string | string[];
@@ -22,7 +22,7 @@ export class PwaReminderComponent implements OnInit {
   @Input() desktopChromeMessage: string | string[];
   @Input() desktopAnyMessage: string | string[];
 
-  @Input() dismissText = 'Already installed?';
+  @Input() dismissText = 'Don\'t show again';
   @Input() hideText = 'Remind me later';
 
   constructor() {

@@ -5,30 +5,28 @@ import { mergeMap } from 'rxjs/operators';
 import { LocalstorageService } from '../localstorage/localstorage.service';
 
 export interface PWAOptions {
+  reminder?: boolean | number;
   reminderEvery?: number;
   reminderMax?: number;
   reminderAnnoying?: number;
 }
 
-export type PWAStatus =
-  | 'installed' // standalone or installed implicitly
-  | 'available' // can be asked now
-  | 'unavailable'; // already asked
-
 @Injectable({
   providedIn: 'root'
 })
 export class PwaService {
-  private readonly LSK_STATUS = 'pwa_status';
+  private readonly LSK_INSTALLED = 'pwa_installed';
   private readonly LSK_REMINDER_TIMESTAMP = 'pwa_reminder_timestamp';
   private readonly LSK_REMINDER_COUNT = 'pwa_reminder_count';
 
   private options: PWAOptions = {};
 
   private runtime = 'desktop-any';
-  private status?: PWAStatus;
-  private timestamp = 0;
-  private count = 0;
+  private installed = true;
+
+  private reminderCount = 0;
+  private reminderTimestamp = 0;
+  private reminderShowed = false;
 
   constructor(
     private localstorageService: LocalstorageService
@@ -39,12 +37,18 @@ export class PwaService {
     // get runtime
     this.setRuntime();
     // checking
-    this.loadLocalData()
-    .subscribe(({ status, timestamp, count }) => {
-      this.timestamp = timestamp as number;
-      this.count = count as number;
-      // change
-      this.changeStatus(status as PWAStatus);
+    this.loadLocalMetrics()
+    .subscribe(({ installed, reminderCount, reminderTimestamp, reminderShowed }) => {
+      this.installed = installed;
+      // handle reminder
+      this.reminderCount = reminderCount;
+      this.reminderTimestamp = reminderTimestamp;
+      if (this.options.reminder && reminderShowed) {
+        setTimeout(
+          () => this.showReminder(),
+          this.options.reminder === true ? 0 : (this.options.reminder * 1000)
+        );
+      }
     });
   }
 
@@ -53,48 +57,44 @@ export class PwaService {
   }
 
   get IS_INSTALLED() {
-    return this.status === 'installed';
+    return this.installed;
   }
 
-  get IS_AVAILABLE() {
-    return this.status === 'available';
+  get IS_REMINDER_COUNT() {
+    return this.reminderCount;
+  }
+
+  get IS_REMINDER_SHOWED() {
+    return this.reminderShowed;
   }
 
   get IS_REMINDER_ANNOYED() {
-    return this.count >= (this.options.reminderAnnoying || 3);
+    return this.reminderCount > (this.options.reminderAnnoying || 3);
   }
 
-  changeStatus(status: PWAStatus) {
-    // in app
-    this.status = status;
-    // if available
-    if (
-      status === 'available'
-      || (
-          status === 'unavailable'
-          && this.runtime === 'android-chrome'
-        )
-    ) {
-      this.timestamp = new Date().getTime();
-      this.localstorageService.set(this.LSK_REMINDER_TIMESTAMP, this.timestamp);
-      this.localstorageService.set(this.LSK_REMINDER_COUNT, ++this.count);
+  showReminder(manualShowed?: boolean) {
+    const isAndroidChromeFirstTime = this.runtime === 'android-chrome' && this.reminderCount === 0;
+    // not the first time on Chrome on Android
+    // use native propmt instead
+    this.reminderShowed = !isAndroidChromeFirstTime;
+    // save metrics
+    if (isAndroidChromeFirstTime || !manualShowed) {
+      this.reminderCount++;
+      this.reminderTimestamp = new Date().getTime();
+      this.localstorageService.set(this.LSK_REMINDER_COUNT, this.reminderCount);
+      this.localstorageService.set(this.LSK_REMINDER_TIMESTAMP, this.reminderTimestamp);
     }
-    // if installed
-    else if (status === 'installed') {
-      this.localstorageService.set(this.LSK_STATUS, status);
-    }
-  }
-
-  showReminder() {
-    this.changeStatus('available');
   }
 
   hideReminder() {
-    this.changeStatus('unavailable');
+    this.reminderShowed = false;
   }
 
   dismissReminder() {
-    this.changeStatus('installed');
+    this.hideReminder();
+    // set installed
+    this.installed = true;
+    this.localstorageService.set(this.LSK_INSTALLED, this.installed);
   }
 
   private setRuntime() {
@@ -130,40 +130,44 @@ export class PwaService {
     }
   }
 
-  private loadLocalData() {
+  private loadLocalMetrics() {
     return this.localstorageService.getBulk([
-      this.LSK_STATUS,
-      this.LSK_REMINDER_TIMESTAMP,
-      this.LSK_REMINDER_COUNT
+      this.LSK_INSTALLED,
+      this.LSK_REMINDER_COUNT,
+      this.LSK_REMINDER_TIMESTAMP
     ])
     .pipe(
-      mergeMap(([status, timestamp = 0, count = 0]) => {
-        const result = { status, timestamp, count };
-        // check local metrics
-        if (!status || status === 'available') {
-          const {reminderEvery, reminderMax} = this.options;
-          // is standalone
-          const isInstalled = 
+      mergeMap(([installed, reminderCount, reminderTimestamp, reminderShowed]) => {
+        installed = installed || false;
+        reminderCount = reminderCount || 0;
+        reminderTimestamp = reminderTimestamp || 0;
+        reminderShowed = reminderShowed || false;
+        // is standalone
+        if (!installed) {
+          installed = 
             (navigator as any).standalone || window.matchMedia('(display-mode: standalone)').matches;
-          // is available (for reminder)
-          const isAvailable =
-            // must not pass the maximum (if defined)
-            (!reminderMax || (count as number) < reminderMax)
-            // must expired
-            && (
-              (reminderEvery ? (reminderEvery * 60000) : 43200000 /* 12 hours */)
-              < (new Date().getTime() - new Date(timestamp as number).getTime())
-            )
-            // not first time on chrome on Android
-            && !(
-              this.runtime === 'android-chrome'
-              && (!count || count === 0)
-            );
-          result.status = (
-            isInstalled ? 'installed' : isAvailable ? 'available' : 'unavailable'
-          );
         }
-        return of(result);
+        // is reminder available
+        const {reminderEvery, reminderMax} = this.options;
+        reminderShowed =
+          // must not pass the maximum (if defined)
+          (!reminderMax || (reminderCount as number) < reminderMax)
+          // must expired
+          && (
+            (reminderEvery ? (reminderEvery * 60000) : 43200000 /* 12 hours */)
+            < (new Date().getTime() - new Date(reminderTimestamp as number).getTime())
+          );
+        return of({
+          installed,
+          reminderCount,
+          reminderTimestamp,
+          reminderShowed,
+        } as {
+          installed: boolean;
+          reminderCount: number;
+          reminderTimestamp: number;
+          reminderShowed: boolean;
+        });
       })
     );
   }

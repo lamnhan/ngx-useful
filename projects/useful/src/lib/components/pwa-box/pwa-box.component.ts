@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import {PwaService} from '../../services/pwa/pwa.service';
 
@@ -10,12 +10,15 @@ import {PwaService} from '../../services/pwa/pwa.service';
 export class PwaBoxComponent implements OnInit {
   @Input('pwaService') pwa?: PwaService;
 
-  @Input() icon = '/icons/icon-32x32.png';
-  @Input() title = 'App';
-  @Input() description = 'Add to your home screen.';
+  @Input() title = 'Install app?';
 
-  @Input() dismissText = 'Don\'t care';
+  @Input() icon = '/icons/icon-96x96.png';
+  @Input() name = 'App';
+  @Input() tagline = 'Add app to your home screen';
+
   @Input() actionText = 'Show me how';
+  @Output() action: EventEmitter<void> = new EventEmitter();
+  @Output() dismiss: EventEmitter<void> = new EventEmitter();
 
   constructor() {}
 

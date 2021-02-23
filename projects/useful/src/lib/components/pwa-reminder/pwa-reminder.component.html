@@ -2,7 +2,7 @@
   class="component-pwa-reminder"
   *ngIf="pwa && !pwa.IS_INSTALLED"
   [class]="pwa.RUNTIME"
-  [class.show]="pwa.IS_AVAILABLE"
+  [class.show]="pwa.IS_REMINDER_SHOWED"
   [class.annoyed]="pwa.IS_REMINDER_ANNOYED"
 >
 
