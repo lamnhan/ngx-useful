@@ -12,7 +12,8 @@
     "umdId": "ng.lamnhan.useful",
     "umdModuleIds": {
       "localforage": "localforage",
-      "howler": "howler"
+      "howler": "howler",
+      "firebase": "firebase"
     }
   },
   "whitelistedNonPeerDependencies": [
