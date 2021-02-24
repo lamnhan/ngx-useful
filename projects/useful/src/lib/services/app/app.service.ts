@@ -21,10 +21,6 @@ export class AppService {
 
   init(options: AppOptions = {}) {
     this.options = options;
-    // mark app loaded ok (prevent timeout - unsupported message)
-    if (this.options.splashScreen) {
-      this.getSplashScreenElement().classList.add('has-app');
-    }
     // set app host
     this.setHost();
     // set viewport
@@ -83,7 +79,7 @@ export class AppService {
   hideSplashScreen() {
     const elm = this.getSplashScreenElement();
     elm.classList.add('hidden');
-    setTimeout(() => elm.style.display = 'none', 700);
+    setTimeout(() => elm.style.display = 'none', 1000);
   }
 
   private getSplashScreenElement() {
