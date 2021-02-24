@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AuthService as AngularSheetbaseAuth } from '@sheetbase/angular';
 import { AuthUser } from '@lamnhan/schemata';
 
-export type AuthServices = AngularFireAuth | AngularSheetbaseAuth;
+export type AuthServices = AngularFireAuth;
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +20,9 @@ export class AuthService {
   }
 
   get SERVICE() {
+    if (!this.service) {
+      throw new Error('No auth service, please run init() first!');
+    }
     return this.service;
   }
 

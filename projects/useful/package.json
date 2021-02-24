@@ -24,7 +24,7 @@
     "@angular/router": "^11.0.9",
     "@angular/fire": "^6.1.4",
     "@lamnhan/schemata": "^1.0.3",
-    "@sheetbase/angular": "^3.0.0",
+    "firebase": "^8.2.9",
     "rxjs": "~6.6.0"
   },
   "dependencies": {
