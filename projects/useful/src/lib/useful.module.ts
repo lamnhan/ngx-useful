@@ -27,6 +27,7 @@ import {CurrencyService} from './services/currency/currency.service';
 import {NotifyService} from './services/notify/notify.service';
 import {CartService} from './services/cart/cart.service';
 import {PlayerService} from './services/player/player.service';
+import {AuthService} from './services/auth/auth.service';
 
 @NgModule({
   declarations: [],
@@ -58,6 +59,7 @@ import {PlayerService} from './services/player/player.service';
     NotifyService,
     CartService,
     PlayerService,
+    AuthService,
   ],
   exports: [
     OauthPopupComponentModule,

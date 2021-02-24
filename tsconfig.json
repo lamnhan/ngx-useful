@@ -19,6 +19,7 @@
       "es2018",
       "dom"
     ],
+    "skipLibCheck": true,
     "paths": {
       "@lamnhan/ngx-useful": [
         "dist/useful/useful",

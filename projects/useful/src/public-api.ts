@@ -42,3 +42,6 @@ export * from './lib/services/currency/currency.service';
 export * from './lib/services/notify/notify.service';
 export * from './lib/services/cart/cart.service';
 export * from './lib/services/player/player.service';
+export * from './lib/services/auth/auth.service';
+
+export * from './lib/guards/auth.guard';
