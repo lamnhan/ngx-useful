@@ -57,8 +57,8 @@ export class SettingService {
 
     // =======================================================
     // NOTE: Settings flow
-    // + Get: Remote (auth user) -> Local storage (if enabled) -> AppService -> Apply
-    // + Set: Apply -> AppService -> Local storage (if enabled) -> Remote (maybe?)
+    // + Get: Remote/cache (auth user) -> Local storage (if enabled) -> AppService -> Apply
+    // + Set: Apply -> AppService -> Local storage (if enabled) -> Remote/cache (maybe?)
     // =======================================================
     
     const {
@@ -78,10 +78,9 @@ export class SettingService {
     )
     .subscribe(uiSettings => {
       const [theme, persona] = uiSettings;
-      // change theme
-      if (theme) {
-        this.changeTheme(theme);
-      }
+      // set values
+      this.changeTheme(theme);
+      this.changePersona(persona);
       // hide splash screen
       if (this.appService.HAS_SPLASHSCREEN) {
         this.appService.hideSplashScreen();
