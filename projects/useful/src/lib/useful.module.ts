@@ -21,6 +21,7 @@ import {MetaService} from './services/meta/meta.service';
 import {AppService} from './services/app/app.service';
 import {NavService} from './services/nav/nav.service';
 import {SettingService} from './services/setting/setting.service';
+import {PersonaService} from './services/persona/persona.service';
 import {PwaService} from './services/pwa/pwa.service';
 import {DateService} from './services/date/date.service';
 import {CurrencyService} from './services/currency/currency.service';
@@ -28,7 +29,7 @@ import {NotifyService} from './services/notify/notify.service';
 import {CartService} from './services/cart/cart.service';
 import {PlayerService} from './services/player/player.service';
 import {AuthService} from './services/auth/auth.service';
-import {PersonaService} from './services/persona/persona.service';
+import {UserService} from './services/user/user.service';
 
 @NgModule({
   declarations: [],
@@ -54,6 +55,7 @@ import {PersonaService} from './services/persona/persona.service';
     AppService,
     NavService,
     SettingService,
+    PersonaService,
     PwaService,
     DateService,
     CurrencyService,
@@ -61,7 +63,7 @@ import {PersonaService} from './services/persona/persona.service';
     CartService,
     PlayerService,
     AuthService,
-    PersonaService,
+    UserService,
   ],
   exports: [
     OauthPopupComponentModule,

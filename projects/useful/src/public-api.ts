@@ -36,6 +36,7 @@ export * from './lib/services/meta/meta.service';
 export * from './lib/services/app/app.service';
 export * from './lib/services/nav/nav.service';
 export * from './lib/services/setting/setting.service';
+export * from './lib/services/persona/persona.service';
 export * from './lib/services/pwa/pwa.service';
 export * from './lib/services/date/date.service';
 export * from './lib/services/currency/currency.service';
@@ -43,6 +44,6 @@ export * from './lib/services/notify/notify.service';
 export * from './lib/services/cart/cart.service';
 export * from './lib/services/player/player.service';
 export * from './lib/services/auth/auth.service';
-export * from './lib/services/persona/persona.service';
+export * from './lib/services/user/user.service';
 
 export * from './lib/guards/auth.guard';
