@@ -1,22 +1,23 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { Observable, of, combineLatest } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { LocalstorageService } from '../localstorage/localstorage.service';
 import { AppService } from '../app/app.service';
 
-export interface BuiltinSettings {}
-
 export interface BuiltinUISettings {
   theme?: string;
+  persona?: string;
 }
 
-export interface AppSettings extends BuiltinSettings, BuiltinUISettings {}
+export interface BuiltinGeneralSettings {}
+
+export interface AppSettings extends BuiltinUISettings, BuiltinGeneralSettings {}
 
 export interface SettingOptions {
   browserColor?: boolean;
-  settingsLoader?: () => Observable<BuiltinSettings>,
-  settingsLoaderUI?: () => Observable<BuiltinUISettings>,
+  uiSettingsLoader?: () => Observable<BuiltinUISettings>,
+  generalSettingsLoader?: () => Observable<BuiltinGeneralSettings>,
 }
 
 @Injectable({
@@ -24,11 +25,14 @@ export interface SettingOptions {
 })
 export class SettingService {  
   private readonly LSK_THEME = 'setting_theme';
+  private readonly LSK_PERSONA = 'setting_persona';
 
   private options: SettingOptions = {};
+  private defaultSettings: AppSettings = {};
 
   // UI intensive settings
   private theme?: string;
+  private persona?: string;
 
   // other settings
   // ...
@@ -38,8 +42,18 @@ export class SettingService {
     private appService: AppService
   ) {}
 
-  init(options: SettingOptions = {}) {
+  init(
+    options: SettingOptions = {},
+    defaultSettings: AppSettings = {}
+  ) {
     this.options = options;
+    this.defaultSettings = {
+      // defaults
+      theme: 'light',
+      persona: 'default',
+      // custom
+      ...defaultSettings
+    };
 
     // =======================================================
     // NOTE: Settings flow
@@ -48,18 +62,22 @@ export class SettingService {
     // =======================================================
     
     const {
-      settingsLoaderUI = () => of({}),
-      settingsLoader = () => of({}),
+      uiSettingsLoader = () => of({} as BuiltinUISettings),
+      // generalSettingsLoader = () => of({} as BuiltinGeneralSettings),
     } = this.options;
 
     // handle UI intensive settings
-    settingsLoaderUI()
+    uiSettingsLoader()
     .pipe(
-      mergeMap(uiSettings => this.localUISettingsLoader(uiSettings)),
-      mergeMap(uiSettings => this.appUISettingsLoader(uiSettings)),
+      switchMap(uiSettings =>
+        combineLatest([
+          this.loadTheme(uiSettings.theme),
+          this.loadPersona(uiSettings.persona)
+        ])
+      ),
     )
     .subscribe(uiSettings => {
-      const {theme} = uiSettings;
+      const [theme, persona] = uiSettings;
       // change theme
       if (theme) {
         this.changeTheme(theme);
@@ -69,15 +87,14 @@ export class SettingService {
         this.appService.hideSplashScreen();
       }
     });
-
-    settingsLoader()
-    .subscribe(settings => {
-      // handle settings
-    });
   }
 
   get THEME() {
-    return this.theme;
+    return this.theme as string;
+  }
+
+  get PERSONA() {
+    return this.persona as string;
   }
   
   changeTheme(name: string) {
@@ -91,50 +108,47 @@ export class SettingService {
     // ...
   }
 
-  
-  private localUISettingsLoader(uiSettings: BuiltinUISettings) {
-    return of(uiSettings).pipe(
-      // .theme
-      mergeMap(({ theme }) =>
-        // pass value down
-        theme
-          ? of(theme)
-          // get from local
-          : this.localstorageService.get<string>(this.LSK_THEME)
-      ),
-      mergeMap(theme =>
-        of({...uiSettings, theme} as BuiltinUISettings)
-      ),
-      // other ui settings
-      // mergeMap(uiSettings => {})
-    );
+  changePersona(name: string) {
+    // in app
+    this.persona = name;
+    // local
+    this.localstorageService.set(this.LSK_PERSONA, name);
   }
   
-  private appUISettingsLoader(uiSettings: BuiltinUISettings) {
-    return of(uiSettings).pipe(
-      // .theme
-      mergeMap(({ theme }) =>
-        of(
-          // pass down
-          theme
-            ? theme
-            // default theme
-            : !this.options.browserColor
-              ? null
-              // browser scheme colors
+  private loadTheme(remoteTheme?: string) {
+    return remoteTheme
+      ? of(remoteTheme) // remote
+      // local
+      : this.localstorageService
+        .get<string>(this.LSK_THEME)
+        .pipe(
+          switchMap(theme => of(
+            theme
+              ? theme
+              // default
               : (
-                window.matchMedia
-                && window.matchMedia('(prefers-color-scheme: dark)').matches
+                this.options.browserColor
+                && (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
               )
                 ? 'dark'
-                : 'light'
-        )
-      ),
-      mergeMap(theme =>
-        of({...uiSettings, theme} as BuiltinUISettings)
-      ),
-      // other ui settings
-      // mergeMap(uiSettings => {})
-    );
+                : this.defaultSettings.theme as string
+          ))
+        );
+  }
+
+  private loadPersona(remotePersona?: string) {
+    return remotePersona
+      ? of(remotePersona) // remote
+      : this.localstorageService
+        .get<string>(this.LSK_PERSONA)
+        .pipe(
+          switchMap(persona => of(
+            // local
+            persona
+              ? persona
+              //default
+              : this.defaultSettings.persona as string
+          ))
+        );
   }
 }

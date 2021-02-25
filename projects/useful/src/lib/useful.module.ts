@@ -28,6 +28,7 @@ import {NotifyService} from './services/notify/notify.service';
 import {CartService} from './services/cart/cart.service';
 import {PlayerService} from './services/player/player.service';
 import {AuthService} from './services/auth/auth.service';
+import {PersonaService} from './services/persona/persona.service';
 
 @NgModule({
   declarations: [],
@@ -60,6 +61,7 @@ import {AuthService} from './services/auth/auth.service';
     CartService,
     PlayerService,
     AuthService,
+    PersonaService,
   ],
   exports: [
     OauthPopupComponentModule,
