@@ -14,6 +14,7 @@ export type NavRouterEventHooks = 'RouteConfigLoadStart' | 'RouteConfigLoadEnd' 
 
 export interface NavItem {
   text?: string;
+  shortText?: string;
   html?: string;
   icon?: string;
   classes?: string | string[];
@@ -26,8 +27,8 @@ export interface NavItem {
   handler?: (...args: unknown[]) => void; // click
 }
 
-export interface NavMenuItem extends NavItem {
-  subItems?: NavMenuItem[];
+export interface MenuItem extends NavItem {
+  subItems?: MenuItem[];
 }
 
 export type NavMetaModifier =
