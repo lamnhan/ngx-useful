@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { from } from 'rxjs';
+import { from, Subject } from 'rxjs';
 import firebase from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 // import { AuthService as AngularSheetbaseAuth, User as SheetbaseUser } from '@sheetbase/angular';
-import { AuthUser } from '@lamnhan/schemata';
+
+import { AuthNativeUser } from '../user/user.service';
 
 export type AuthServices = AngularFireAuth; // | AngularSheetbaseAuth
-export type AuthNativeUser = firebase.User | AuthUser; // | SheetbaseUser
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +16,8 @@ export class AuthService {
   private service?: AuthServices;
 
   private redirectUrl: null | string = null;
-  private nativeUser: null | AuthNativeUser = null; // native (firebase/sheetbase) user object
-  private user: null | AuthUser = null; // @lamnhan/schemata user
+  private isAuth?: boolean;
+  public readonly onAuthStateChanged: Subject<null | AuthNativeUser> = new Subject();
 
   constructor() {}
 
@@ -25,7 +25,10 @@ export class AuthService {
     this.service = service;
     this.driver = driver || (service as any).name;
     // watch for changed
-    this.service.onAuthStateChanged(user => this.authChanged(user));
+    this.service.onAuthStateChanged(user => {
+      this.isAuth = !!user; // change status
+      this.onAuthStateChanged.next(user); // emit
+    });
   }
 
   get DRIVER() {
@@ -42,16 +45,12 @@ export class AuthService {
     return this.service;
   }
 
-  get NATIVE_USER() {
-    return this.nativeUser;
-  }
-
-  get USER() {
-    return this.user;
-  }
-
   get REDIRECT_URL() {
     return this.redirectUrl;
+  }
+
+  get IS_AUTH() {
+    return this.isAuth;
   }
 
   setRedirectUrl(url: null | string) {
@@ -87,16 +86,5 @@ export class AuthService {
 
   signOut() {
     return from(this.SERVICE.signOut());
-  }
-
-  private authChanged(nativeUser: null | AuthNativeUser) {
-    // raw user
-    this.nativeUser = nativeUser;
-    // auth user
-    if (!nativeUser) {
-      this.user = null;
-    } else {
-      this.user = nativeUser as unknown as AuthUser;
-    }
   }
 }
