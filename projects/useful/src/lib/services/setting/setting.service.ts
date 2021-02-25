@@ -8,6 +8,7 @@ import { AppService } from '../app/app.service';
 export interface BuiltinUISettings {
   theme?: string;
   persona?: string;
+  locale?: string;
 }
 
 export interface BuiltinGeneralSettings {}
@@ -26,6 +27,7 @@ export interface SettingOptions {
 export class SettingService {  
   private readonly LSK_THEME = 'setting_theme';
   private readonly LSK_PERSONA = 'setting_persona';
+  private readonly LSK_LOCALE = 'setting_locale';
 
   private options: SettingOptions = {};
   private defaultSettings: AppSettings = {};
@@ -33,6 +35,7 @@ export class SettingService {
   // UI intensive settings
   private theme?: string;
   private persona?: string;
+  private locale?: string;
 
   // other settings
   // ...
@@ -51,6 +54,7 @@ export class SettingService {
       // defaults
       theme: 'light',
       persona: 'default',
+      locale: 'en-US',
       // custom
       ...defaultSettings
     };
@@ -72,15 +76,17 @@ export class SettingService {
       switchMap(uiSettings =>
         combineLatest([
           this.loadTheme(uiSettings.theme),
-          this.loadPersona(uiSettings.persona)
+          this.loadPersona(uiSettings.persona),
+          this.loadLocale(uiSettings.locale)
         ])
       ),
     )
     .subscribe(uiSettings => {
-      const [theme, persona] = uiSettings;
+      const [theme, persona, locale] = uiSettings;
       // set values
       this.changeTheme(theme);
       this.changePersona(persona);
+      this.changeLocale(locale);
       // hide splash screen
       if (this.appService.HAS_SPLASHSCREEN) {
         this.appService.hideSplashScreen();
@@ -95,6 +101,10 @@ export class SettingService {
   get PERSONA() {
     return this.persona as string;
   }
+
+  get LOCALE() {
+    return this.locale as string;
+  }
   
   changeTheme(name: string) {
     // handler
@@ -108,10 +118,13 @@ export class SettingService {
   }
 
   changePersona(name: string) {
-    // in app
     this.persona = name;
-    // local
     this.localstorageService.set(this.LSK_PERSONA, name);
+  }
+
+  changeLocale(value: string) {
+    this.locale = value;
+    this.localstorageService.set(this.LSK_LOCALE, value);
   }
   
   private loadTheme(remoteTheme?: string) {
@@ -147,6 +160,22 @@ export class SettingService {
               ? persona
               //default
               : this.defaultSettings.persona as string
+          ))
+        );
+  }
+
+  private loadLocale(remoteLocale?: string) {
+    return remoteLocale
+      ? of(remoteLocale) // remote
+      : this.localstorageService
+        .get<string>(this.LSK_LOCALE)
+        .pipe(
+          switchMap(locale => of(
+            // local
+            locale
+              ? locale
+              //default
+              : this.defaultSettings.locale as string
           ))
         );
   }
