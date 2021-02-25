@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 import { LocalstorageService } from '../localstorage/localstorage.service';
 
@@ -142,7 +142,7 @@ export class PwaService {
       this.LSK_REMINDER_TIMESTAMP
     ])
     .pipe(
-      mergeMap(([installed, reminderCount, reminderTimestamp, reminderShowed]) => {
+      switchMap(([installed, reminderCount, reminderTimestamp, reminderShowed]) => {
         installed =
         // implicit installed
           installed

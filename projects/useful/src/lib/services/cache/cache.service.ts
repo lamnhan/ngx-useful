@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { mergeMap, catchError } from 'rxjs/operators';
+import { switchMap, catchError } from 'rxjs/operators';
 
 import {
   LocalstorageService,
@@ -54,7 +54,7 @@ export class CacheService {
     return this.localstorageService
       .set<number>(key + '__expiration', new Date().getTime() + cacheTime * 60000)
       .pipe(
-        mergeMap(() => this.localstorageService.set<Data>(key, data))
+        switchMap(() => this.localstorageService.set<Data>(key, data))
       );
   }
 
@@ -67,7 +67,7 @@ export class CacheService {
     return this.localstorageService
     .get<number>(key + '__expiration')
     .pipe(
-      mergeMap(expiration => {
+      switchMap(expiration => {
         const isExpired = !expiration || expiration <= new Date().getTime();
         // not expired
         if (!isExpired) {
@@ -83,7 +83,7 @@ export class CacheService {
         }
       }),
       // result
-      mergeMap(data => !data
+      switchMap(data => !data
         // no data
         ? of(null)
         // has data
@@ -119,7 +119,7 @@ export class CacheService {
     return this.localstorageService
       .remove(key + '__expiration')
       .pipe(
-        mergeMap(() => this.localstorageService.remove(key))
+        switchMap(() => this.localstorageService.remove(key))
       );
   }
 
