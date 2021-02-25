@@ -5,33 +5,33 @@ import { AngularFireAuth } from '@angular/fire/auth';
 // import { AuthService as AngularSheetbaseAuth, User as SheetbaseUser } from '@sheetbase/angular';
 import { AuthUser } from '@lamnhan/schemata';
 
-export type AuthDrivers = 'firebase' | 'sheetbase';
 export type AuthServices = AngularFireAuth; // | AngularSheetbaseAuth
-export type AuthNativeUser = firebase.User; // | SheetbaseUser
+export type AuthNativeUser = firebase.User | AuthUser; // | SheetbaseUser
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private driver: AuthDrivers = 'firebase';
+  private driver?: string;
   private service?: AuthServices;
-  private nativeUser: null | AuthNativeUser = null; // native (firebase/sheetbase) user object
 
-  private user: null | AuthUser = null; // @lamnhan/schemata user
   private redirectUrl: null | string = null;
+  private nativeUser: null | AuthNativeUser = null; // native (firebase/sheetbase) user object
+  private user: null | AuthUser = null; // @lamnhan/schemata user
 
   constructor() {}
 
-  init(service: AuthServices, driver: AuthDrivers = 'firebase') {
-    this.driver = driver;
+  init(service: AuthServices, driver?: string) {
     this.service = service;
+    this.driver = driver || (service as any).name;
     // watch for changed
-    if (this.driver === 'firebase') {
-      this.service.onAuthStateChanged(user => this.authChanged(user));
-    }
+    this.service.onAuthStateChanged(user => this.authChanged(user));
   }
 
   get DRIVER() {
+    if (!this.driver) {
+      throw new Error('Invalid driver, please provide when init().');
+    }
     return this.driver;
   }
 
@@ -65,6 +65,10 @@ export class AuthService {
   signInWithEmailAndPassword(email: string, password: string) {
     return from(this.SERVICE.signInWithEmailAndPassword(email, password));
   }
+
+  sendPasswordResetEmail(email: string) {
+    return from(this.SERVICE.sendPasswordResetEmail(email));
+  }
   
   signInWithPopupForGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -79,10 +83,6 @@ export class AuthService {
   signInWithPopupForGithub() {
     const provider = new firebase.auth.GithubAuthProvider();
     return from(this.SERVICE.signInWithPopup(provider));
-  }
-
-  sendPasswordResetEmail(email: string) {
-    return from(this.SERVICE.sendPasswordResetEmail(email));
   }
 
   signOut() {

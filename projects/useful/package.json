@@ -23,7 +23,7 @@
     "@angular/platform-browser": "~11.0.9",
     "@angular/router": "^11.0.9",
     "@angular/fire": "^6.1.4",
-    "@lamnhan/schemata": "^1.0.3",
+    "@lamnhan/schemata": "0.0.1",
     "firebase": "^8.2.9",
     "rxjs": "~6.6.0"
   },

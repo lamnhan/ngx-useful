@@ -13,7 +13,7 @@
     "umdModuleIds": {
       "localforage": "localforage",
       "howler": "howler",
-      "firebase": "firebase"
+      "firebase/app": "firebase"
     }
   },
   "whitelistedNonPeerDependencies": [

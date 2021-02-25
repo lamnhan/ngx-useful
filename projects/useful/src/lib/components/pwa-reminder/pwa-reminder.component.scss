@@ -69,14 +69,8 @@
       }
   
       button.close {
-        background: none;
-        border: none;
         color: var(--app-color-medium);
         margin-top: -1.5rem;
-
-        &:hover, &:focus, &:active {
-          outline: 0;
-        }
       }
     }
   

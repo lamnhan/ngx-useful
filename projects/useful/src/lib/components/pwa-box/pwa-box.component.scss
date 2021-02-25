@@ -13,13 +13,7 @@
     }
 
     button.close {
-      background: none;
-      border: none;
       color: var(--app-color-medium);
-
-      &:hover, &:focus, &:active {
-        outline: 0;
-      }
     }
   }
 
