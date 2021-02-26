@@ -13,6 +13,8 @@ import { DatexPipeModule } from './pipes/datex/datex.module';
 import { AgoPipeModule } from './pipes/ago/ago.module';
 import { ListPipeModule } from './pipes/list/list.module';
 
+import { RouterLinkDirectiveModule } from './directives/router-link/router-link.module';
+
 import {HelperService} from './services/helper/helper.service';
 import {LocalstorageService} from './services/localstorage/localstorage.service';
 import {CacheService} from './services/cache/cache.service';
@@ -45,6 +47,7 @@ import {UserService} from './services/user/user.service';
     DatexPipeModule,
     AgoPipeModule,
     ListPipeModule,
+    RouterLinkDirectiveModule,
   ],
   providers: [
     HelperService,
@@ -77,6 +80,7 @@ import {UserService} from './services/user/user.service';
     DatexPipeModule,
     AgoPipeModule,
     ListPipeModule,
+    RouterLinkDirectiveModule,
   ]
 })
 export class UsefulModule { }

@@ -182,12 +182,15 @@ export class NavService {
   }
 
   navigate(
-    route: string[],
+    route: string | string[],
     data: Record<string, unknown> = {},
     navigationExtras?: NavigationExtras,
   ) {
     this.routingData = data; // set route data
-    return this.ROUTER.navigate(route, navigationExtras);
+    return this.ROUTER.navigate(
+      typeof route === 'string' ? [route] : route,
+      navigationExtras
+    );
   }
 
   scrollToTop() {
