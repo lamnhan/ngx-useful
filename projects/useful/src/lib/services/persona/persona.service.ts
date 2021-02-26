@@ -19,30 +19,30 @@ export type PersonaData = Record<string, PersonaProperties>;
 })
 export class PersonaService {
   private data: PersonaData = {};
-  private menuRegister?: Record<string, MenuItem>;
+  private menuRegistry?: Record<string, MenuItem>;
 
   constructor(private settingService: SettingService) {}
 
   init(
     data: PersonaData = {},
-    menuRegister?: Record<string, MenuItem>,
+    menuRegistry?: Record<string, MenuItem>,
   ) {
     // proccess menu & secondary menu
-    if (menuRegister) {
+    if (menuRegistry) {
       Object.keys(data).forEach(persona => {
         const {menu, secondaryMenu} = data[persona];
         if (menu) {
           data[persona].menu =
-            menu.map(value => typeof value === 'string' ? menuRegister[value] : value);
+            menu.map(value => typeof value === 'string' ? menuRegistry[value] : value);
         }
         if (secondaryMenu) {
           data[persona].secondaryMenu =
-            secondaryMenu.map(value => typeof value === 'string' ? menuRegister[value] : value);
+            secondaryMenu.map(value => typeof value === 'string' ? menuRegistry[value] : value);
         }
       });
     }
     // save data
-    this.menuRegister = menuRegister;
+    this.menuRegistry = menuRegistry;
     this.data = data;
   }
 

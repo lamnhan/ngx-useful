@@ -4,6 +4,7 @@ import { switchMap } from 'rxjs/operators';
 
 import { LocalstorageService } from '../localstorage/localstorage.service';
 import { AppService } from '../app/app.service';
+import { UserService } from '../user/user.service';
 
 export interface BuiltinUISettings {
   theme?: string;
@@ -17,8 +18,7 @@ export interface AppSettings extends BuiltinUISettings, BuiltinGeneralSettings {
 
 export interface SettingOptions {
   browserColor?: boolean;
-  uiSettingsLoader?: () => Observable<BuiltinUISettings>,
-  generalSettingsLoader?: () => Observable<BuiltinGeneralSettings>,
+  withAuth?: boolean;
 }
 
 @Injectable({
@@ -42,7 +42,8 @@ export class SettingService {
 
   constructor(
     private localstorageService: LocalstorageService,
-    private appService: AppService
+    private appService: AppService,
+    private userService: UserService,
   ) {}
 
   init(
@@ -58,40 +59,34 @@ export class SettingService {
       // custom
       ...defaultSettings
     };
-
-    // =======================================================
-    // NOTE: Settings flow
-    // + Get: Remote/cache (auth user) -> Local storage (if enabled) -> AppService -> Apply
-    // + Set: Apply -> AppService -> Local storage (if enabled) -> Remote/cache (maybe?)
-    // =======================================================
-    
-    const {
-      uiSettingsLoader = () => of({} as BuiltinUISettings),
-      // generalSettingsLoader = () => of({} as BuiltinGeneralSettings),
-    } = this.options;
-
     // handle UI intensive settings
-    uiSettingsLoader()
+    this.remoteLoader()
     .pipe(
       switchMap(uiSettings =>
         combineLatest([
+          this.loadLocale(uiSettings.locale),
           this.loadTheme(uiSettings.theme),
           this.loadPersona(uiSettings.persona),
-          this.loadLocale(uiSettings.locale)
         ])
       ),
     )
     .subscribe(uiSettings => {
-      const [theme, persona, locale] = uiSettings;
+      const [locale, theme, persona] = uiSettings;
       // set values
+      this.changeLocale(locale);
       this.changeTheme(theme);
       this.changePersona(persona);
-      this.changeLocale(locale);
       // hide splash screen
-      if (this.appService.HAS_SPLASHSCREEN) {
-        this.appService.hideSplashScreen();
-      }
+      this.appService.hideSplashScreen();
     });
+  }
+
+  get LOCALE() {
+    return this.locale as string;
+  }
+
+  get LANG() {
+    return (this.locale as string).split('-').shift();
   }
 
   get THEME() {
@@ -100,10 +95,6 @@ export class SettingService {
 
   get PERSONA() {
     return this.persona as string;
-  }
-
-  get LOCALE() {
-    return this.locale as string;
   }
   
   changeTheme(name: string) {
@@ -126,7 +117,31 @@ export class SettingService {
     this.locale = value;
     this.localstorageService.set(this.LSK_LOCALE, value);
   }
-  
+
+  private remoteLoader() {
+    return !this.options.withAuth
+      ? of({} as AppSettings)
+      : this.userService.onUserReady.pipe(
+        switchMap(user => of(user ? (user as AppSettings) : {})),
+      );
+  }
+
+  private loadLocale(remoteLocale?: string) {
+    return remoteLocale
+      ? of(remoteLocale) // remote
+      : this.localstorageService
+        .get<string>(this.LSK_LOCALE)
+        .pipe(
+          switchMap(locale => of(
+            // local
+            locale
+              ? locale
+              //default
+              : this.defaultSettings.locale as string
+          ))
+        );
+  }
+
   private loadTheme(remoteTheme?: string) {
     return remoteTheme
       ? of(remoteTheme) // remote
@@ -160,22 +175,6 @@ export class SettingService {
               ? persona
               //default
               : this.defaultSettings.persona as string
-          ))
-        );
-  }
-
-  private loadLocale(remoteLocale?: string) {
-    return remoteLocale
-      ? of(remoteLocale) // remote
-      : this.localstorageService
-        .get<string>(this.LSK_LOCALE)
-        .pipe(
-          switchMap(locale => of(
-            // local
-            locale
-              ? locale
-              //default
-              : this.defaultSettings.locale as string
           ))
         );
   }

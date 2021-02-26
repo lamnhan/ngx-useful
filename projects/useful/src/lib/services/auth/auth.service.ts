@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { from, BehaviorSubject } from 'rxjs';
+import { from, ReplaySubject } from 'rxjs';
 import firebase from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 // import { AuthService as AngularSheetbaseAuth, User as SheetbaseUser } from '@sheetbase/angular';
@@ -17,7 +17,8 @@ export class AuthService {
 
   private redirectUrl: null | string = null;
   private isAuth?: boolean;
-  public readonly onAuthStateChanged: BehaviorSubject<null | AuthNativeUser> = new BehaviorSubject(null as any);
+
+  public readonly onAuthStateChanged: ReplaySubject<null | AuthNativeUser> = new ReplaySubject(1);
 
   constructor() {}
 

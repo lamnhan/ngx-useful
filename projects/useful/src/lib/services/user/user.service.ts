@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { ReplaySubject } from 'rxjs';
 import firebase from 'firebase/app';
 import { AuthUser } from '@lamnhan/schemata';
 
@@ -12,6 +13,8 @@ export type AuthNativeUser = firebase.User | AuthUser; // | SheetbaseUser
 export class UserService {
   private nativeUser: null | AuthNativeUser = null; // native (firebase/sheetbase) user object
   private user: null | AuthUser = null; // @lamnhan/schemata user
+
+  public readonly onUserReady: ReplaySubject<null | AuthUser> = new ReplaySubject(1);
 
   constructor(private authService: AuthService) {}
   
@@ -38,5 +41,7 @@ export class UserService {
     } else {
       this.user = nativeUser as unknown as AuthUser;
     }
+    // emit user ready
+    this.onUserReady.next(this.user);
   }
 }

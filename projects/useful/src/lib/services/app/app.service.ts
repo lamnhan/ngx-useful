@@ -70,16 +70,12 @@ export class AppService {
     }
   }
 
-  showSplashScreen() {
-    const elm = this.getSplashScreenElement();
-    elm.classList.remove('hidden');
-    elm.style.display = 'flex';
-  }
-
   hideSplashScreen() {
-    const elm = this.getSplashScreenElement();
-    elm.classList.add('hidden');
-    setTimeout(() => elm.style.display = 'none', 1000);
+    if (this.HAS_SPLASHSCREEN) {
+      const elm = this.getSplashScreenElement();
+      elm.classList.add('hidden');
+      setTimeout(() => elm.parentNode?.removeChild(elm), 1000);
+    }
   }
 
   private getSplashScreenElement() {
