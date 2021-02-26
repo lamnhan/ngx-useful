@@ -97,9 +97,6 @@ export class NavService {
   }
 
   get ROUTER() {
-    if (!this.router) {
-      throw new Error('No router, please set first!');
-    }
     return this.router;
   }
 

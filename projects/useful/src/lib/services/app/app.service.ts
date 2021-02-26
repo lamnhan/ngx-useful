@@ -28,10 +28,6 @@ export class AppService {
     this.setViewport();
   }
 
-  get HAS_SPLASHSCREEN() {
-    return this.options.splashScreen;
-  }
-
   get CUSTOM_DATA() {
     return this.options.customData;
   }
@@ -71,22 +67,17 @@ export class AppService {
   }
 
   hideSplashScreen() {
-    if (this.HAS_SPLASHSCREEN) {
-      const elm = this.getSplashScreenElement();
-      elm.classList.add('hidden');
-      setTimeout(() => elm.parentNode?.removeChild(elm), 1000);
+    if (this.options.splashScreen) {
+      const elm = document.getElementById(
+        typeof this.options.splashScreen === 'string'
+          ? this.options.splashScreen
+          : 'app-splash-screen'
+      );
+      if (elm) {
+        elm.classList.add('hidden');
+        setTimeout(() => elm.parentNode?.removeChild(elm), 1000);
+      }
     }
-  }
-
-  private getSplashScreenElement() {
-    const id = typeof this.options.splashScreen === 'string'
-      ? this.options.splashScreen
-      : 'app-splash-screen';
-    const elm = document.getElementById(id);
-    if (!this.options.splashScreen || !elm) {
-      throw new Error('No in-app splash screen by the id #' + id);
-    }
-    return elm;
   }
 
   private setHost() {
