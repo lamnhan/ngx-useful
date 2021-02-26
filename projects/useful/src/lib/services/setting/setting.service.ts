@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, combineLatest } from 'rxjs';
+import { of, combineLatest } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 
 import { LocalstorageService } from '../localstorage/localstorage.service';
 import { AppService } from '../app/app.service';
@@ -19,6 +20,7 @@ export interface AppSettings extends BuiltinUISettings, BuiltinGeneralSettings {
 export interface SettingOptions {
   browserColor?: boolean;
   withAuth?: boolean;
+  translateService?: TranslateService;
 }
 
 @Injectable({
@@ -86,7 +88,7 @@ export class SettingService {
   }
 
   get LANG() {
-    return (this.locale as string).split('-').shift();
+    return (this.locale as string).split('-').shift() as string;
   }
 
   get THEME() {
@@ -96,26 +98,27 @@ export class SettingService {
   get PERSONA() {
     return this.persona as string;
   }
-  
+
+  changeLocale(value: string) {
+    if (this.options.translateService) {
+      this.options.translateService.use(this.LANG);
+    }
+    // set value
+    this.locale = value;
+    this.localstorageService.set(this.LSK_LOCALE, value);
+  }
+
   changeTheme(name: string) {
-    // handler
     document.body.setAttribute('data-theme', name);
-    // in app
+    // set value
     this.theme = name;
-    // local
     this.localstorageService.set(this.LSK_THEME, name);
-    // remote
-    // ...
+    // TODO: remote
   }
 
   changePersona(name: string) {
     this.persona = name;
     this.localstorageService.set(this.LSK_PERSONA, name);
-  }
-
-  changeLocale(value: string) {
-    this.locale = value;
-    this.localstorageService.set(this.LSK_LOCALE, value);
   }
 
   private remoteLoader() {
