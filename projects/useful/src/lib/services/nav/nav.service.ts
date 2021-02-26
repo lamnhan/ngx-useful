@@ -39,7 +39,6 @@ export type NavMetaModifier =
   providedIn: 'root'
 })
 export class NavService {
-  private router?: Router;
   private routingData: Record<string, unknown> = {};
   private routingMetaRecords: Record<string, AppCustomMetas> = {};
 
@@ -48,16 +47,16 @@ export class NavService {
   private previousUrls: string[] = [];
   private isMenuVisible = false; // secondary/mobile menu
 
-  constructor(private metaService: MetaService) {}
+  constructor(
+    private router: Router,
+    private metaService: MetaService,
+  ) {}
 
   init(
-    router: Router,
     hooks: {
       [key in NavRouterEventHooks]?: (event: Event) => void;
     } = {},
   ) {
-    // set router
-    this.router = router;
     // register events
     this.router
       .events
