@@ -14,8 +14,8 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
   private input: string | string[] = '';
   private subscription: Subscription;
 
-  @Input() set usefulRouterLink(input: string | string[]) {
-    this.input = input;
+  @Input() set usefulRouterLink(input: undefined | null | string | string[]) {
+    this.input = input || '';
   }
 
   @HostBinding() href!: string;
