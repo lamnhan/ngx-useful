@@ -19,6 +19,7 @@ export interface AppSettings extends BuiltinUISettings, BuiltinGeneralSettings {
 
 export interface SettingOptions {
   browserColor?: boolean;
+  browserLocale?: boolean;
   withAuth?: boolean;
   translateService?: TranslateService;
 }
@@ -180,6 +181,8 @@ export class SettingService {
             // local
             locale
               ? locale
+              : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
+              ? navigator.language
               //default
               : this.defaultSettings.locale as string
           ))
