@@ -56,15 +56,15 @@ export function i18nRoutes(
     // main
     allRoutes.push(route);
     // localizations
-    Object.keys(translations).forEach(path => {
-      const localizations = translations[path as string];
-      Object.keys(localizations).forEach(locale => {
-        const localizedPath = localizations[locale];
+    const translation = translations[route.path as string];
+    if (translation) {
+      Object.keys(translation).forEach(locale => {
+        const localizedPath = translation[locale];
         if (localizedPath !== true) {
           allRoutes.push({ ...route, path: localizedPath });
         }
       });
-    });
+    }
   });
   // oops
   if (oopsRoute) {
@@ -81,10 +81,13 @@ export class NavService {
   private routingData: Record<string, unknown> = {};
   private routingMetaRecords: Record<string, AppCustomMetas> = {};
 
+  // general
   private loading = false;
-  private loadingIndicatorTimeout?: any;
+  private loadingIndicatorTimer?: any;
   private previousUrls: string[] = [];
   private isMenuVisible = false; // secondary/mobile menu
+
+  // i18n
 
   constructor(
     private router: Router,
@@ -107,13 +110,13 @@ export class NavService {
       if (event instanceof RouteConfigLoadStart) {
         eventName = 'RouteConfigLoadStart';
         // show loading indicator (longer than 1s)
-        this.loadingIndicatorTimeout =
+        this.loadingIndicatorTimer =
           setTimeout(() => this.showLoadingIndicator(), 1000);
       } else if (event instanceof RouteConfigLoadEnd) {
         eventName = 'RouteConfigLoadEnd';
         // hide loadding
-        if (this.loadingIndicatorTimeout) {
-          clearTimeout(this.loadingIndicatorTimeout);
+        if (this.loadingIndicatorTimer) {
+          clearTimeout(this.loadingIndicatorTimer);
           setTimeout(() => this.hideLoadingIndicator(), 1000);
         }
       } else if (event instanceof NavigationEnd) {
