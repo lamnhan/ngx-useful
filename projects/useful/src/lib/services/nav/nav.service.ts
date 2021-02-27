@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
   Router,
+  Route,
+  Routes,
+  LoadChildrenCallback,
   Event,
   RouteConfigLoadStart,
   RouteConfigLoadEnd,
@@ -35,6 +38,42 @@ export type NavMetaModifier =
   | string
   | { (input: Record<string, unknown>): string };
 
+export interface RouteTranslations {
+  [path: string]: Record<string, true | string>;
+}
+
+export function i18nRoutes(
+  routes: Routes,
+  translations: RouteTranslations,
+  homeRoute: Route,
+  oopsRoute?: Route
+): Routes {
+  const allRoutes: Routes = [];
+  // home
+  allRoutes.push(homeRoute);
+  // routes
+  routes.forEach(route => {
+    // main
+    allRoutes.push(route);
+    // localizations
+    Object.keys(translations).forEach(path => {
+      const localizations = translations[path as string];
+      Object.keys(localizations).forEach(locale => {
+        const localizedPath = localizations[locale];
+        if (localizedPath !== true) {
+          allRoutes.push({ ...route, path: localizedPath });
+        }
+      });
+    });
+  });
+  // oops
+  if (oopsRoute) {
+    allRoutes.push(oopsRoute);
+  }
+  // result
+  return allRoutes;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -53,10 +92,13 @@ export class NavService {
   ) {}
 
   init(
-    hooks: {
-      [key in NavRouterEventHooks]?: (event: Event) => void;
-    } = {},
+    i18nRegistry?: { routes: Routes; routeTranslations: RouteTranslations; },
+    hooks: { [key in NavRouterEventHooks]?: (event: Event) => void; } = {},
   ) {
+    // handle i18n
+    if (i18nRegistry) {
+
+    }
     // register events
     this.router
       .events
