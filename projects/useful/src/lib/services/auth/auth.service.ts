@@ -6,14 +6,14 @@ import { AngularFireAuth } from '@angular/fire/auth';
 
 import { AuthNativeUser } from '../user/user.service';
 
-export type AuthServices = AngularFireAuth; // | AngularSheetbaseAuth
+export type VendorAuthService = AngularFireAuth; // | AngularSheetbaseAuth
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private driver?: string;
-  private service?: AuthServices;
+  private service?: VendorAuthService;
 
   private redirectUrl: null | string = null;
   private isAuth?: boolean;
@@ -22,7 +22,7 @@ export class AuthService {
 
   constructor() {}
 
-  init(service: AuthServices, driver?: string) {
+  init(service: VendorAuthService, driver?: string) {
     this.service = service;
     this.driver = driver || (service as any).name;
     // watch for changed

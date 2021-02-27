@@ -3,7 +3,6 @@ import {
   Router,
   Route,
   Routes,
-  LoadChildrenCallback,
   Event,
   RouteConfigLoadStart,
   RouteConfigLoadEnd,
@@ -12,6 +11,7 @@ import {
 } from '@angular/router';
 
 import { MetaService, AppCustomMetas } from '../meta/meta.service';
+import { SettingService } from '../setting/setting.service';
 
 export type NavRouterEventHooks = 'RouteConfigLoadStart' | 'RouteConfigLoadEnd' | 'NavigationEnd';
 
@@ -42,9 +42,16 @@ export interface RouteTranslations {
   [path: string]: Record<string, true | string>;
 }
 
+export interface I18nRoutingItem {
+  [local: string]: string;
+}
+export interface I18nRouting {
+  [path: string]: I18nRoutingItem;
+}
+
 export function i18nRoutes(
   routes: Routes,
-  translations: RouteTranslations,
+  routeTranslations: RouteTranslations,
   homeRoute: Route,
   oopsRoute?: Route
 ): Routes {
@@ -56,7 +63,7 @@ export function i18nRoutes(
     // main
     allRoutes.push(route);
     // localizations
-    const translation = translations[route.path as string];
+    const translation = routeTranslations[route.path as string];
     if (translation) {
       Object.keys(translation).forEach(locale => {
         const localizedPath = translation[locale];
@@ -88,10 +95,12 @@ export class NavService {
   private isMenuVisible = false; // secondary/mobile menu
 
   // i18n
+  private i18nRouting: I18nRouting = {};
 
   constructor(
     private router: Router,
     private metaService: MetaService,
+    private settingService: SettingService,
   ) {}
 
   init(
@@ -100,7 +109,21 @@ export class NavService {
   ) {
     // handle i18n
     if (i18nRegistry) {
-
+      const { routes, routeTranslations } = i18nRegistry;
+      routes.forEach(route => {
+        const routingItem: I18nRoutingItem = {};
+        // proccess translate
+        const path = route.path as string;
+        const translation = routeTranslations[path];
+        if (translation) {
+          Object.keys(translation).forEach(locale => {
+            const localizedPath = translation[locale];
+            routingItem[locale] = localizedPath !== true ? localizedPath : path;
+          });
+        }
+        // save
+        this.i18nRouting[path] = routingItem;
+      });
     }
     // register events
     this.router
@@ -141,14 +164,6 @@ export class NavService {
     return this as NavService;
   }
 
-  get ROUTER() {
-    return this.router;
-  }
-
-  get DATA() {
-    return this.routingData;
-  }
-
   get IS_LOADING() {
     return this.loading;
   }
@@ -165,11 +180,20 @@ export class NavService {
   }
 
   get MENU_ICON() {
-    return this.menuIcon();
+    return this.getMenuIcon();
   }
 
-  menuIcon(menuCls = 'icon-menu', backCls = 'icon-back') {
+  get I18N_ROUTING() {
+    return this.i18nRouting;
+  }
+
+  getMenuIcon(menuCls = 'icon-menu', backCls = 'icon-back') {
     return this.IS_BACKABLE ? backCls : menuCls;
+  }
+
+  getI18nPath(originalPath: string) {
+    const locale = this.settingService.LOCALE;
+    return this.i18nRouting[originalPath][locale] || originalPath;
   }
 
   get(key?: string) {
@@ -228,7 +252,7 @@ export class NavService {
     navigationExtras?: NavigationExtras,
   ) {
     this.routingData = data; // set route data
-    return this.ROUTER.navigate(
+    return this.router.navigate(
       typeof route === 'string' ? [route] : route,
       navigationExtras
     );
