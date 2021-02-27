@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { MetaService } from '../meta/meta.service';
 
 export interface AppOptions {
-  customData?: Record<string, unknown>;
   splashScreen?: boolean | string;
 }
 
@@ -16,32 +15,37 @@ export interface BuiltinData {
 })
 export class AppService {
   private options: AppOptions = {};
+  
+  // builtin data
+  private locales: string[] = ['en-US'];
 
+  // custom data
+  private customData: Record<string, unknown> = {};
+
+  // auto data
   private host = '';
   private viewWidth = 0;
   private viewHeight = 0;
-  private locales: string[] = ['en-US'];
 
   constructor(private metaService: MetaService) {}
 
   init(
     options: AppOptions = {},
-    builtinData: BuiltinData = {}
+    builtinData: BuiltinData = {},
+    customData: Record<string, unknown> = {}
   ) {
     this.options = options;
     // set locales
     if (builtinData.locales) {
       this.locales = builtinData.locales;
     }
+    // custom data
+    this.customData = customData;
     // set app host
     this.setHost();
     // set viewport
     window.addEventListener('resize', () => this.setViewport());
     this.setViewport();
-  }
-
-  get CUSTOM_DATA() {
-    return this.options.customData;
   }
 
   get HOST() {
@@ -60,12 +64,16 @@ export class AppService {
     return this.locales;
   }
 
+  get CUSTOM_DATA() {
+    return this.customData;
+  }
+
   getData<Value>(key: string) {
-    return (this.options.customData || {})[key] as Value;
+    return (this.customData || {})[key] as Value;
   }
 
   addData(data: Record<string, unknown>) {
-    this.options.customData = {...data, ...(this.options.customData || {})};
+    this.customData = {...data, ...(this.customData || {})};
     return this as AppService;
   }
 
