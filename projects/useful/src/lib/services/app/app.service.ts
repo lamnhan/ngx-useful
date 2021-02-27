@@ -7,6 +7,10 @@ export interface AppOptions {
   splashScreen?: boolean | string;
 }
 
+export interface BuiltinData {
+  locales?: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,11 +20,19 @@ export class AppService {
   private host = '';
   private viewWidth = 0;
   private viewHeight = 0;
+  private locales: string[] = ['en-US'];
 
   constructor(private metaService: MetaService) {}
 
-  init(options: AppOptions = {}) {
+  init(
+    options: AppOptions = {},
+    builtinData: BuiltinData = {}
+  ) {
     this.options = options;
+    // set locales
+    if (builtinData.locales) {
+      this.locales = builtinData.locales;
+    }
     // set app host
     this.setHost();
     // set viewport
@@ -42,6 +54,10 @@ export class AppService {
 
   get VIEW_HEIGHT() {
     return this.viewHeight;
+  }
+
+  get LOCALES() {
+    return this.locales;
   }
 
   getData<Value>(key: string) {
