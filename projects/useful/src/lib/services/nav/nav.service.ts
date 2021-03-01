@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Subscription } from 'rxjs';
 import {
   Router,
   Route,
@@ -99,7 +99,7 @@ export class NavService {
   // i18n
   private i18nRouting?: I18nRouting;
   private i18nOrigins: Record<string, string> = {};
-  private i18nWatcher?: Observable<string>;
+  private i18nWatcher?: Subscription;
 
   constructor(
     private router: Router,
@@ -115,11 +115,11 @@ export class NavService {
     if (i18nRegistry) {
       // has i18n
       this.i18nRouting = {};
-      // process
+      // process routes / translations
       const { routes, routeTranslations } = i18nRegistry;
       routes.forEach(route => {
         const path = route.path as string;
-        const pathMap = path.split('/').filter(x => !!x);
+        const pathMap = path.split('/').filter(value => !!value);
         const translation = routeTranslations[path];
         // proccess translations
         const routingItem: I18nRoutingItem = {};
@@ -133,14 +133,18 @@ export class NavService {
               this.i18nOrigins[pathMap[0]] = locale;
             } else {
               // routing item
-              const localizedPathMap = localizedPath.split('/').filter(x => !!x);
+              const localizedPathMap = localizedPath.split('/').filter(value => !!value);
               routingItem[locale] = localizedPathMap;
               // save origins
               this.i18nOrigins[localizedPathMap[0]] = locale;
             }
           });
         }
-        (this.i18nRouting as I18nRouting)[pathMap[0]] = routingItem;
+        // save original/localized routing
+        Object.keys(routingItem).forEach(locale => {
+          const localizedPathMap = routingItem[locale];
+          (this.i18nRouting as I18nRouting)[localizedPathMap[0]] = routingItem;
+        });
       });
     }
     // register events
@@ -172,13 +176,16 @@ export class NavService {
           this.previousUrls.pop();
         }
         // redirect i18n route
-        if (
-          this.i18nRouting
-          && !this.i18nWatcher
-          && url !== '/'
-        ) {
-          const pathInit = url.substr(1).split('/').shift() as string;
-          console.log('I18n navigation ended: ', pathInit, this.settingService.LOCALE);
+        if (this.i18nRouting && !this.i18nWatcher) {
+          // initial load
+          this.i18nWatcher = this.settingService
+            .onLocaleChanged
+            .subscribe(locale => {
+              const pathInit = url.substr(1).split('/').shift() as string;
+              if (pathInit !== '' && this.i18nOrigins[pathInit] !== locale) {
+                this.navigate(url, undefined, {}, locale);
+              }
+            });
         }
         // set title & meta
         // this.metaService.changePageMetas(
@@ -222,7 +229,14 @@ export class NavService {
 
   getRoute(input: string | string[], withLocale?: string) {
     // home
-    if (input.length === 0 || input[0] === '' || input[0] === '/') {
+    if (
+      input.length === 0
+      || input[0] === ''
+      || (
+        input.length === 1
+        && input[0] === '/'
+      )
+    ) {
       return [''];
     }
     // no i18n

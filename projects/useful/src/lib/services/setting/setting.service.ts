@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { of, combineLatest } from 'rxjs';
+import { of, combineLatest, ReplaySubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -42,6 +42,11 @@ export class SettingService {
 
   // other settings
   // ...
+
+  // events
+  public readonly onThemeChanged = new ReplaySubject<string>(1);
+  public readonly onPersonaChanged = new ReplaySubject<string>(1);
+  public readonly onLocaleChanged = new ReplaySubject<string>(1);
 
   constructor(
     private zone: NgZone,
@@ -86,15 +91,15 @@ export class SettingService {
   }
 
   get THEME() {
-    return this.theme as string;
+    return this.theme || this.defaultSettings.theme as string;
   }
 
   get PERSONA() {
-    return this.persona as string;
+    return this.persona || this.defaultSettings.persona as string;
   }
 
   get LOCALE() {
-    return this.locale as string;
+    return this.locale || this.defaultSettings.locale as string;
   }
 
   get LANG() {
@@ -107,6 +112,8 @@ export class SettingService {
       // set value
       this.theme = name;
       this.localstorageService.set(this.LSK_THEME, name);
+      // event
+      this.onThemeChanged.next(name);
     }
   }
 
@@ -114,6 +121,8 @@ export class SettingService {
     if (!this.persona || this.persona !== name) {
       this.persona = name;
       this.localstorageService.set(this.LSK_PERSONA, name);
+      // event
+      this.onPersonaChanged.next(name);
     }
   }
 
@@ -124,6 +133,8 @@ export class SettingService {
       }
       this.locale = value;
       this.localstorageService.set(this.LSK_LOCALE, value);
+      // event
+      this.onLocaleChanged.next(value);
     }
   }
 
@@ -134,7 +145,7 @@ export class SettingService {
   private remoteLoader() {
     return !this.options.withAuth
       ? of({} as AppSettings)
-      : this.userService.onUserReady.pipe(
+      : this.userService.onUserChanged.pipe(
         switchMap(user => of(user ? (user as AppSettings) : {})),
       );
   }

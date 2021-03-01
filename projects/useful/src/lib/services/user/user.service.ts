@@ -14,7 +14,7 @@ export class UserService {
   private nativeUser: null | AuthNativeUser = null; // native (firebase/sheetbase) user object
   private user: null | AuthUser = null; // @lamnhan/schemata user
 
-  public readonly onUserReady: ReplaySubject<null | AuthUser> = new ReplaySubject(1);
+  public readonly onUserChanged = new ReplaySubject<null | AuthUser>(1);
 
   constructor(private authService: AuthService) {}
   
@@ -42,6 +42,6 @@ export class UserService {
       this.user = nativeUser as unknown as AuthUser;
     }
     // emit user ready
-    this.onUserReady.next(this.user);
+    this.onUserChanged.next(this.user);
   }
 }

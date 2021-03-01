@@ -18,7 +18,7 @@ export class AuthService {
   private redirectUrl: null | string = null;
   private isAuth?: boolean;
 
-  public readonly onAuthStateChanged: ReplaySubject<null | AuthNativeUser> = new ReplaySubject(1);
+  public readonly onAuthStateChanged = new ReplaySubject<null | AuthNativeUser>(1);
 
   constructor() {}
 
