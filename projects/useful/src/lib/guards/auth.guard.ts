@@ -24,16 +24,16 @@ export class AuthGuard implements CanActivate, CanLoad {
   }
 
   canLoad(route: Route) {
-    return this.handler('/' + route.path);
+    return this.handler(route.path || null);
   }
 
-  private handler(url: string) {
+  private handler(url: null | string) {
     if (this.authService.IS_AUTH) {
       return true;
     }
     // Store the attempted URL for redirecting
     this.authService.setRedirectUrl(url);
-    this.navService.navigate(['/login']);
+    this.navService.navigate(['login']);
     return false;
   }
 }
