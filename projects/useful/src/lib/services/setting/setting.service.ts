@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { of, combineLatest, ReplaySubject } from 'rxjs';
+import { of, combineLatest } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -34,11 +34,6 @@ export class SettingService {
 
   private options: SettingOptions = {};
   private defaultSettings: AppSettings = {};
-
-  // events
-  public readonly onThemeChanged: ReplaySubject<string> = new ReplaySubject(1);
-  public readonly onPersonaChanged: ReplaySubject<string> = new ReplaySubject(1);
-  public readonly onLocaleChanged: ReplaySubject<string> = new ReplaySubject(1);
 
   // UI intensive settings
   private theme?: string;
@@ -111,9 +106,7 @@ export class SettingService {
       document.body.setAttribute('data-theme', name);
       // set value
       this.theme = name;
-      this.localstorageService.set(this.LSK_THEME, name);      
-      // event
-      this.onThemeChanged.next(name);
+      this.localstorageService.set(this.LSK_THEME, name);
     }
   }
 
@@ -121,8 +114,6 @@ export class SettingService {
     if (!this.persona || this.persona !== name) {
       this.persona = name;
       this.localstorageService.set(this.LSK_PERSONA, name);
-      // event
-      this.onPersonaChanged.next(name);
     }
   }
 
@@ -133,8 +124,6 @@ export class SettingService {
       }
       this.locale = value;
       this.localstorageService.set(this.LSK_LOCALE, value);
-      // event
-      this.onLocaleChanged.next(value);
     }
   }
 
