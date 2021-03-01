@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import {
   Router,
   Route,
@@ -10,7 +11,7 @@ import {
   NavigationExtras
 } from '@angular/router';
 
-import { MetaService, AppCustomMetas } from '../meta/meta.service';
+// import { MetaService, AppCustomMetas } from '../meta/meta.service';
 import { SettingService } from '../setting/setting.service';
 
 export type NavRouterEventHooks = 'RouteConfigLoadStart' | 'RouteConfigLoadEnd' | 'NavigationEnd';
@@ -87,7 +88,7 @@ export function i18nRoutes(
 })
 export class NavService {
   private routingData: Record<string, unknown> = {};
-  private routingMetaRecords: Record<string, AppCustomMetas> = {};
+  // private routingMetaRecords: Record<string, AppCustomMetas> = {};
 
   // general
   private loading = false;
@@ -96,41 +97,50 @@ export class NavService {
   private isMenuVisible = false; // secondary/mobile menu
 
   // i18n
-  private isI18n = false;
-  private i18nRouting: I18nRouting = {};
+  private i18nRouting?: I18nRouting;
+  private i18nOrigins: Record<string, string> = {};
+  private i18nWatcher?: Observable<string>;
 
   constructor(
     private router: Router,
-    private metaService: MetaService,
+    // private metaService: MetaService,
     private settingService: SettingService,
   ) {}
 
   init(
-    i18nRegistry?: { routes: Routes; routeTranslations: RouteTranslations; },
-    hooks: { [key in NavRouterEventHooks]?: (event: Event) => void; } = {},
+    i18nRegistry?: {routes: Routes; routeTranslations: RouteTranslations},
+    hooks: {[key in NavRouterEventHooks]?: (event: Event) => void} = {},
   ) {
     // handle i18n
     if (i18nRegistry) {
-      this.isI18n = true;
+      // has i18n
+      this.i18nRouting = {};
       // process
       const { routes, routeTranslations } = i18nRegistry;
       routes.forEach(route => {
-        const routingItem: I18nRoutingItem = {};
-        // proccess translate
         const path = route.path as string;
         const pathMap = path.split('/').filter(x => !!x);
         const translation = routeTranslations[path];
+        // proccess translations
+        const routingItem: I18nRoutingItem = {};
         if (translation) {
           Object.keys(translation).forEach(locale => {
             const localizedPath = translation[locale];
-            routingItem[locale] =
-              localizedPath !== true
-              ? localizedPath.split('/').filter(x => !!x)
-              : pathMap;
+            if (localizedPath === true) {
+              // routing item
+              routingItem[locale] = pathMap;
+              // save origins
+              this.i18nOrigins[pathMap[0]] = locale;
+            } else {
+              // routing item
+              const localizedPathMap = localizedPath.split('/').filter(x => !!x);
+              routingItem[locale] = localizedPathMap;
+              // save origins
+              this.i18nOrigins[localizedPathMap[0]] = locale;
+            }
           });
         }
-        // save
-        this.i18nRouting[pathMap[0]] = routingItem;
+        (this.i18nRouting as I18nRouting)[pathMap[0]] = routingItem;
       });
     }
     // register events
@@ -151,24 +161,35 @@ export class NavService {
           setTimeout(() => this.hideLoadingIndicator(), 1000);
         }
       } else if (event instanceof NavigationEnd) {
+        const url = event.urlAfterRedirects;
+        // event name
         eventName = 'NavigationEnd';
         // record urls for backing navigation
-        const url = event.urlAfterRedirects;
         const backUrl = this.previousUrls[this.previousUrls.length - 2];
         if (!backUrl || (backUrl && url !== backUrl)) {
           this.previousUrls.push(url);
         } else {
           this.previousUrls.pop();
         }
+        // redirect i18n route
+        if (
+          this.i18nRouting
+          && !this.i18nWatcher
+          && url !== '/'
+        ) {
+          const pathInit = url.substr(1).split('/').shift() as string;
+          console.log('I18n navigation ended: ', pathInit, this.settingService.LOCALE);
+        }
         // set title & meta
-        this.metaService.changePageMetas(
-          this.routingMetaRecords[(this.router as Router).url] || {}
-        );
+        // this.metaService.changePageMetas(
+        //   this.routingMetaRecords[(this.router as Router).url] || {}
+        // );
       }
       // run hook
       const hook = hooks[eventName] || ((e: Event) => e);
       hook(event);
     });
+    // initialized
     return this as NavService;
   }
 
@@ -195,7 +216,7 @@ export class NavService {
     return this.IS_BACKABLE ? backClass : menuClass;
   }
 
-  getRouteStr(input: string | string[], withLocale?: string) {
+  getRouteUrl(input: string | string[], withLocale?: string) {
     return this.getRoute(input, withLocale).join('/');
   }
 
@@ -205,15 +226,16 @@ export class NavService {
       return [''];
     }
     // no i18n
-    else if (!this.isI18n) {
+    else if (!this.i18nRouting) {
       return typeof input === 'string' ? input.split('/') : input;
     }
     // get i18n
     else {
       const locale = withLocale || this.settingService.LOCALE;
-      const inputMap = typeof input === 'string'
-        ? input.split('/').filter(x => !!x)
-        : input;
+      const inputMap = (typeof input === 'string'
+        ? input.split('/')
+        : input.map(value => value.startsWith('/') ? value.substr(1) : value)
+      ).filter(value => !!value);
       const pathMap = (this.i18nRouting[inputMap[0]] || {})[locale];
       const route = pathMap
         ? inputMap.map((inputValue, i) => pathMap[i].startsWith(':') ? inputValue : pathMap[i])
@@ -226,16 +248,16 @@ export class NavService {
     return key ? this.routingData[key] : this.routingData;
   }
 
-  setMeta(
-    input: Record<string, unknown>,
-    modifiers: Record<string, NavMetaModifier> = {}
-  ) {
-    const customMetas = this.extractCustomMetas(input, modifiers);
-    if (this.router && !this.routingMetaRecords[this.router.url]) {
-      this.routingMetaRecords[this.router.url] = customMetas;
-    }
-    return this as NavService;
-  }
+  // setMeta(
+  //   input: Record<string, unknown>,
+  //   modifiers: Record<string, NavMetaModifier> = {}
+  // ) {
+  //   const customMetas = this.extractCustomMetas(input, modifiers);
+  //   if (this.router && !this.routingMetaRecords[this.router.url]) {
+  //     this.routingMetaRecords[this.router.url] = customMetas;
+  //   }
+  //   return this as NavService;
+  // }
 
   showLoadingIndicator() {
     this.loading = true;
@@ -293,36 +315,36 @@ export class NavService {
     return elm?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  private extractCustomMetas(
-    input: Record<string, unknown>,
-    modifiers: Record<string, NavMetaModifier> = {}
-  ) {
-    const getMetaValue = (fieldName: string) => {
-      const modifier = modifiers[fieldName];
-      return modifier && modifier instanceof Function
-        ? modifier(input)
-        : input[modifier || fieldName] as string;
-    };
-    const title = getMetaValue('title');
-    const description = getMetaValue('description');
-    const image = getMetaValue('image');
-    let url = getMetaValue('url') || window.document.URL;
-    url = url.substr(-1) === '/' ? url : (url + '/');
-    const author = getMetaValue('author');
-    const twitterCard = getMetaValue('twitterCard');
-    const twitterCreator = getMetaValue('twitterCreator');
-    const ogType = getMetaValue('ogType');
-    const ogLocale = getMetaValue('ogLocale');
-    return {
-      title,
-      description,
-      image,
-      url,
-      author,
-      twitterCard,
-      twitterCreator,
-      ogType,
-      ogLocale
-    } as AppCustomMetas;
-  }
+  // private extractCustomMetas(
+  //   input: Record<string, unknown>,
+  //   modifiers: Record<string, NavMetaModifier> = {}
+  // ) {
+  //   const getMetaValue = (fieldName: string) => {
+  //     const modifier = modifiers[fieldName];
+  //     return modifier && modifier instanceof Function
+  //       ? modifier(input)
+  //       : input[modifier || fieldName] as string;
+  //   };
+  //   const title = getMetaValue('title');
+  //   const description = getMetaValue('description');
+  //   const image = getMetaValue('image');
+  //   let url = getMetaValue('url') || window.document.URL;
+  //   url = url.substr(-1) === '/' ? url : (url + '/');
+  //   const author = getMetaValue('author');
+  //   const twitterCard = getMetaValue('twitterCard');
+  //   const twitterCreator = getMetaValue('twitterCreator');
+  //   const ogType = getMetaValue('ogType');
+  //   const ogLocale = getMetaValue('ogLocale');
+  //   return {
+  //     title,
+  //     description,
+  //     image,
+  //     url,
+  //     author,
+  //     twitterCard,
+  //     twitterCreator,
+  //     ogType,
+  //     ogLocale
+  //   } as AppCustomMetas;
+  // }
 }

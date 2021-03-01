@@ -36,12 +36,12 @@ export class RouterLinkDirective {
     this.activeClasses = !classes
       ? []
       : typeof classes === 'string'
-      ? classes.split(' ').filter(x => !!x)
+      ? classes.split(' ').filter(value => !!value)
       : classes;
   }
 
   @HostBinding() get href() {
-    return this.navService.getRouteStr(this.input, this.locale);
+    return this.navService.getRouteUrl(this.input, this.locale);
   }
 
   @HostBinding() get class() {
