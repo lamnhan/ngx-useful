@@ -43,10 +43,11 @@ export interface RouteTranslations {
 }
 
 export interface I18nRoutingItem {
-  [local: string]: string;
+  [local: string]: string[];
 }
+
 export interface I18nRouting {
-  [path: string]: I18nRoutingItem;
+  [init: string]: I18nRoutingItem;
 }
 
 export function i18nRoutes(
@@ -114,15 +115,19 @@ export class NavService {
         const routingItem: I18nRoutingItem = {};
         // proccess translate
         const path = route.path as string;
+        const pathMap = path.split('/').filter(x => !!x);
         const translation = routeTranslations[path];
         if (translation) {
           Object.keys(translation).forEach(locale => {
             const localizedPath = translation[locale];
-            routingItem[locale] = localizedPath !== true ? localizedPath : path;
+            routingItem[locale] =
+              localizedPath !== true
+              ? localizedPath.split('/').filter(x => !!x)
+              : pathMap;
           });
         }
         // save
-        this.i18nRouting[path] = routingItem;
+        this.i18nRouting[pathMap[0]] = routingItem;
       });
     }
     // register events
@@ -183,17 +188,25 @@ export class NavService {
     return this.getMenuIcon();
   }
 
-  get I18N_ROUTING() {
-    return this.i18nRouting;
+  getMenuIcon(menuClass = 'icon-menu', backClass = 'icon-back') {
+    return this.IS_BACKABLE ? backClass : menuClass;
   }
 
-  getMenuIcon(menuCls = 'icon-menu', backCls = 'icon-back') {
-    return this.IS_BACKABLE ? backCls : menuCls;
-  }
-
-  getI18nPath(originalPath: string) {
-    const locale = this.settingService.LOCALE;
-    return this.i18nRouting[originalPath][locale] || originalPath;
+  getI18nRoute(original: string | string[], withLocale?: string, toString = false) {
+    const locale = withLocale || this.settingService.LOCALE;
+    const originalMap = typeof original === 'string'
+      ? original.split('/').filter(x => !!x)
+      : original;
+    const pathMap = this.i18nRouting[originalMap[0]][locale];
+    const route = pathMap
+      ? originalMap.map((originalValue, i) => {
+        const value = pathMap[i];
+          return value.startsWith(':')
+            ? originalValue
+            : value;
+        })
+      : originalMap;
+    return toString ? route.join('/') : route;
   }
 
   get(key?: string) {
@@ -243,19 +256,19 @@ export class NavService {
       }
     }
     // navigate
-    return this.navigate([ path ], {}, { queryParams });
+    const commands = [ path ];
+    return this.router.navigate(commands, { queryParams });
   }
 
   navigate(
-    route: string | string[],
-    data: Record<string, unknown> = {},
+    input: string | string[],
     navigationExtras?: NavigationExtras,
+    data: Record<string, unknown> = {},
+    locale?: string,
   ) {
-    this.routingData = data; // set route data
-    return this.router.navigate(
-      typeof route === 'string' ? [route] : route,
-      navigationExtras
-    );
+    this.routingData = data;
+    const commands = this.getI18nRoute(input, locale);
+    return this.router.navigate(commands as string[], navigationExtras);
   }
 
   scrollToTop() {
