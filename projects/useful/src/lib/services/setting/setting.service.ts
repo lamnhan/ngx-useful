@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { of, combineLatest } from 'rxjs';
+import { of, combineLatest, ReplaySubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -34,6 +34,9 @@ export class SettingService {
 
   private options: SettingOptions = {};
   private defaultSettings: AppSettings = {};
+
+  // events
+  public readonly onLocaleChanged: ReplaySubject<string> = new ReplaySubject(1);
 
   // UI intensive settings
   private theme?: string;
@@ -102,24 +105,31 @@ export class SettingService {
   }
 
   changeTheme(name: string) {
-    document.body.setAttribute('data-theme', name);
-    // set value
-    this.theme = name;
-    this.localstorageService.set(this.LSK_THEME, name);
-    // TODO: remote
+    if (!this.theme || this.theme !== name) {
+      document.body.setAttribute('data-theme', name);
+      // set value
+      this.theme = name;
+      this.localstorageService.set(this.LSK_THEME, name);
+    }
   }
 
   changePersona(name: string) {
-    this.persona = name;
-    this.localstorageService.set(this.LSK_PERSONA, name);
+    if (!this.persona || this.persona !== name) {
+      this.persona = name;
+      this.localstorageService.set(this.LSK_PERSONA, name);
+    }
   }
 
   changeLocale(value: string) {
-    if (this.options.translateService) {
-      this.options.translateService.use(this.extractLangCode(value))
+    if (!this.locale || this.locale !== value) {
+      if (this.options.translateService) {
+        this.options.translateService.use(this.extractLangCode(value))
+      }
+      this.locale = value;
+      this.localstorageService.set(this.LSK_LOCALE, value);
+      // event
+      this.onLocaleChanged.next(value);
     }
-    this.locale = value;
-    this.localstorageService.set(this.LSK_LOCALE, value);
   }
 
   private extractLangCode(locale: string) {
