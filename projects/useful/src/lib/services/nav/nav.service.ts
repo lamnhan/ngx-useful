@@ -165,10 +165,9 @@ export class NavService {
           setTimeout(() => this.hideLoadingIndicator(), 1000);
         }
       } else if (event instanceof NavigationEnd) {
-        const url = event.urlAfterRedirects;
-        // event name
         eventName = 'NavigationEnd';
         // record urls for backing navigation
+        const url = event.urlAfterRedirects;
         const backUrl = this.previousUrls[this.previousUrls.length - 2];
         if (!backUrl || (backUrl && url !== backUrl)) {
           this.previousUrls.push(url);
@@ -177,10 +176,10 @@ export class NavService {
         }
         // redirect i18n route
         if (this.i18nRouting && !this.i18nWatcher) {
-          // initial load
           this.i18nWatcher = this.settingService
             .onLocaleChanged
             .subscribe(locale => {
+              const url = this.router.url;
               const pathInit = url.substr(1).split('/').shift() as string;
               if (pathInit !== '' && this.i18nOrigins[pathInit] !== locale) {
                 this.navigate(url, undefined, {}, locale);
