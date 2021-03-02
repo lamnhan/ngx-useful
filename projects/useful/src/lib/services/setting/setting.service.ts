@@ -21,6 +21,7 @@ export interface SettingOptions {
   browserLocale?: boolean;
   withAuth?: boolean;
   translateService?: TranslateService;
+  onReady?: () => void;
 }
 
 @Injectable({
@@ -43,7 +44,6 @@ export class SettingService {
   // ...
 
   // events
-  public readonly onReady = new ReplaySubject<AppSettings>(1);
   public readonly onThemeChanged = new ReplaySubject<string>(1);
   public readonly onPersonaChanged = new ReplaySubject<string>(1);
   public readonly onLocaleChanged = new ReplaySubject<string>(1);
@@ -84,8 +84,10 @@ export class SettingService {
       this.changeTheme(theme);
       this.changePersona(persona);
       this.changeLocale(locale);
-      // event
-      this.onReady.next(uiSettings as AppSettings);
+      // ready
+      if (this.options.onReady) {
+        this.options.onReady();
+      }
     }));
     // done
     return this as SettingService;
