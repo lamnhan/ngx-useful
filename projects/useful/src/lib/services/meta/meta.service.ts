@@ -104,6 +104,7 @@ export class MetaService {
     const image = customMetas['image'] || appMetas['image'];
     const url = customMetas['url'];
     const author = customMetas['author'] || appMetas['author'];
+    const lang = customMetas['lang'] || appMetas['lang'];
     const twitterCard = customMetas['twitterCard'] || appMetas['twitterCard'];
     const twitterCreator = customMetas['twitterCreator'] || appMetas['twitterCreator'];
     const ogType = customMetas['ogType'] || appMetas['ogType'];
@@ -118,6 +119,7 @@ export class MetaService {
       image,
       url,
       author,
+      lang,
       twitterCard,
       twitterSite,
       twitterCreator,
