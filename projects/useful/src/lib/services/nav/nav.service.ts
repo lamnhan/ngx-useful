@@ -10,7 +10,6 @@ import {
   NavigationExtras
 } from '@angular/router';
 
-// import { MetaService, AppCustomMetas } from '../meta/meta.service';
 import { SettingService } from '../setting/setting.service';
 
 export type NavRouterEventHooks = 'RouteConfigLoadStart' | 'RouteConfigLoadEnd' | 'NavigationEnd';
@@ -34,9 +33,13 @@ export interface MenuItem extends NavItem {
   subItems?: MenuItem[];
 }
 
-export type NavMetaModifier =
-  | string
-  | { (input: Record<string, unknown>): string };
+// export type NavMetaModifier =
+//   | string
+//   | { (input: Record<string, unknown>): string };
+
+export interface NavOptions {
+  i18nRedirect?: boolean
+}
 
 export interface RouteTranslations {
   [path: string]: Record<string, true | string>;
@@ -86,6 +89,8 @@ export function i18nRoutes(
   providedIn: 'root'
 })
 export class NavService {
+  private options: NavOptions = {};
+
   private routingData: Record<string, unknown> = {};
   // private routingMetaRecords: Record<string, AppCustomMetas> = {};
 
@@ -101,14 +106,15 @@ export class NavService {
 
   constructor(
     private router: Router,
-    // private metaService: MetaService,
     private settingService: SettingService,
   ) {}
 
   init(
+    options: NavOptions = {},
     i18nRegistry?: {routes: Routes; routeTranslations: RouteTranslations},
     hooks: {[key in NavRouterEventHooks]?: (event: Event) => void} = {},
   ) {
+    this.options = options;
     // handle i18n
     if (i18nRegistry) {
       // has i18n
@@ -145,15 +151,15 @@ export class NavService {
         });
       });
       // redirect i18n route
-      this.settingService
-        .onLocaleChanged
-        .subscribe(locale => {
+      if (this.options.i18nRedirect) {
+        this.settingService.onLocaleChanged.subscribe(locale => {
           const url = this.router.url;
           const pathInit = url.substr(1).split('/').shift() as string;
           if (pathInit !== '' && this.i18nOrigins[pathInit] !== locale) {
             this.navigate(url, undefined, {}, locale);
           }
         });
+      }
     }
     // register events
     this.router

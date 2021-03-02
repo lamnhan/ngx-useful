@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 
-import { MetaService } from '../meta/meta.service';
-
 export interface AppOptions {
   splashScreen?: boolean | string;
 }
@@ -27,7 +25,7 @@ export class AppService {
   private viewWidth = 0;
   private viewHeight = 0;
 
-  constructor(private metaService: MetaService) {}
+  constructor() {}
 
   init(
     options: AppOptions = {},
@@ -46,6 +44,8 @@ export class AppService {
     // set viewport
     window.addEventListener('resize', () => this.setViewport());
     this.setViewport();
+    // done
+    return this as AppService;
   }
 
   get HOST() {
@@ -77,10 +77,7 @@ export class AppService {
     return this as AppService;
   }
 
-  shareApp() {
-    const title = this.metaService.TITLE;
-    const text = this.metaService.DESCRIPTION;
-    const url = this.metaService.URL;
+  share(title?: string, text?: string, url?: string) {
     if (title && text && url) {
       if (navigator.share) {
         return navigator.share({ title, text, url });

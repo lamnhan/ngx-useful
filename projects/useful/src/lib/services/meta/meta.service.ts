@@ -46,35 +46,31 @@ export class MetaService {
     this.defaultMetas = defaultMetas;
     this.metaTranslations = metaTranslations;
     // watch for locale changed
-    this.settingService
-      .onLocaleChanged
-      .subscribe(locale => {
-        console.log('Update meta: ', locale);
-      });
+    this.settingService.onLocaleChanged.subscribe(locale => this.changePageMetas({}, locale));
   }
 
   get TITLE() {
-    return this.defaultMetas.title;
+    return this.getAppMetas().title;
   }
 
   get DESCRIPTION() {
-    return this.defaultMetas.description;
+    return this.getAppMetas().description;
   }
 
   get URL() {
-    return this.defaultMetas.url;
+    return this.getAppMetas().url;
   }
 
   get IMAGE() {
-    return this.defaultMetas.image;
+    return this.getAppMetas().image;
   }
 
   get AUTHOR() {
-    return this.defaultMetas.author;
+    return this.getAppMetas().author;
   }
 
   get LANG() {
-    return this.defaultMetas.lang;
+    return this.getAppMetas().lang;
   }
 
   changePageTitle(title: string) {
@@ -87,29 +83,35 @@ export class MetaService {
     return this as MetaService;
   }
 
-  changePageMetas(customMetas: AppCustomMetas) {
-    const metas = this.processMetaData(customMetas);
+  changePageMetas(customMetas: AppCustomMetas = {}, withLocale?: string) {
+    const metas = this.processMetaData(customMetas, withLocale);
     this.changePageTitle(metas.title || 'App');
     this.changePageLang(metas.lang || 'en');
     this.changeMetaTags(metas);
     return this as MetaService;
   }
 
-  private processMetaData(customMetas: AppCustomMetas) {
+  private getAppMetas(withLocale?: string) {
+    const locale = withLocale || this.settingService.LOCALE;
+    return this.metaTranslations[locale] || this.defaultMetas;
+  }
+
+  private processMetaData(customMetas: AppCustomMetas, withLocale?: string) {
+    const appMetas = this.getAppMetas(withLocale);
     // custom
-    const title = customMetas['title'] || this.defaultMetas['title'];
-    const description = customMetas['description'] || this.defaultMetas['description'];
-    const image = customMetas['image'] || this.defaultMetas['image'];
+    const title = customMetas['title'] || appMetas['title'];
+    const description = customMetas['description'] || appMetas['description'];
+    const image = customMetas['image'] || appMetas['image'];
     const url = customMetas['url'];
-    const author = customMetas['author'] || this.defaultMetas['author'];
-    const twitterCard = customMetas['twitterCard'] || this.defaultMetas['twitterCard'];
-    const twitterCreator = customMetas['twitterCreator'] || this.defaultMetas['twitterCreator'];
-    const ogType = customMetas['ogType'] || this.defaultMetas['ogType'];
-    const ogLocale = customMetas['ogLocale'] || this.defaultMetas['ogLocale'];
+    const author = customMetas['author'] || appMetas['author'];
+    const twitterCard = customMetas['twitterCard'] || appMetas['twitterCard'];
+    const twitterCreator = customMetas['twitterCreator'] || appMetas['twitterCreator'];
+    const ogType = customMetas['ogType'] || appMetas['ogType'];
+    const ogLocale = customMetas['ogLocale'] || appMetas['ogLocale'];
     // default
-    const twitterSite = this.defaultMetas['twitterSite'];
-    const ogSiteName = this.defaultMetas['ogSiteName'];
-    const fbAppId = this.defaultMetas['fbAppId'];
+    const twitterSite = appMetas['twitterSite'];
+    const ogSiteName = appMetas['ogSiteName'];
+    const fbAppId = appMetas['fbAppId'];
     return {
       title,
       description,

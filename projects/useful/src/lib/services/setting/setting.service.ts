@@ -4,8 +4,6 @@ import { switchMap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
 import { LocalstorageService } from '../localstorage/localstorage.service';
-import { AppService } from '../app/app.service';
-// import { MetaService } from '../meta/meta.service';
 import { UserService } from '../user/user.service';
 
 export interface BuiltinUISettings {
@@ -45,6 +43,7 @@ export class SettingService {
   // ...
 
   // events
+  public readonly onReady = new ReplaySubject<AppSettings>(1);
   public readonly onThemeChanged = new ReplaySubject<string>(1);
   public readonly onPersonaChanged = new ReplaySubject<string>(1);
   public readonly onLocaleChanged = new ReplaySubject<string>(1);
@@ -52,8 +51,6 @@ export class SettingService {
   constructor(
     private zone: NgZone,
     private localstorageService: LocalstorageService,
-    private appService: AppService,
-    // private metaService: MetaService,
     private userService: UserService,
   ) {}
 
@@ -87,9 +84,11 @@ export class SettingService {
       this.changeTheme(theme);
       this.changePersona(persona);
       this.changeLocale(locale);
-      // hide splash screen
-      this.appService.hideSplashScreen();
+      // event
+      this.onReady.next(uiSettings as AppSettings);
     }));
+    // done
+    return this as SettingService;
   }
 
   get THEME() {
