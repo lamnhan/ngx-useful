@@ -5,7 +5,7 @@ import { SettingService } from '../setting/setting.service';
 
 export interface PersonaBuiltinProperties {
   menu?: Array<string | MenuItem>;
-  secondaryMenu?: Array<string | MenuItem>;
+  tabs?: Array<string | MenuItem>;
 }
 
 export interface PersonaProperties extends PersonaBuiltinProperties {
@@ -30,14 +30,14 @@ export class PersonaService {
     // proccess menu & secondary menu
     if (menuRegistry) {
       Object.keys(data).forEach(persona => {
-        const {menu, secondaryMenu} = data[persona];
+        const {menu, tabs} = data[persona];
         if (menu) {
           data[persona].menu =
             menu.map(value => typeof value === 'string' ? menuRegistry[value] : value);
         }
-        if (secondaryMenu) {
-          data[persona].secondaryMenu =
-            secondaryMenu.map(value => typeof value === 'string' ? menuRegistry[value] : value);
+        if (tabs) {
+          data[persona].tabs =
+            tabs.map(value => typeof value === 'string' ? menuRegistry[value] : value);
         }
       });
     }
@@ -50,12 +50,16 @@ export class PersonaService {
     return this.settingService.PERSONA;
   }
 
+  get MENU_REGISTRY() {
+    return this.menuRegistry;
+  }
+
   get MENU() {
     return this.getData('menu') as MenuItem[];
   }
 
-  get SECONDARY_MENU() {
-    return this.getData('secondaryMenu') as MenuItem[];
+  get TABS() {
+    return this.getData('tabs') as MenuItem[];
   }
 
   getData(key: string) {

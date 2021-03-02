@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { LocalstorageService } from '../localstorage/localstorage.service';
 import { AppService } from '../app/app.service';
-import { MetaService } from '../meta/meta.service';
+// import { MetaService } from '../meta/meta.service';
 import { UserService } from '../user/user.service';
 
 export interface BuiltinUISettings {
@@ -53,7 +53,7 @@ export class SettingService {
     private zone: NgZone,
     private localstorageService: LocalstorageService,
     private appService: AppService,
-    private metaService: MetaService,
+    // private metaService: MetaService,
     private userService: UserService,
   ) {}
 
@@ -104,10 +104,6 @@ export class SettingService {
     return this.locale || this.defaultSettings.locale as string;
   }
 
-  get LANG() {
-    return this.extractLangCode(this.LOCALE);
-  }
-
   changeTheme(name: string) {
     if (!this.theme || this.theme !== name) {
       document.body.setAttribute('data-theme', name);
@@ -130,20 +126,14 @@ export class SettingService {
 
   changeLocale(value: string) {
     if (!this.locale || this.locale !== value) {
-      const lang = this.extractLangCode(value);
-      this.metaService.changePageLang(lang);
       if (this.options.translateService) {
-        this.options.translateService.use(lang);
+        this.options.translateService.use(value);
       }
       this.locale = value;
       this.localstorageService.set(this.LSK_LOCALE, value);
       // event
       this.onLocaleChanged.next(value);
     }
-  }
-
-  private extractLangCode(locale: string) {
-    return locale.split('-').shift() as string;
   }
 
   private remoteLoader() {

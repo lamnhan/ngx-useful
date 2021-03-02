@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Subscription } from 'rxjs';
 import {
   Router,
   Route,
@@ -99,7 +98,6 @@ export class NavService {
   // i18n
   private i18nRouting?: I18nRouting;
   private i18nOrigins: Record<string, string> = {};
-  private i18nWatcher?: Subscription;
 
   constructor(
     private router: Router,
@@ -146,6 +144,16 @@ export class NavService {
           (this.i18nRouting as I18nRouting)[localizedPathMap[0]] = routingItem;
         });
       });
+      // redirect i18n route
+      this.settingService
+        .onLocaleChanged
+        .subscribe(locale => {
+          const url = this.router.url;
+          const pathInit = url.substr(1).split('/').shift() as string;
+          if (pathInit !== '' && this.i18nOrigins[pathInit] !== locale) {
+            this.navigate(url, undefined, {}, locale);
+          }
+        });
     }
     // register events
     this.router
@@ -173,18 +181,6 @@ export class NavService {
           this.previousUrls.push(url);
         } else {
           this.previousUrls.pop();
-        }
-        // redirect i18n route
-        if (this.i18nRouting && !this.i18nWatcher) {
-          this.i18nWatcher = this.settingService
-            .onLocaleChanged
-            .subscribe(locale => {
-              const url = this.router.url;
-              const pathInit = url.substr(1).split('/').shift() as string;
-              if (pathInit !== '' && this.i18nOrigins[pathInit] !== locale) {
-                this.navigate(url, undefined, {}, locale);
-              }
-            });
         }
         // set title & meta
         // this.metaService.changePageMetas(

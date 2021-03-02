@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 
+import { SettingService } from '../setting/setting.service';
+
 export interface AppCustomMetas {
   title?: string;
   description?: string;
@@ -20,23 +22,35 @@ export interface AppMetas extends AppCustomMetas {
   fbAppId?: string;
 }
 
+export interface MetaTranslations {
+  [locale: string]: AppMetas;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class MetaService {
   private defaultMetas: AppMetas = {};
+  private metaTranslations: MetaTranslations = {};
 
   constructor(
     private title: Title,
     private meta: Meta,
-  ) { }
+    private settingService: SettingService,
+  ) {}
 
-  init(defaultMetas: AppMetas = {}) {
+  init(
+    defaultMetas: AppMetas = {},
+    metaTranslations: MetaTranslations = {},
+  ) {
     this.defaultMetas = defaultMetas;
-  }
-
-  get DEFAULTS() {
-    return this.defaultMetas;
+    this.metaTranslations = metaTranslations;
+    // watch for locale changed
+    this.settingService
+      .onLocaleChanged
+      .subscribe(locale => {
+        console.log('Update meta: ', locale);
+      });
   }
 
   get TITLE() {

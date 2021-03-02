@@ -78,7 +78,9 @@ export class AppService {
   }
 
   shareApp() {
-    const {title, description: text, url} = this.metaService.DEFAULTS;
+    const title = this.metaService.TITLE;
+    const text = this.metaService.DESCRIPTION;
+    const url = this.metaService.URL;
     if (title && text && url) {
       if (navigator.share) {
         return navigator.share({ title, text, url });
