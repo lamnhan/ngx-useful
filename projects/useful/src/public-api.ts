@@ -48,5 +48,6 @@ export * from './lib/services/cart/cart.service';
 export * from './lib/services/player/player.service';
 export * from './lib/services/auth/auth.service';
 export * from './lib/services/user/user.service';
+export * from './lib/services/database/database.service';
 
 export * from './lib/guards/auth.guard';

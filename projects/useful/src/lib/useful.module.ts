@@ -32,6 +32,7 @@ import {CartService} from './services/cart/cart.service';
 import {PlayerService} from './services/player/player.service';
 import {AuthService} from './services/auth/auth.service';
 import {UserService} from './services/user/user.service';
+import {DatabaseService} from './services/database/database.service';
 
 @NgModule({
   declarations: [],
@@ -67,6 +68,7 @@ import {UserService} from './services/user/user.service';
     PlayerService,
     AuthService,
     UserService,
+    DatabaseService,
   ],
   exports: [
     OauthPopupComponentModule,
