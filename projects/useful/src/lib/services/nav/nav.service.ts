@@ -197,7 +197,7 @@ export class NavService {
       const hook = hooks[eventName] || ((e: Event) => e);
       hook(event);
     });
-    // initialized
+    // done
     return this as NavService;
   }
 

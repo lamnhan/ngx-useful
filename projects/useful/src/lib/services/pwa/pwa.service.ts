@@ -49,6 +49,8 @@ export class PwaService {
         );
       }
     });
+    // done
+    return this as PwaService;
   }
 
   get RUNTIME() {

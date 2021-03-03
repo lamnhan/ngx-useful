@@ -22,6 +22,8 @@ export class UserService {
     this.authService
       .onAuthStateChanged
       .subscribe(user => this.setUser(user));
+    // done
+    return this as UserService;
   }
 
   get NATIVE_USER() {

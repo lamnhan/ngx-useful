@@ -16,6 +16,13 @@ export class DatabaseService {
 
   constructor() {}
 
+  init(service: VendorDatabaseService, driver?: string) {
+    this.service = service;
+    this.driver = driver || (service as any).name;
+    // done
+    return this as DatabaseService;
+  }
+
   get DRIVER() {
     if (!this.driver) {
       throw new Error('Invalid driver, please provide when init().');
@@ -28,11 +35,6 @@ export class DatabaseService {
       throw new Error('No auth service, please run init() first!');
     }
     return this.service;
-  }
-
-  init(service: VendorDatabaseService, driver?: string) {
-    this.service = service;
-    this.driver = driver || (service as any).name;
   }
 
   doc<Item>(path: string) {

@@ -30,6 +30,8 @@ export class CurrencyService {
     this.currencyPipe = new CurrencyPipe(locale);
     // load exchange rate
     return this.loadExchangeRate();
+    // done
+    return this as CurrencyService;
   }
 
   format(

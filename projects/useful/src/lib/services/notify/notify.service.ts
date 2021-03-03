@@ -31,6 +31,8 @@ export class NotifyService {
         this.readNotificationIds = ids || {} as Record<string, true>;  
       });
     }
+    // done
+    return this as NotifyService;
   }
 
   isNotificationRead(key: string) {

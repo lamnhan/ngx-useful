@@ -32,6 +32,8 @@ export class DateService {
     this.configs = configs;
     // create date pipe instance
     this.datePipe = new DatePipe(locale);
+    // done
+    return this as DateService;
   }
 
   format(

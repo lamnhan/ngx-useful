@@ -47,6 +47,8 @@ export class MetaService {
     this.metaTranslations = metaTranslations;
     // watch for locale changed
     this.settingService.onLocaleChanged.subscribe(locale => this.changePageMetas({}, locale));
+    // done
+    return this as MetaService;
   }
 
   get TITLE() {

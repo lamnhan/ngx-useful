@@ -37,6 +37,7 @@ export class LocalstorageService {
       name: 'APP_LOCAL_STORAGE',
       ...storageConfigs
     });
+    // done
     return this as LocalstorageService;
   }
 

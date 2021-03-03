@@ -44,6 +44,8 @@ export class PersonaService {
     // save data
     this.menuRegistry = menuRegistry;
     this.data = data;
+    // done
+    return this as PersonaService;
   }
 
   get ACTIVE() {

@@ -27,6 +27,7 @@ export class CacheService {
       name: 'APP_LOCAL_CACHE',
       ...storageConfigs,
     });
+    // done
     return this as CacheService;
   }
 

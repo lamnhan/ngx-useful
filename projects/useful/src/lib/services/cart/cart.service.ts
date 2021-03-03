@@ -83,6 +83,8 @@ export class CartService {
     });
     // load local cart
     this.loadLocalCart();
+    // done
+    return this as CartService;
   }
  
   loadLocalCart() {

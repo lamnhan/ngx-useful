@@ -30,6 +30,8 @@ export class AuthService {
       this.isAuth = !!user; // change status
       this.onAuthStateChanged.next(user); // emit
     });
+    // done
+    return this as AuthService;
   }
 
   get DRIVER() {
