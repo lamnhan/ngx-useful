@@ -34,6 +34,8 @@ import {AuthService} from './services/auth/auth.service';
 import {UserService} from './services/user/user.service';
 import {DatabaseService} from './services/database/database.service';
 
+import {OptionDataService} from './schematas/option/option.service';
+
 @NgModule({
   declarations: [],
   imports: [
@@ -51,6 +53,7 @@ import {DatabaseService} from './services/database/database.service';
     RouterLinkDirectiveModule,
   ],
   providers: [
+    // normal services
     HelperService,
     LocalstorageService,
     CacheService,
@@ -69,6 +72,8 @@ import {DatabaseService} from './services/database/database.service';
     AuthService,
     UserService,
     DatabaseService,
+    // data services
+    OptionDataService
   ],
   exports: [
     OauthPopupComponentModule,

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 export interface AppOptions {
   splashScreen?: boolean | string;
@@ -30,15 +31,23 @@ export class AppService {
   init(
     options: AppOptions = {},
     builtinData: BuiltinData = {},
-    customData: Record<string, unknown> = {}
+    customData: Record<string, unknown> = {},
+    dataLoader?: () => Observable<Record<string, unknown>>,
   ) {
     this.options = options;
     // set locales
     if (builtinData.locales) {
       this.locales = builtinData.locales;
     }
-    // custom data
+    // custom data (directly)
     this.customData = customData;
+    // remote custom data
+    if (dataLoader) {
+      dataLoader().subscribe(remoteData => this.customData = {
+        ...this.customData,
+        ...remoteData,
+      });
+    }
     // set app host
     this.setHost();
     // set viewport
