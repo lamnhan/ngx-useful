@@ -141,7 +141,7 @@ export class SettingService {
     return !this.options.withAuth
       ? of({} as AppSettings)
       : this.userService.onUserChanged.pipe(
-        switchMap(user => of(user ? (user as AppSettings) : {})),
+        switchMap(data => of(data && data.settings ? data.settings : {})),
       );
   }
 

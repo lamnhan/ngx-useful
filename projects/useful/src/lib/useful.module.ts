@@ -35,6 +35,7 @@ import {UserService} from './services/user/user.service';
 import {DatabaseService} from './services/database/database.service';
 
 import {OptionDataService} from './schematas/option/option.service';
+import {UserDataService} from './schematas/user/user.service';
 
 @NgModule({
   declarations: [],
@@ -73,7 +74,8 @@ import {OptionDataService} from './schematas/option/option.service';
     UserService,
     DatabaseService,
     // data services
-    OptionDataService
+    OptionDataService,
+    UserDataService,
   ],
   exports: [
     OauthPopupComponentModule,

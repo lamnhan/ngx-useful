@@ -1,27 +1,43 @@
 import { Injectable } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
+import { Observable, ReplaySubject, of, combineLatest } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import firebase from 'firebase/app';
-import { AuthUser } from '@lamnhan/schemata';
+import { User, UserProperties } from '@lamnhan/schemata';
 
 import { AuthService } from '../auth/auth.service';
 
-export type AuthNativeUser = firebase.User | AuthUser; // | SheetbaseUser
+export type AuthNativeUser = firebase.User; // | SheetbaseUser
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private nativeUser: null | AuthNativeUser = null; // native (firebase/sheetbase) user object
-  private user: null | AuthUser = null; // @lamnhan/schemata user
+  private nativeUser: null | AuthNativeUser = null;
+  private data?: UserProperties;
 
-  public readonly onUserChanged = new ReplaySubject<null | AuthUser>(1);
+  public readonly onUserChanged = new ReplaySubject<undefined | UserProperties>(1);
 
   constructor(private authService: AuthService) {}
   
-  init() {
+  init(
+    dataLoader?: (uid: string) => Observable<User>
+  ) {
     this.authService
       .onAuthStateChanged
-      .subscribe(user => this.setUser(user));
+      .pipe(
+        switchMap(user => combineLatest([
+          of(user),
+          (
+            dataLoader
+            && user
+            && user.uid
+            && this.authService.DRIVER === 'firebase'
+          )
+            ? dataLoader(user.uid)
+            : of(undefined),
+        ]))
+      )
+      .subscribe(([nativeUser, userDoc]) => this.setUser(nativeUser, userDoc));
     // done
     return this as UserService;
   }
@@ -30,20 +46,29 @@ export class UserService {
     return this.nativeUser;
   }
 
-  get USER() {
-    return this.user;
+  get DATA() {
+    return this.data;
   }
 
-  private setUser(nativeUser: null | AuthNativeUser) {
+  private setUser(
+    nativeUser: null | AuthNativeUser,
+    userDoc?: User
+  ) {
     // raw user
     this.nativeUser = nativeUser;
     // auth user
     if (!nativeUser) {
-      this.user = null;
+      this.data = undefined;
+    } else if (this.authService.DRIVER === 'firebase') {
+      // TODO: fix this
+      this.data = {
+        ...(userDoc || {}),
+        ...nativeUser as any,
+      };
     } else {
-      this.user = nativeUser as unknown as AuthUser;
+      this.data = nativeUser as any;
     }
     // emit user ready
-    this.onUserChanged.next(this.user);
+    this.onUserChanged.next(this.data);
   }
 }
