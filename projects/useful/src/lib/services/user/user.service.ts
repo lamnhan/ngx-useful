@@ -90,45 +90,40 @@ export class UserService {
         const defaultUsername = nativeUser.email
           ? nativeUser.email.split('@').shift() as string
           : nativeUser.uid.substr(-7);
-        const userInitilizer = (_exists: boolean, _defaultUsername: string) => {
+        const userInitilizer = (usernameExists: boolean, username: string) => {
           const userDoc = {
             uid: nativeUser.uid,
-            username: _exists ? nativeUser.uid : _defaultUsername,
+            username: usernameExists ? nativeUser.uid : username,
           } as User;
-          const data = this.proccessUserData(nativeUser, userDoc);
           return this.userDataService
             .add(nativeUser.uid, userDoc)
-            .pipe(map(() => data));
+            .pipe(map(() => this.proccessUserData(nativeUser, userDoc)));
         };
         if (!this.profileDataService) {
-          return this.userDataService
-            .exists(ref => ref.where('username', '==', defaultUsername))
-            .pipe(
-              switchMap(exists => userInitilizer(exists, defaultUsername)),
-              map(data => ({ nativeUser, data }))
-            );
+          // username = uid
+          return userInitilizer(true, defaultUsername).pipe(
+            map(data => ({ nativeUser, data }))
+          );
         }
         // has profiles collection
         else {
           // create initial profile record
-          return this.profileDataService
-            .exists(defaultUsername)
-            .pipe(
-              switchMap(exists => userInitilizer(exists, defaultUsername)),
-              switchMap(data => {
-                const username = data.username as string; // pass down from userInitilizer()
-                const profileDoc = {
-                  id: username,
-                  title: data.displayName || username,
-                  status: this.options.profilePublished ? 'publish' : 'draft',
-                  uid: nativeUser.uid,
-                } as Profile;
-                return (this.profileDataService as ProfileDataService)
-                  .add(username, profileDoc)
-                  .pipe(map(() => data));
-              }),
-              map(data => ({ nativeUser, data }))
-            );
+          return this.profileDataService.exists(defaultUsername).pipe(
+            switchMap(exists => userInitilizer(exists, defaultUsername)),
+            switchMap(data => {
+              const username = data.username as string; // pass down from userInitilizer()
+              const profileDoc = {
+                id: username,
+                title: data.displayName || username,
+                status: this.options.profilePublished ? 'publish' : 'draft',
+                uid: nativeUser.uid,
+              } as Profile;
+              return (this.profileDataService as ProfileDataService)
+                .add(username, profileDoc)
+                .pipe(map(() => data));
+            }),
+            map(data => ({ nativeUser, data }))
+          );
         }
       }
     }
@@ -138,17 +133,18 @@ export class UserService {
     nativeUser: AuthNativeUser,
     userDoc: User
   ) {
-    const data = userDoc;
-    data.isAnonymous = nativeUser.isAnonymous ?? undefined;
-    data.emailVerified = nativeUser.emailVerified ?? undefined;
-    data.uid = nativeUser.uid ?? undefined;
-    data.email = nativeUser.email ?? undefined;
-    data.phoneNumber = nativeUser.phoneNumber ?? undefined;
-    data.providerId = (nativeUser.providerId ?? undefined) as any;
-    data.providerData = (nativeUser.providerData ?? undefined) as any;
-    data.metadata = nativeUser.metadata ?? undefined;
-    data.displayName = nativeUser.displayName ?? undefined;
-    data.photoURL = nativeUser.photoURL ?? undefined;
-    return data as User;
+    return {
+      ...userDoc,
+      isAnonymous: nativeUser.isAnonymous ?? undefined,
+      emailVerified: nativeUser.emailVerified ?? undefined,
+      uid: nativeUser.uid ?? undefined,
+      email: nativeUser.email ?? undefined,
+      phoneNumber: nativeUser.phoneNumber ?? undefined,
+      providerId: (nativeUser.providerId ?? undefined) as any,
+      providerData: (nativeUser.providerData ?? undefined) as any,
+      metadata: nativeUser.metadata ?? undefined,
+      displayName: nativeUser.displayName ?? undefined,
+      photoURL: nativeUser.photoURL ?? undefined,
+    } as User;
   }
 }
