@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
-import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
 
 export type VendorDatabaseService = AngularFirestore;
 
@@ -39,16 +39,17 @@ export class DatabaseService {
     return this.service;
   }
 
-  exists(path: string) {
-    return this.flatDoc(path)
-      .pipe(map(item => !!item));
+  exists(path: string, queryFn?: QueryFn) {
+    return !queryFn 
+      ? this.flatDoc(path).pipe(map(item => !!item))
+      : this.flatCollection(path, queryFn).pipe(map(items => !!items.length));
   }
 
   doc<Item>(path: string) {
     return this.SERVICE.doc(path) as DatabaseItem<Item>;
   }
 
-  collection<Item>(path: string, queryFn?: any) {
+  collection<Item>(path: string, queryFn?: QueryFn) {
     return this.SERVICE.collection(path, queryFn) as DatabaseCollection<Item>;
   }
 
@@ -61,7 +62,7 @@ export class DatabaseService {
       );
   }
 
-  flatCollection<Item>(path: string, queryFn?: any) {
+  flatCollection<Item>(path: string, queryFn?: QueryFn) {
     return this.collection<Item>(path, queryFn)
       .get()
       .pipe(
@@ -70,7 +71,7 @@ export class DatabaseService {
       );
   }
 
-  flatRecord<Item>(path: string, queryFn?: any) {
+  flatRecord<Item>(path: string, queryFn?: QueryFn) {
     return this.collection<Item>(path, queryFn)
     .get()
     .pipe(
@@ -96,7 +97,7 @@ export class DatabaseService {
     );
   }
 
-  streamCollection<Item>(path: string, queryFn?: any) {
+  streamCollection<Item>(path: string, queryFn?: QueryFn) {
     return new Observable<Item[]>(observer =>
       this.collection<Item>(path, queryFn)
         .ref
@@ -106,7 +107,7 @@ export class DatabaseService {
     );
   }
 
-  streamRecord<Item>(path: string, queryFn?: any) {
+  streamRecord<Item>(path: string, queryFn?: QueryFn) {
     return new Observable<Record<string, Item>>(observer =>
       this.collection<Item>(path, queryFn)
         .ref
@@ -120,6 +121,22 @@ export class DatabaseService {
         })
     );
   }
+
+  add<Item>(path: string, item: Item) {
+    return this.set(path, item);
+  }
+
+  set<Item>(path: string, item: Item) {
+    return from(this.doc(path).set(item));
+  }
+
+  update<Item>(path: string, item: Item) {
+    return from(this.doc(path).update(item));
+  }
+
+  delete(path: string) {
+    return from(this.doc(path).delete());
+  }
 }
 
 export class DataService<Type> {
@@ -128,8 +145,10 @@ export class DataService<Type> {
     public readonly name: string
   ) {}
 
-  exists(id: string) {
-    return this.databaseService.exists(`${this.name}/${id}`);
+  exists(input: string | QueryFn) {
+    return typeof input === 'string'
+      ? this.databaseService.exists(`${this.name}/${input}`)
+      : this.databaseService.exists(this.name, input);
   }
 
   doc(id: string) {
@@ -162,5 +181,21 @@ export class DataService<Type> {
 
   streamRecord(queryfn?: any) {
     return this.databaseService.streamRecord<Type>(this.name, queryfn);
+  }
+
+  add(id: string, item: Type) {
+    return this.databaseService.add(`${this.name}/${id}`, item);
+  }
+
+  set(id: string, item: Type) {
+    return this.databaseService.set(`${this.name}/${id}`, item);
+  }
+
+  update(id: string, item: Type) {
+    return this.databaseService.update(`${this.name}/${id}`, item);
+  }
+
+  delete(id: string) {
+    return this.databaseService.delete(`${this.name}/${id}`);
   }
 }

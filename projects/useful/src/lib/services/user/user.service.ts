@@ -86,33 +86,48 @@ export class UserService {
       }
       // new user
       else {
-        // create initial user record
-        const userDoc = {
-          uid: nativeUser.uid,
-        } as User;
-        const data = this.proccessUserData(nativeUser, userDoc);
         // no profiles collection
+        const defaultUsername = nativeUser.email
+          ? nativeUser.email.split('@').shift() as string
+          : nativeUser.uid.substr(-7);
+        const userInitilizer = (_exists: boolean, _defaultUsername: string) => {
+          const userDoc = {
+            uid: nativeUser.uid,
+            username: _exists ? nativeUser.uid : _defaultUsername,
+          } as User;
+          const data = this.proccessUserData(nativeUser, userDoc);
+          return this.userDataService
+            .add(nativeUser.uid, userDoc)
+            .pipe(map(() => data));
+        };
         if (!this.profileDataService) {
           return this.userDataService
-            .add(id, userDoc)
+            .exists(ref => ref.where('username', '==', defaultUsername))
             .pipe(
-              map(() => ({ nativeUser, data }))
+              switchMap(exists => userInitilizer(exists, defaultUsername)),
+              map(data => ({ nativeUser, data }))
             );
         }
         // has profiles collection
         else {
           // create initial profile record
-          const profileDoc = {
-            id: '', // username
-            title: '', // displayName
-            status: this.options.profilePublished ? 'publish' : 'draft',
-            uid: nativeUser.uid,
-          } as Profile;
-          return this.options
-            .add(id, userDoc)
+          return this.profileDataService
+            .exists(defaultUsername)
             .pipe(
-              switchMap(() => (this.profileDataService as ProfileDataService).add(id, profileDoc)),
-              map(() => ({ nativeUser, data }))
+              switchMap(exists => userInitilizer(exists, defaultUsername)),
+              switchMap(data => {
+                const username = data.username as string; // pass down from userInitilizer()
+                const profileDoc = {
+                  id: username,
+                  title: data.displayName || username,
+                  status: this.options.profilePublished ? 'publish' : 'draft',
+                  uid: nativeUser.uid,
+                } as Profile;
+                return (this.profileDataService as ProfileDataService)
+                  .add(username, profileDoc)
+                  .pipe(map(() => data));
+              }),
+              map(data => ({ nativeUser, data }))
             );
         }
       }
