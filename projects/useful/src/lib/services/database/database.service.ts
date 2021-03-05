@@ -39,6 +39,11 @@ export class DatabaseService {
     return this.service;
   }
 
+  exists(path: string) {
+    return this.flatDoc(path)
+      .pipe(map(item => !!item));
+  }
+
   doc<Item>(path: string) {
     return this.SERVICE.doc(path) as DatabaseItem<Item>;
   }
@@ -122,6 +127,10 @@ export class DataService<Type> {
     public readonly databaseService: DatabaseService,
     public readonly name: string
   ) {}
+
+  exists(id: string) {
+    return this.databaseService.exists(`${this.name}/${id}`);
+  }
 
   doc(id: string) {
     return this.databaseService.doc<Type>(`${this.name}/${id}`); 
