@@ -35,6 +35,7 @@ import {UserService} from './services/user/user.service';
 import {DatabaseService} from './services/database/database.service';
 
 import {OptionDataService} from './schematas/option/option.service';
+import {ProfileDataService} from './schematas/profile/profile.service';
 import {UserDataService} from './schematas/user/user.service';
 
 @NgModule({
@@ -75,6 +76,7 @@ import {UserDataService} from './schematas/user/user.service';
     DatabaseService,
     // data services
     OptionDataService,
+    ProfileDataService,
     UserDataService,
   ],
   exports: [

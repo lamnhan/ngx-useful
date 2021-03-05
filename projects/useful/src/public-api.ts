@@ -51,6 +51,7 @@ export * from './lib/services/user/user.service';
 export * from './lib/services/database/database.service';
 
 export * from './lib/schematas/option/option.service';
+export * from './lib/schematas/profile/profile.service';
 export * from './lib/schematas/user/user.service';
 
 export * from './lib/guards/auth.guard';
