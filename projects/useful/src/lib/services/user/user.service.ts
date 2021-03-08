@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
-import { ReplaySubject, of, from, combineLatest } from 'rxjs';
+import { ReplaySubject, of, from, throwError, combineLatest } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import firebase from 'firebase/app';
-import { Profile, User } from '@lamnhan/schemata';
+import {
+  Profile,
+  User,
+  UserEditableProfile,
+  UserSettings,
+  UserAddress,
+  UserPublicly,
+} from '@lamnhan/schemata';
 
 import { HelperService } from '../helper/helper.service';
 import { AuthService } from '../auth/auth.service';
@@ -23,7 +30,6 @@ export class UserService {
   private userDataService!: UserDataService;
   private profileDataService?: ProfileDataService;
 
-  private isUser?: boolean;
   private nativeUser?: AuthNativeUser;
   private data?: User;
   private publicData?: Profile;
@@ -66,7 +72,6 @@ export class UserService {
       )
       .subscribe(({nativeUser, data, publicData}) => {
         // set data
-        this.isUser = !!(nativeUser && data);
         this.nativeUser = nativeUser;
         this.data = data;
         this.publicData = publicData;
@@ -78,7 +83,7 @@ export class UserService {
   }
 
   get IS_USER() {
-    return this.isUser;
+    return !!(this.nativeUser && this.data && (!this.profileDataService || this.publicData));
   }
 
   get NATIVE_USER() {
@@ -91,6 +96,171 @@ export class UserService {
 
   get PUBLIC_DATA() {
     return this.publicData;
+  }
+
+  checkUsernameExists(username: string) {
+    return !this.profileDataService
+      ? of(true)
+      : this.profileDataService.exists(username);
+  }
+
+  changeEmail(email: string) {
+    // TODO
+    console.log('TODO: ...');
+  }
+
+  changePhoneNumber(phoneNumber: string) {
+    // TODO
+    console.log('TODO: ...');
+  }
+
+  changeUsername(username: string) {
+    if (!this.IS_USER || !this.profileDataService) {
+      return throwError('Can not change username.');
+    }
+    return this.checkUsernameExists(username).pipe(
+      switchMap(exists => {
+        if (exists) {
+          return throwError('User exists with the username: ' + username);
+        }
+        const uid = this.nativeUser?.uid as string;
+        const currentUsername = this.DATA?.username as string;
+        // in service
+        (this.data as User).username = username;
+        (this.publicData as Profile).id = username;
+        // remotely
+        return this.userDataService.update(uid, { username }).pipe(
+          switchMap(() =>
+            (this.profileDataService as ProfileDataService).delete(currentUsername)
+          ),
+          switchMap(() =>
+            this.profileInitializer(this.nativeUser as AuthNativeUser, this.data as User)
+          ),
+        );
+      }),
+    );
+  }
+
+  updateSettings(settings: UserSettings) {
+    if (!this.IS_USER) {
+      return throwError('No user.');
+    }
+    const uid = this.nativeUser?.uid as string;
+    // in service
+    (this.data as User).settings = { ...this.data?.settings, ...settings };
+    // remotely
+    return this.userDataService.update(uid, { settings: this.data?.settings });
+  }
+
+  updateAddresses(addresses: string | Record<string, string | UserAddress>) {
+    if (!this.IS_USER) {
+      return throwError('No user.');
+    }
+    const uid = this.nativeUser?.uid as string;
+    // in service
+    if (!this.data?.addresses || typeof this.data.addresses === 'string') {
+      (this.data as User).addresses = addresses;
+    } else {
+      (this.data as User).addresses = {
+        ...this.data.addresses,
+        ...(
+          typeof addresses === 'string'
+            ? { [new Date().getTime()]: addresses }
+            : addresses
+        )
+      };
+    }
+    // remotely
+    return this.userDataService.update(uid, { addresses: this.data?.addresses });
+  }
+
+  updatePublicity(publicly: UserPublicly) {
+    if (!this.IS_USER) {
+      return throwError('No user.');
+    }
+    const uid = this.nativeUser?.uid as string;
+    // in service
+    Object.keys(publicly).forEach(key => {
+      if (publicly[key] === true) {
+        // user doc
+        (this.data as User).publicly = {
+          ...(this.data as User).publicly,
+          ...{ [key]: true }
+        };
+        // profile doc
+      } else {
+        // user doc
+        delete (this.data as User).publicly?.[key];
+        // profile doc
+      }
+    });
+
+  }
+
+  updateAdditionalData(
+    data: Record<string, unknown>,
+    publicity: Record<string, boolean> = {}
+  ) {
+    if (!this.IS_USER) {
+      return throwError('No user.');
+    }
+  }
+
+  updateProfile(data: UserEditableProfile) {
+    if (!this.IS_USER) {
+      return throwError('No user.');
+    }
+    const uid = this.nativeUser?.uid as string;
+    const username = this.DATA?.username as string;
+    // extract data
+    const { displayName, photoURL, coverPhoto, intro, detail, url } = data;
+    let userDoc: undefined | UserEditableProfile;
+    let profileDoc: undefined | Partial<Profile>;
+    let nativeProfile: undefined | {displayName?: string; photoURL?: string};
+    if (displayName) {
+      userDoc = {...userDoc, displayName};
+      profileDoc = {...profileDoc, title: displayName};
+      nativeProfile = {...nativeProfile, displayName};
+    }
+    if (photoURL) {
+      userDoc = {...userDoc, photoURL};
+      profileDoc = {...profileDoc, thumbnail: photoURL};
+      nativeProfile = {...nativeProfile, photoURL};
+    }
+    if (coverPhoto) {
+      userDoc = {...userDoc, coverPhoto};
+      profileDoc = {...profileDoc, image: coverPhoto};
+    }
+    if (intro) {
+      userDoc = {...userDoc, intro};
+      profileDoc = {...profileDoc, description: intro};
+    }
+    if (detail) {
+      userDoc = {...userDoc, detail};
+      profileDoc = {...profileDoc, content: detail};
+    }
+    if (url) {
+      userDoc = {...userDoc, url};
+      profileDoc = {...profileDoc, url};
+    }
+    // in service
+    this.data = {...this.data, ...userDoc};
+    this.publicData = {...this.publicData, ...(profileDoc as Profile)};
+    // remotely
+    return combineLatest([
+      // update native profile
+      nativeProfile && this.nativeUser
+        ? from(this.nativeUser.updateProfile(nativeProfile))
+        : of(null),
+      // update user doc
+      userDoc
+        ? this.userDataService.update(uid, userDoc)
+        : of(null),
+      // update profile doc
+      profileDoc && this.profileDataService
+        ? this.profileDataService.update(username, profileDoc)
+        : of(null),
+    ]);
   }
 
   private handleAuthChanged(

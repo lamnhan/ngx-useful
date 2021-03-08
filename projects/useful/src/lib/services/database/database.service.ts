@@ -45,21 +45,21 @@ export class DatabaseService {
       : this.flatCollection(path, queryFn).pipe(map(items => !!items.length));
   }
 
-  doc<Item>(path: string) {
-    return this.SERVICE.doc(path) as DatabaseItem<Item>;
+  doc<Type>(path: string) {
+    return this.SERVICE.doc(path) as DatabaseItem<Type>;
   }
 
-  collection<Item>(path: string, queryFn?: QueryFn) {
-    return this.SERVICE.collection(path, queryFn) as DatabaseCollection<Item>;
+  collection<Type>(path: string, queryFn?: QueryFn) {
+    return this.SERVICE.collection(path, queryFn) as DatabaseCollection<Type>;
   }
 
-  flatDoc<Item>(path: string, queryFn?: QueryFn) {
+  flatDoc<Type>(path: string, queryFn?: QueryFn) {
     return !queryFn
-      ? this.doc<Item>(path).get().pipe(
+      ? this.doc<Type>(path).get().pipe(
         map(doc => doc.data()),
         take(1)
       )
-      : this.collection<Item>(path, queryFn).get().pipe(
+      : this.collection<Type>(path, queryFn).get().pipe(
         map(collection =>
           collection.docs.length === 1
           ? collection.docs[0].data()
@@ -69,17 +69,17 @@ export class DatabaseService {
       );
   }
 
-  flatCollection<Item>(path: string, queryFn?: QueryFn) {
-    return this.collection<Item>(path, queryFn).get().pipe(
+  flatCollection<Type>(path: string, queryFn?: QueryFn) {
+    return this.collection<Type>(path, queryFn).get().pipe(
       map(collection => collection.docs.map(doc => doc.data())),
       take(1)
     );
   }
 
-  flatRecord<Item>(path: string, queryFn?: QueryFn) {
-    return this.collection<Item>(path, queryFn).get().pipe(
+  flatRecord<Type>(path: string, queryFn?: QueryFn) {
+    return this.collection<Type>(path, queryFn).get().pipe(
       map(collection => {
-        const record = {} as Record<string, Item>;
+        const record = {} as Record<string, Type>;
         collection.docs.forEach(doc => {
           const data = doc.data();
           record[(data as Record<string, unknown>).id as string] = data;
@@ -90,28 +90,28 @@ export class DatabaseService {
     );;
   }
 
-  streamDoc<Item>(path: string, queryFn?: QueryFn) {
-    return new Observable<Item | undefined>(observer =>
+  streamDoc<Type>(path: string, queryFn?: QueryFn) {
+    return new Observable<Type | undefined>(observer =>
       !queryFn
-        ? this.doc<Item>(path).ref.onSnapshot(doc => observer.next(doc.data()))
-        : this.collection<Item>(path, queryFn).ref.onSnapshot(collection =>
+        ? this.doc<Type>(path).ref.onSnapshot(doc => observer.next(doc.data()))
+        : this.collection<Type>(path, queryFn).ref.onSnapshot(collection =>
           observer.next(collection.docs.length === 1 ? collection.docs[0].data() : undefined)
         )
     );
   }
 
-  streamCollection<Item>(path: string, queryFn?: QueryFn) {
-    return new Observable<Item[]>(observer =>
-      this.collection<Item>(path, queryFn).ref.onSnapshot(collection =>
-        observer.next(collection.docs.map(doc => doc.data() as Item))
+  streamCollection<Type>(path: string, queryFn?: QueryFn) {
+    return new Observable<Type[]>(observer =>
+      this.collection<Type>(path, queryFn).ref.onSnapshot(collection =>
+        observer.next(collection.docs.map(doc => doc.data() as Type))
       )
     );
   }
 
-  streamRecord<Item>(path: string, queryFn?: QueryFn) {
-    return new Observable<Record<string, Item>>(observer =>
-      this.collection<Item>(path, queryFn).ref.onSnapshot(collection => {
-        const record = {} as Record<string, Item>;
+  streamRecord<Type>(path: string, queryFn?: QueryFn) {
+    return new Observable<Record<string, Type>>(observer =>
+      this.collection<Type>(path, queryFn).ref.onSnapshot(collection => {
+        const record = {} as Record<string, Type>;
         collection.docs.forEach(doc => {
           const data = doc.data();
           record[(data as Record<string, unknown>).id as string] = data;
@@ -121,15 +121,15 @@ export class DatabaseService {
     );
   }
 
-  add<Item>(path: string, item: Item) {
+  add<Type>(path: string, item: Type) {
     return this.set(path, item);
   }
 
-  set<Item>(path: string, item: Item) {
+  set<Type>(path: string, item: Type) {
     return from(this.doc(path).set(item));
   }
 
-  update<Item>(path: string, item: Item) {
+  update<Type>(path: string, item: Partial<Type>) {
     return from(this.doc(path).update(item));
   }
 
@@ -138,7 +138,7 @@ export class DatabaseService {
   }
 }
 
-export class DataService<Type> {
+export class DataService<Type extends Record<string, unknown>> {
   constructor(
     public readonly databaseService: DatabaseService,
     public readonly name: string
@@ -194,7 +194,7 @@ export class DataService<Type> {
     return this.databaseService.set(`${this.name}/${id}`, item);
   }
 
-  update(id: string, item: Type) {
+  update(id: string, item: Partial<Type>) {
     return this.databaseService.update(`${this.name}/${id}`, item);
   }
 
