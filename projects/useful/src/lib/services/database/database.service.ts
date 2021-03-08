@@ -53,28 +53,31 @@ export class DatabaseService {
     return this.SERVICE.collection(path, queryFn) as DatabaseCollection<Item>;
   }
 
-  flatDoc<Item>(path: string) {
-    return this.doc<Item>(path)
-      .get()
-      .pipe(
+  flatDoc<Item>(path: string, queryFn?: QueryFn) {
+    return !queryFn
+      ? this.doc<Item>(path).get().pipe(
         map(doc => doc.data()),
+        take(1)
+      )
+      : this.collection<Item>(path, queryFn).get().pipe(
+        map(collection =>
+          collection.docs.length === 1
+          ? collection.docs[0].data()
+          : undefined
+        ),
         take(1)
       );
   }
 
   flatCollection<Item>(path: string, queryFn?: QueryFn) {
-    return this.collection<Item>(path, queryFn)
-      .get()
-      .pipe(
-        map(collection => collection.docs.map(doc => doc.data())),
-        take(1)
-      );
+    return this.collection<Item>(path, queryFn).get().pipe(
+      map(collection => collection.docs.map(doc => doc.data())),
+      take(1)
+    );
   }
 
   flatRecord<Item>(path: string, queryFn?: QueryFn) {
-    return this.collection<Item>(path, queryFn)
-    .get()
-    .pipe(
+    return this.collection<Item>(path, queryFn).get().pipe(
       map(collection => {
         const record = {} as Record<string, Item>;
         collection.docs.forEach(doc => {
@@ -87,38 +90,34 @@ export class DatabaseService {
     );;
   }
 
-  streamDoc<Item>(path: string) {
-    return new Observable<Item>(observer =>
-      this.doc<Item>(path)
-        .ref
-        .onSnapshot(doc => 
-          observer.next(doc.data())
+  streamDoc<Item>(path: string, queryFn?: QueryFn) {
+    return new Observable<Item | undefined>(observer =>
+      !queryFn
+        ? this.doc<Item>(path).ref.onSnapshot(doc => observer.next(doc.data()))
+        : this.collection<Item>(path, queryFn).ref.onSnapshot(collection =>
+          observer.next(collection.docs.length === 1 ? collection.docs[0].data() : undefined)
         )
     );
   }
 
   streamCollection<Item>(path: string, queryFn?: QueryFn) {
     return new Observable<Item[]>(observer =>
-      this.collection<Item>(path, queryFn)
-        .ref
-        .onSnapshot(collection =>
-          observer.next(collection.docs.map(doc => doc.data() as Item))
-        )
+      this.collection<Item>(path, queryFn).ref.onSnapshot(collection =>
+        observer.next(collection.docs.map(doc => doc.data() as Item))
+      )
     );
   }
 
   streamRecord<Item>(path: string, queryFn?: QueryFn) {
     return new Observable<Record<string, Item>>(observer =>
-      this.collection<Item>(path, queryFn)
-        .ref
-        .onSnapshot(collection => {
-          const record = {} as Record<string, Item>;
-          collection.docs.forEach(doc => {
-            const data = doc.data();
-            record[(data as Record<string, unknown>).id as string] = data;
-          });
-          observer.next(record);
-        })
+      this.collection<Item>(path, queryFn).ref.onSnapshot(collection => {
+        const record = {} as Record<string, Item>;
+        collection.docs.forEach(doc => {
+          const data = doc.data();
+          record[(data as Record<string, unknown>).id as string] = data;
+        });
+        observer.next(record);
+      })
     );
   }
 
@@ -145,10 +144,10 @@ export class DataService<Type> {
     public readonly name: string
   ) {}
 
-  exists(input: string | QueryFn) {
-    return typeof input === 'string'
-      ? this.databaseService.exists(`${this.name}/${input}`)
-      : this.databaseService.exists(this.name, input);
+  exists(idOrQuery: string | QueryFn) {
+    return typeof idOrQuery === 'string'
+      ? this.databaseService.exists(`${this.name}/${idOrQuery}`)
+      : this.databaseService.exists(this.name, idOrQuery);
   }
 
   doc(id: string) {
@@ -159,8 +158,10 @@ export class DataService<Type> {
     return this.databaseService.collection<Type>(this.name, queryfn);
   }
 
-  flatDoc(id: string) {
-    return this.databaseService.flatDoc<Type>(`${this.name}/${id}`);
+  flatDoc(idOrQuery: string | QueryFn) {
+    return typeof idOrQuery === 'string'
+      ? this.databaseService.flatDoc<Type>(`${this.name}/${idOrQuery}`)
+      : this.databaseService.flatDoc<Type>(this.name, idOrQuery);
   }
 
   flatCollection(queryfn?: any) {
@@ -171,8 +172,10 @@ export class DataService<Type> {
     return this.databaseService.flatRecord<Type>(this.name, queryfn);
   }
 
-  streamDoc(id: string) {
-    return this.databaseService.streamDoc<Type>(`${this.name}/${id}`);
+  streamDoc(idOrQuery: string | QueryFn) {
+    return typeof idOrQuery === 'string'
+      ? this.databaseService.streamDoc<Type>(`${this.name}/${idOrQuery}`)
+      : this.databaseService.streamDoc<Type>(this.name, idOrQuery);
   }
 
   streamCollection(queryfn?: any) {
