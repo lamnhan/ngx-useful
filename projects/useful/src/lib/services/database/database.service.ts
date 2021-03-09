@@ -3,6 +3,8 @@ import { from, Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
 
+export type NullableOptional<T> = PickRequired<T> & Nullable<PickOptional<T>>;
+
 export type VendorDatabaseService = AngularFirestore;
 
 export type DatabaseItem<T> = AngularFirestoreDocument<T>;
@@ -129,7 +131,7 @@ export class DatabaseService {
     return from(this.doc(path).set(item));
   }
 
-  update<Type>(path: string, item: Partial<Type>) {
+  update<Type>(path: string, item: Type) {
     return from(this.doc(path).update(item));
   }
 
@@ -186,15 +188,15 @@ export class DataService<Type extends Record<string, unknown>> {
     return this.databaseService.streamRecord<Type>(this.name, queryfn);
   }
 
-  add(id: string, item: Type) {
+  add(id: string, item: Type | NullableOptional<Type>) {
     return this.databaseService.add(`${this.name}/${id}`, item);
   }
 
-  set(id: string, item: Type) {
+  set(id: string, item: Type | NullableOptional<Type>) {
     return this.databaseService.set(`${this.name}/${id}`, item);
   }
 
-  update(id: string, item: Partial<Type>) {
+  update(id: string, item: Partial<Type> | NullableOptional<Partial<Type>>) {
     return this.databaseService.update(`${this.name}/${id}`, item);
   }
 
@@ -202,3 +204,9 @@ export class DataService<Type extends Record<string, unknown>> {
     return this.databaseService.delete(`${this.name}/${id}`);
   }
 }
+
+type RequiredKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? never : K }[keyof T];
+type OptionalKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? K : never }[keyof T];
+type PickRequired<T> = Pick<T, RequiredKeys<T>>;
+type PickOptional<T> = Pick<T, OptionalKeys<T>>;
+type Nullable<T> = { [P in keyof T]: T[P] | null };

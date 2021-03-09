@@ -12,6 +12,7 @@ import {
 } from '@lamnhan/schemata';
 
 import { HelperService } from '../helper/helper.service';
+import { NullableOptional } from '../database/database.service';
 import { AuthService } from '../auth/auth.service';
 import { UserDataService } from '../../schematas/user/user.service';
 import { ProfileDataService } from '../../schematas/profile/profile.service';
@@ -115,24 +116,26 @@ export class UserService {
   }
 
   changeUsername(username: string) {
-    if (!this.IS_USER || !this.profileDataService) {
-      return throwError('Can not change username.');
-    }
     return this.checkUsernameExists(username).pipe(
       switchMap(exists => {
         if (exists) {
           return throwError('User exists with the username: ' + username);
         }
-        const uid = this.nativeUser?.uid as string;
-        const currentUsername = this.DATA?.username as string;
+        if (!this.nativeUser || !this.data || !this.publicData || !this.profileDataService) {
+          return throwError('Can not change username.');
+        }
+        const uid = this.nativeUser.uid;
+        const currentUsername = this.data.username as string;
         // in service
-        (this.data as User).username = username;
-        (this.publicData as Profile).id = username;
+        this.data.username = username;
+        this.publicData.id = username;
         // remotely
-        return this.userDataService.update(uid, { username }).pipe(
+        return this.userDataService.update(uid, {username}).pipe(
+          // remove current doc from /profiles
           switchMap(() =>
             (this.profileDataService as ProfileDataService).delete(currentUsername)
           ),
+          // add new doc to /profiles
           switchMap(() =>
             this.profileInitializer(this.nativeUser as AuthNativeUser, this.data as User)
           ),
@@ -142,59 +145,104 @@ export class UserService {
   }
 
   updateSettings(settings: UserSettings) {
-    if (!this.IS_USER) {
+    if (!this.nativeUser || !this.data) {
       return throwError('No user.');
     }
-    const uid = this.nativeUser?.uid as string;
+    const uid = this.nativeUser.uid;
     // in service
-    (this.data as User).settings = { ...this.data?.settings, ...settings };
+    this.data.settings = { ...this.data?.settings, ...settings };
     // remotely
-    return this.userDataService.update(uid, { settings: this.data?.settings });
+    return this.userDataService.update(uid, { settings: this.data.settings });
   }
 
   updateAddresses(addresses: string | Record<string, string | UserAddress>) {
-    if (!this.IS_USER) {
+    if (!this.nativeUser || !this.data) {
       return throwError('No user.');
     }
     const uid = this.nativeUser?.uid as string;
     // in service
     if (!this.data?.addresses || typeof this.data.addresses === 'string') {
-      (this.data as User).addresses = addresses;
+      this.data.addresses = addresses;
     } else {
-      (this.data as User).addresses = {
+      this.data.addresses = {
         ...this.data.addresses,
         ...(
           typeof addresses === 'string'
-            ? { [new Date().getTime()]: addresses }
+            ? {[new Date().getTime()]: addresses}
             : addresses
         )
       };
     }
     // remotely
-    return this.userDataService.update(uid, { addresses: this.data?.addresses });
+    return this.userDataService.update(uid, { addresses: this.data.addresses });
   }
 
   updatePublicity(publicly: UserPublicly) {
-    if (!this.IS_USER) {
+    if (!this.nativeUser || !this.data) {
       return throwError('No user.');
     }
-    const uid = this.nativeUser?.uid as string;
+    const uid = this.nativeUser.uid;
+    const username = this.data.username as string;
     // in service
+    let profileDoc: Partial<Profile> | NullableOptional<Partial<Profile>>;
     Object.keys(publicly).forEach(key => {
-      if (publicly[key] === true) {
-        // user doc
-        (this.data as User).publicly = {
-          ...(this.data as User).publicly,
-          ...{ [key]: true }
-        };
-        // profile doc
-      } else {
-        // user doc
-        delete (this.data as User).publicly?.[key];
-        // profile doc
+      if (this.data) {
+        if (publicly[key] === true) {
+          // user doc
+          this.data.publicly = {
+            ...this.data.publicly,
+            ...{ [key]: true }
+          };
+          // profile doc
+          if (this.publicData) {
+            const {email, phoneNumber, additionalData} = this.data;
+            if (key === 'email') {
+              this.publicData.email = email;
+              profileDoc = {...profileDoc, email};
+            } else if (key === 'phoneNumber') {
+              this.publicData.phoneNumber = phoneNumber;
+              profileDoc = {...profileDoc, phoneNumber};
+            } else if (additionalData?.[key]) {
+              const data = additionalData[key];
+              this.publicData.props = {...this.publicData.props, [key]: data};
+              profileDoc = {...profileDoc, props: this.publicData.props};
+            }
+          }
+        } else {
+          // user doc
+          delete this.data.publicly?.[key];
+          // profile doc
+          if (this.publicData) {
+            if (key === 'email') {
+              delete this.publicData.email;
+              profileDoc = {...profileDoc, email: null};
+            } else if (key === 'phoneNumber') {
+              delete this.publicData.phoneNumber;
+              profileDoc = {...profileDoc, phoneNumber: null};
+            } else if (this.publicData.props) {
+              delete this.publicData.props[key];
+              profileDoc = {
+                ...profileDoc,
+                props: (!this.publicData.props || !Object.keys(this.publicData.props).length)
+                  ? null
+                  : this.publicData.props
+              };
+            }
+          }
+        }
       }
     });
-
+    return this.userDataService.update(uid, {
+      publicly: (!this.data.publicly || !Object.keys(this.data.publicly).length)
+        ? null
+        : this.data.publicly
+    }).pipe(
+      switchMap(() =>
+        this.profileDataService
+          ? this.profileDataService.update(username, profileDoc)
+          : of(null)
+      ),
+    );
   }
 
   updateAdditionalData(
