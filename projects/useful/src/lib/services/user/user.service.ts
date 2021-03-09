@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ReplaySubject, of, from, throwError, combineLatest } from 'rxjs';
+import { ReplaySubject, of, from, throwError, combineLatest, pipe } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import {
@@ -240,26 +240,37 @@ export class UserService {
       switchMap(() =>
         this.profileDataService
           ? this.profileDataService.update(username, profileDoc)
-          : of(null)
+          : of(undefined)
       ),
     );
   }
 
   updateAdditionalData(
     data: Record<string, unknown>,
-    publicity: Record<string, boolean> = {}
+    publicity?: Record<string, boolean>
   ) {
-    if (!this.IS_USER) {
+    if (!this.nativeUser || !this.data) {
       return throwError('No user.');
     }
+    const uid = this.nativeUser.uid;
+    // in service
+    this.data.additionalData = {...this.data.additionalData, ...data};
+    // remotely
+    return this.userDataService.update(uid, { additionalData: this.data.additionalData }).pipe(
+      switchMap(() =>
+        publicity
+          ? this.updatePublicity(publicity)
+          : of(undefined)
+      ),
+    );
   }
 
   updateProfile(data: UserEditableProfile) {
-    if (!this.IS_USER) {
+    if (!this.nativeUser || !this.data) {
       return throwError('No user.');
     }
-    const uid = this.nativeUser?.uid as string;
-    const username = this.DATA?.username as string;
+    const uid = this.nativeUser.uid;
+    const username = this.data.username as string;
     // extract data
     const { displayName, photoURL, coverPhoto, intro, detail, url } = data;
     let userDoc: undefined | UserEditableProfile;
@@ -299,15 +310,15 @@ export class UserService {
       // update native profile
       nativeProfile && this.nativeUser
         ? from(this.nativeUser.updateProfile(nativeProfile))
-        : of(null),
+        : of(undefined),
       // update user doc
       userDoc
         ? this.userDataService.update(uid, userDoc)
-        : of(null),
+        : of(undefined),
       // update profile doc
       profileDoc && this.profileDataService
         ? this.profileDataService.update(username, profileDoc)
-        : of(null),
+        : of(undefined),
     ]);
   }
 
