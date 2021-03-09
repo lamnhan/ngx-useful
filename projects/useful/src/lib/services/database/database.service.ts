@@ -140,7 +140,7 @@ export class DatabaseService {
   }
 }
 
-export class DataService<Type extends Record<string, unknown>> {
+export class DataService<Type> {
   constructor(
     public readonly databaseService: DatabaseService,
     public readonly name: string

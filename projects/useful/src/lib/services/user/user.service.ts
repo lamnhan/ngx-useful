@@ -144,6 +144,14 @@ export class UserService {
     );
   }
 
+  changePublicity(toPublic = false) {
+    if (!this.nativeUser || !this.data || !this.publicData || !this.profileDataService) {
+      return throwError('No user.');
+    }
+    // TODO
+    return throwError('TODO: ...');
+  }
+
   updateSettings(settings: UserSettings) {
     if (!this.nativeUser || !this.data) {
       return throwError('No user.');
@@ -177,7 +185,7 @@ export class UserService {
     return this.userDataService.update(uid, { addresses: this.data.addresses });
   }
 
-  updatePublicity(publicly: UserPublicly) {
+  updatePublicly(publicly: UserPublicly) {
     if (!this.nativeUser || !this.data) {
       return throwError('No user.');
     }
@@ -247,7 +255,7 @@ export class UserService {
 
   updateAdditionalData(
     data: Record<string, unknown>,
-    publicity?: Record<string, boolean>
+    publicly?: Record<string, boolean>
   ) {
     if (!this.nativeUser || !this.data) {
       return throwError('No user.');
@@ -258,8 +266,8 @@ export class UserService {
     // remotely
     return this.userDataService.update(uid, { additionalData: this.data.additionalData }).pipe(
       switchMap(() =>
-        publicity
-          ? this.updatePublicity(publicity)
+        publicly
+          ? this.updatePublicly(publicly)
           : of(undefined)
       ),
     );

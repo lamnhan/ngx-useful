@@ -1,5 +1,6 @@
-import { Directive, HostBinding, HostListener, Input } from '@angular/core';
-import { Router, NavigationExtras } from '@angular/router';
+import { Directive, HostBinding, HostListener, Input, OnChanges, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { NavigationExtras } from '@angular/router';
 
 import { NavService } from '../../services/nav/nav.service';
 
@@ -9,7 +10,7 @@ import { NavService } from '../../services/nav/nav.service';
 @Directive({
   selector: 'a[routerLink]'
 })
-export class RouterLinkDirective {
+export class RouterLinkDirective implements OnChanges, OnDestroy {
   private input: string | string[] = [];
   private data?: Record<string, unknown>;
   private locale?: string;
@@ -40,24 +41,36 @@ export class RouterLinkDirective {
       : classes;
   }
 
-  @HostBinding() get href() {
-    return this.navService.getRouteUrl(this.input, this.locale);
-  }
+  @HostBinding() href!: string;
 
-  @HostBinding() get class() {
-    return this.activeClasses && this.router.isActive(this.href, true)
-      ? this.activeClasses
-      : [];
-  }
+  @HostBinding() class!: string | string[];
 
   @HostListener('click') onClick() {
     this.navService.navigate(this.input, this.extras, this.data, this.locale);
     return false;
   }
 
-  constructor(
-    private router: Router,
-    private navService: NavService
-  ) {}
+  private subscription: Subscription;
 
+  constructor(private navService: NavService) {
+    this.subscription = navService
+      .onRefreshRouterLink
+      .subscribe(() => this.updateTargetAttributes());
+  }
+
+  ngOnChanges() {
+    this.updateTargetAttributes();
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  private updateTargetAttributes() {
+    this.href = this.navService.getRouteUrl(this.input, this.locale);
+    this.class =
+      (this.activeClasses && this.navService.isActive(this.href))
+        ? this.activeClasses
+        : [];
+  }
 }

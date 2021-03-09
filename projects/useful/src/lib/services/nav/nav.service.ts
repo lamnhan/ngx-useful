@@ -9,6 +9,7 @@ import {
   NavigationEnd,
   NavigationExtras
 } from '@angular/router';
+import { ReplaySubject } from 'rxjs';
 
 import { SettingService } from '../setting/setting.service';
 
@@ -104,6 +105,9 @@ export class NavService {
   private i18nRouting?: I18nRouting;
   private i18nOrigins: Record<string, string> = {};
 
+  // router link
+  public readonly onRefreshRouterLink = new ReplaySubject<void>(1);
+
   constructor(
     private router: Router,
     private settingService: SettingService,
@@ -150,9 +154,12 @@ export class NavService {
           (this.i18nRouting as I18nRouting)[localizedPathMap[0]] = routingItem;
         });
       });
-      // redirect i18n route
+      // watch for locale
       if (this.options.i18nRedirect) {
         this.settingService.onLocaleChanged.subscribe(locale => {
+          // refresh router link
+          this.onRefreshRouterLink.next();
+          // redirect i18n route
           const url = this.router.url;
           const pathInit = url.substr(1).split('/').shift() as string;
           if (pathInit !== '' && this.i18nOrigins[pathInit] !== locale) {
@@ -180,6 +187,8 @@ export class NavService {
         }
       } else if (event instanceof NavigationEnd) {
         eventName = 'NavigationEnd';
+        // refresh router link
+        this.onRefreshRouterLink.next();
         // record urls for backing navigation
         const url = event.urlAfterRedirects;
         const backUrl = this.previousUrls[this.previousUrls.length - 2];
@@ -290,6 +299,10 @@ export class NavService {
 
   toggleMenu() {
     this.isMenuVisible = !this.isMenuVisible;
+  }
+
+  isActive(href: string, exact = true) {
+    return this.router.isActive(href, exact);
   }
 
   back() {
