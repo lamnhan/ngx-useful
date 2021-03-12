@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ReplaySubject, of, from, throwError, combineLatest, pipe } from 'rxjs';
+import { ReplaySubject, of, from, throwError, combineLatest } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import {
@@ -17,7 +17,8 @@ import { AuthService } from '../auth/auth.service';
 import { UserDataService } from '../../schematas/user/user.service';
 import { ProfileDataService } from '../../schematas/profile/profile.service';
 
-export type AuthNativeUser = firebase.User; // | SheetbaseUser
+export type NativeUser = firebase.User;
+export type NativeUserCredential = firebase.auth.UserCredential;
 
 export interface UserOptions {
   profilePublished?: boolean;
@@ -31,7 +32,7 @@ export class UserService {
   private userDataService!: UserDataService;
   private profileDataService?: ProfileDataService;
 
-  private nativeUser?: AuthNativeUser;
+  private nativeUser?: NativeUser;
   private data?: User;
   private publicData?: Profile;
 
@@ -137,7 +138,7 @@ export class UserService {
           ),
           // add new doc to /profiles
           switchMap(() =>
-            this.profileInitializer(this.nativeUser as AuthNativeUser, this.data as User)
+            this.profileInitializer(this.nativeUser as NativeUser, this.data as User)
           ),
         );
       }),
@@ -331,7 +332,7 @@ export class UserService {
   }
 
   private handleAuthChanged(
-    nativeUser: null | AuthNativeUser,
+    nativeUser: null | NativeUser,
     userDoc?: User,
     profileDoc?: Profile
   ) {
@@ -348,9 +349,12 @@ export class UserService {
     }
     // with /profiles
     else {
-      const defaultUsername = nativeUser.email
-        ? nativeUser.email.split('@').shift() as string
-        : nativeUser.uid.substr(-7);
+      const nativeUsername = this.authService.CREDENTIAL?.additionalUserInfo?.username;
+      const defaultUsername = nativeUsername
+        ? nativeUsername
+        : nativeUser.email
+          ? nativeUser.email.split('@').shift() as string
+          : nativeUser.uid.substr(-7);
       return !userDoc
         ? this.profileDataService.exists(defaultUsername).pipe(
           switchMap(exists =>
@@ -370,7 +374,7 @@ export class UserService {
     }
   }
 
-  private userInitializer(nativeUser: AuthNativeUser, username?: string) {
+  private userInitializer(nativeUser: NativeUser, username?: string) {
     const {uid} = nativeUser;
     const userDoc = { uid, username: username || uid } as User;
     return this.userDataService.add(uid, userDoc).pipe(
@@ -378,7 +382,7 @@ export class UserService {
     );
   }
 
-  private profileInitializer(nativeUser: AuthNativeUser, data: User) {
+  private profileInitializer(nativeUser: NativeUser, data: User) {
     const time = new Date().toISOString();
     const uid = nativeUser.uid;
     const username = data.username as string;
@@ -441,11 +445,13 @@ export class UserService {
     );
   }
 
-  private proccessUserData(nativeUser: AuthNativeUser, userDoc: User) {
+  private proccessUserData(nativeUser: NativeUser, userDoc: User) {
     return from(nativeUser.getIdTokenResult()).pipe(map(idTokenResult => {
+      const isNew = this.authService?.CREDENTIAL?.additionalUserInfo?.isNewUser;
       const data = {
         ...userDoc,
         isAnonymous: nativeUser.isAnonymous ?? undefined,
+        isNew,
         emailVerified: nativeUser.emailVerified ?? undefined,
         uid: nativeUser.uid ?? undefined,
         email: nativeUser.email ?? undefined,
