@@ -1,5 +1,5 @@
 <div
-  class="component-pwa-reminder"
+  class="useful-pwa-reminder"
   *ngIf="pwa && !pwa.IS_INSTALLED"
   [class]="pwa.RUNTIME"
   [class.show]="pwa.IS_REMINDER_SHOWED"
@@ -9,18 +9,27 @@
   <div class="head">
     <img class="icon" [src]="icon" alt="title">
     <div class="text">
-      <strong>{{title}}</strong>
-      <span>{{message}}</span>
+      <strong>{{ !i18n ? title : ('USEFUL_PWA_REMINDER.TITLE' | translate) }}</strong>
+      <span>{{ !i18n ? text : ('USEFUL_PWA_REMINDER.TEXT' | translate) }}</span>
     </div>
     <button class="close button-clear" (click)="pwa.hideReminder()">✕</button>
   </div>
 
   <div class="body">
-    <div [class]="pwa.RUNTIME + '-message'" [innerHtml]="getMessage()"></div>
+    <div
+      [class]="pwa.RUNTIME + '-message'"
+      [innerHtml]="!i18n ? getMessage() : (I18N_MESSAGE_CODE | translate)"
+    ></div>
   </div>
 
   <div class="foot">
-    <button class="dismiss button-link" (click)="pwa.dismissReminder()">{{dismissText}}</button>
-    <button class="hide button-sm" (click)="pwa.hideReminder()">{{hideText}}</button>
+    <button
+      class="dismiss button-link"
+      (click)="pwa.dismissReminder()"
+    >{{ !i18n ? dismissText : ('USEFUL_PWA_REMINDER.DISMISS_TEXT' | translate) }}</button>
+    <button
+      class="hide button-sm"
+      (click)="pwa.hideReminder()"
+    >{{ !i18n ? hideText : ('USEFUL_PWA_REMINDER.HIDE_TEXT' | translate) }}</button>
   </div>
 </div>

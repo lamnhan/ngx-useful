@@ -1,5 +1,6 @@
 import {NgModule} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 import {PwaReminderComponent} from './pwa-reminder.component';
 
@@ -9,6 +10,7 @@ import {PwaReminderComponent} from './pwa-reminder.component';
   ],
   imports: [
     CommonModule,
+    TranslateModule,
   ],
   exports: [
     PwaReminderComponent,

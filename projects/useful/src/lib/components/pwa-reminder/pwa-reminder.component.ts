@@ -8,11 +8,13 @@ import {PwaService} from '../../services/pwa/pwa.service';
   styleUrls: ['./pwa-reminder.component.scss']
 })
 export class PwaReminderComponent implements OnInit {
-  @Input('pwaService') pwa?: PwaService;
+  @Input() i18n = false;
+
+  @Input('pwaService') pwa!: PwaService;
 
   @Input() icon = '/icons/icon-72x72.png';
   @Input() title = 'Install app?';
-  @Input() message = 'Add app to your home screen';
+  @Input() text = 'Add app to your home screen';
 
   @Input() iosSafariMessage: string | string[];
   @Input() iosAnyMessage: string | string[];
@@ -57,9 +59,14 @@ export class PwaReminderComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  get I18N_MESSAGE_CODE() {
+    return 'USEFUL_PWA_REMINDER.MESSAGE.'
+      + (this.pwa.RUNTIME || 'desktop-any').replace(/-/g, '_').toUpperCase();
+  }
+
   getMessage() {
     let msg: string | string[] = '';
-    switch (this?.pwa?.RUNTIME) {
+    switch (this.pwa.RUNTIME) {
       case 'ios-safari':
         msg = this.iosSafariMessage;
         break;

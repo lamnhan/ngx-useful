@@ -1,10 +1,10 @@
 <div
-  class="component-nav-indicator"
+  class="useful-nav-indicator"
   *ngIf="nav"
   [class.show]="nav.IS_LOADING"
 >
   <div class="body" (click)="nav.hideLoadingIndicator()">
     <img [src]="icon">
-    <span [innerHtml]="text"></span>
+    <span>{{ !i18n ? text : ('USEFUL_NAV_INDICATOR.TEXT' | translate) }}</span>
   </div>
 </div>

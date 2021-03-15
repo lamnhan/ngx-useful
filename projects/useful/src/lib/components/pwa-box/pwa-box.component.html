@@ -1,15 +1,15 @@
-<div class="component-pwa-box" *ngIf="pwa && !pwa.IS_INSTALLED">
+<div class="useful-pwa-box" *ngIf="pwa && !pwa.IS_INSTALLED">
 
   <div class="head">
-    <span class="title">{{title}}</span>
+    <span class="title">{{ !i18n ? title : ('USEFUL_PWA_BOX.TITLE' | translate) }}</span>
     <button class="close button-clear" (click)="dismiss.emit()">✕</button>
   </div>
 
   <div class="body" (click)="action.emit()">
     <img class="thumbnail" [src]="icon" alt="name">
     <div class="text">
-      <strong>{{name}}</strong>
-      <span>{{tagline}}</span>
+      <strong>{{ !i18n ? name : ('USEFUL_PWA_BOX.NAME' | translate) }}</strong>
+      <span>{{ !i18n ? tagline : ('USEFUL_PWA_BOX.TAGLINE' | translate) }}</span>
     </div>
   </div>
 

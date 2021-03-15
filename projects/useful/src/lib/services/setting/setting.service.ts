@@ -19,7 +19,7 @@ export interface AppSettings extends BuiltinUISettings, BuiltinGeneralSettings {
 export interface SettingOptions {
   browserColor?: boolean;
   browserLocale?: boolean;
-  withAuth?: boolean;
+  userService?: UserService;
   translateService?: TranslateService;
   onReady?: () => void;
 }
@@ -50,8 +50,7 @@ export class SettingService {
 
   constructor(
     private zone: NgZone,
-    private localstorageService: LocalstorageService,
-    private userService: UserService,
+    private localstorageService: LocalstorageService
   ) {}
 
   init(
@@ -84,7 +83,7 @@ export class SettingService {
       this.changeTheme(theme);
       this.changePersona(persona);
       this.changeLocale(locale);
-      // ready
+      // trigger ready
       if (this.options.onReady) {
         this.options.onReady();
       }
@@ -107,10 +106,18 @@ export class SettingService {
 
   changeTheme(name: string) {
     if (!this.theme || this.theme !== name) {
+      // affect
       document.body.setAttribute('data-theme', name);
       // set value
       this.theme = name;
       this.localstorageService.set(this.LSK_THEME, name);
+      if (
+        this.options.userService
+        && this.options.userService.IS_USER
+        && this.options.userService.DATA?.settings?.theme !== name
+      ) {
+        this.options.userService.updateSettings({ theme: name });
+      }
       // event
       this.onThemeChanged.next(name);
     }
@@ -118,8 +125,16 @@ export class SettingService {
 
   changePersona(name: string) {
     if (!this.persona || this.persona !== name) {
+      // set value
       this.persona = name;
       this.localstorageService.set(this.LSK_PERSONA, name);
+      if (
+        this.options.userService
+        && this.options.userService.IS_USER
+        && this.options.userService.DATA?.settings?.persona !== name
+      ) {
+        this.options.userService.updateSettings({ persona: name });
+      }
       // event
       this.onPersonaChanged.next(name);
     }
@@ -127,21 +142,30 @@ export class SettingService {
 
   changeLocale(value: string) {
     if (!this.locale || this.locale !== value) {
+      // affect
       if (this.options.translateService) {
         this.options.translateService.use(value);
       }
+      // set value
       this.locale = value;
       this.localstorageService.set(this.LSK_LOCALE, value);
+      if (
+        this.options.userService
+        && this.options.userService.IS_USER
+        && this.options.userService.DATA?.settings?.locale !== value
+      ) {
+        this.options.userService.updateSettings({ locale: value });
+      }
       // event
       this.onLocaleChanged.next(value);
     }
   }
 
   private remoteLoader() {
-    return !this.options.withAuth
+    return !this.options.userService
       ? of({} as AppSettings)
-      : this.userService.onUserChanged.pipe(
-        switchMap(data => of(data && data.settings ? data.settings : {})),
+      : this.options.userService.onUserChanged.pipe(
+        switchMap(data => of(data?.settings ? data.settings : {})),
       );
   }
 

@@ -8,8 +8,9 @@ import { NavService } from '../../services/nav/nav.service';
   styleUrls: ['./nav-indicator.component.scss']
 })
 export class NavIndicatorComponent implements OnInit {
-  @Input('navService') nav?: NavService;
+  @Input() i18n = false;
 
+  @Input('navService') nav!: NavService;
   @Input() icon = '/assets/images/logo.svg';
   @Input() text = 'Please wait ...';
 

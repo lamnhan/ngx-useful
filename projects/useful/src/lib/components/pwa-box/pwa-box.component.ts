@@ -8,10 +8,10 @@ import {PwaService} from '../../services/pwa/pwa.service';
   styleUrls: ['./pwa-box.component.scss']
 })
 export class PwaBoxComponent implements OnInit {
-  @Input('pwaService') pwa?: PwaService;
+  @Input() i18n = false;
 
+  @Input('pwaService') pwa!: PwaService;
   @Input() title = 'Install app?';
-
   @Input() icon = '/icons/icon-72x72.png';
   @Input() name = 'Install now';
   @Input() tagline = 'Add app to your home screen';
