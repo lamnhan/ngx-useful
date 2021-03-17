@@ -99,6 +99,58 @@ export class UserService {
   get PUBLIC_DATA() {
     return this.publicData;
   }
+  
+  get ROLE() {
+    const { sadmin, admin, editor, author, contributor } = this.DATA?.claims || {};
+    return sadmin ? 'sadmin'
+      : admin ? 'admin'
+      : editor ? 'editor'
+      : author ? 'author'
+      : contributor ? 'contributor'
+      : 'subscriber';
+  }
+
+  get LEVEL() {
+    const { sadmin, admin, editor, author, contributor } = this.DATA?.claims || {};
+    return sadmin ? 6
+      : admin ? 5
+      : editor ? 4
+      : author ? 3
+      : contributor ? 2
+      : 1;
+  }
+
+  get IS_SUPER_ADMIN() {
+    return this.IS_USER && this.isRole('sadmin');
+  }
+
+  get IS_ADMIN() {
+    return this.IS_USER && this.isRole('admin');
+  }
+
+  get IS_EDITOR() {
+    return this.IS_USER && this.isRole('editor');
+  }
+
+  get IS_AUTHOR() {
+    return this.IS_USER && this.isRole('author');
+  }
+
+  get IS_CONTRIBUTOR() {
+    return this.IS_USER && this.isRole('contributor');
+  }
+
+  get IS_SUBSCRIBER() {
+    return true;
+  }
+
+  isRole(role: string) {
+    return this.DATA?.claims?.[role] === true;
+  }
+
+  allowedLevel(level: number) {
+    return this.LEVEL >= level;
+  }
 
   checkUsernameExists(username: string) {
     return !this.profileDataService

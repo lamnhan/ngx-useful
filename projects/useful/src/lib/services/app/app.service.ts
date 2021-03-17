@@ -5,8 +5,15 @@ export interface AppOptions {
   splashScreen?: boolean | string;
 }
 
+export interface BuiltinDataItem {
+  value: string;
+  text: string;
+}
+
 export interface BuiltinData {
-  locales?: string[];
+  themes?: BuiltinDataItem[];
+  personas?: BuiltinDataItem[];
+  locales?: BuiltinDataItem[];
 }
 
 @Injectable({
@@ -16,7 +23,9 @@ export class AppService {
   private options: AppOptions = {};
   
   // builtin data
-  private locales: string[] = ['en-US'];
+  private themes: BuiltinDataItem[] = [{text: 'Light', value: 'light'}];
+  private personas: BuiltinDataItem[] = [{text: 'Default', value: 'default'}];
+  private locales: BuiltinDataItem[] = [{text: 'English', value: 'en-US'}];
 
   // custom data
   private customData: Record<string, unknown> = {};
@@ -35,9 +44,16 @@ export class AppService {
     dataLoader?: () => Observable<Record<string, unknown>>,
   ) {
     this.options = options;
-    // set locales
-    if (builtinData.locales) {
-      this.locales = builtinData.locales;
+    // set builtin
+    const {themes, personas, locales} = builtinData;
+    if (themes) {
+      this.themes = themes;
+    }
+    if (personas) {
+      this.personas = personas;
+    }
+    if (locales) {
+      this.locales = locales;
     }
     // custom data (directly)
     this.customData = customData;
@@ -67,6 +83,14 @@ export class AppService {
 
   get VIEW_HEIGHT() {
     return this.viewHeight;
+  }
+
+  get THEMES() {
+    return this.themes;
+  }
+
+  get PERSONAS() {
+    return this.personas;
   }
 
   get LOCALES() {

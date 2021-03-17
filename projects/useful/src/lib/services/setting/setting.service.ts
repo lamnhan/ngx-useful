@@ -22,6 +22,7 @@ export interface SettingOptions {
   userService?: UserService;
   translateService?: TranslateService;
   onReady?: () => void;
+  personaValidator?: (persona: string, userService?: UserService) => boolean;
 }
 
 @Injectable({
@@ -112,8 +113,7 @@ export class SettingService {
       this.theme = name;
       this.localstorageService.set(this.LSK_THEME, name);
       if (
-        this.options.userService
-        && this.options.userService.IS_USER
+        this.options.userService?.IS_USER
         && this.options.userService.DATA?.settings?.theme !== name
       ) {
         this.options.userService.updateSettings({ theme: name });
@@ -124,13 +124,16 @@ export class SettingService {
   }
 
   changePersona(name: string) {
+    const isValid = !this.options.personaValidator
+      ? true
+      : this.options.personaValidator(name, this.options.userService);
+    name = isValid ? name : 'default';
     if (!this.persona || this.persona !== name) {
       // set value
       this.persona = name;
       this.localstorageService.set(this.LSK_PERSONA, name);
       if (
-        this.options.userService
-        && this.options.userService.IS_USER
+        this.options.userService?.IS_USER
         && this.options.userService.DATA?.settings?.persona !== name
       ) {
         this.options.userService.updateSettings({ persona: name });
@@ -150,8 +153,7 @@ export class SettingService {
       this.locale = value;
       this.localstorageService.set(this.LSK_LOCALE, value);
       if (
-        this.options.userService
-        && this.options.userService.IS_USER
+        this.options.userService?.IS_USER
         && this.options.userService.DATA?.settings?.locale !== value
       ) {
         this.options.userService.updateSettings({ locale: value });
