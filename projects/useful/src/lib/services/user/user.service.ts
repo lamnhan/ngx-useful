@@ -71,6 +71,9 @@ export class UserService {
         switchMap(([nativeUser, userDoc, profileDoc]) =>
           this.handleAuthChanged(nativeUser, userDoc, profileDoc)
         ),
+        switchMap(({nativeUser, data, publicData}) =>
+          this.publicProfilePatcher(nativeUser, data, publicData)
+        ),
       )
       .subscribe(({nativeUser, data, publicData}) => {
         // set data
@@ -381,6 +384,27 @@ export class UserService {
         ? this.profileDataService.update(username, profileDoc)
         : of(undefined),
     ]);
+  }
+
+  private publicProfilePatcher(nativeUser?: NativeUser, data?: User, publicData?: Profile) {
+    if (nativeUser && data && this.profileDataService && publicData) {
+      const { displayName, photoURL } = data;
+      const { id, title, thumbnail } = publicData;
+      let profileDoc: undefined | Partial<Profile>;
+      if (displayName && (!title || title !== displayName)) {
+        profileDoc = {...profileDoc, title: displayName};
+      }
+      if (photoURL && (!thumbnail || thumbnail !== photoURL)) {
+        profileDoc = {...profileDoc, thumbnail: photoURL};
+      }
+      return !profileDoc
+        ? of({nativeUser, data, publicData})
+        : this.profileDataService.update(id, profileDoc).pipe(
+          map(() => ({nativeUser, data, publicData: {...publicData, ...profileDoc}}))
+        );
+    } else {
+      return of({nativeUser, data, publicData});
+    }
   }
 
   private handleAuthChanged(

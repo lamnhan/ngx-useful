@@ -13,7 +13,8 @@
     "umdModuleIds": {
       "localforage": "localforage",
       "howler": "howler",
-      "firebase/app": "firebase"
+      "firebase/app": "firebase",
+      "@ngx-translate/core": "ng.translate"
     }
   },
   "whitelistedNonPeerDependencies": [
