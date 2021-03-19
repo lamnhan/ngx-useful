@@ -135,6 +135,10 @@ export class DatabaseService {
     return from(this.doc(path).update(item));
   }
 
+  trash(path: string) {
+    return this.update(path, { status: 'trash' });
+  }
+
   delete(path: string) {
     return from(this.doc(path).delete());
   }
@@ -198,6 +202,10 @@ export class DataService<Type> {
 
   update(id: string, item: Partial<Type> | NullableOptional<Partial<Type>>) {
     return this.databaseService.update(`${this.name}/${id}`, item);
+  }
+
+  trash(id: string) {
+    return this.databaseService.trash(`${this.name}/${id}`);
   }
 
   delete(id: string) {
