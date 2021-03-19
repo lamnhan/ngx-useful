@@ -123,20 +123,12 @@ export class DatabaseService {
     );
   }
 
-  add<Type>(path: string, item: Type) {
-    return this.set(path, item);
-  }
-
   set<Type>(path: string, item: Type) {
     return from(this.doc(path).set(item));
   }
 
   update<Type>(path: string, item: Type) {
     return from(this.doc(path).update(item));
-  }
-
-  trash(path: string) {
-    return this.update(path, { status: 'trash' });
   }
 
   delete(path: string) {
@@ -192,20 +184,22 @@ export class DataService<Type> {
     return this.databaseService.streamRecord<Type>(this.name, queryfn);
   }
 
-  add(id: string, item: Type | NullableOptional<Type>) {
-    return this.databaseService.add(`${this.name}/${id}`, item);
-  }
-
   set(id: string, item: Type | NullableOptional<Type>) {
     return this.databaseService.set(`${this.name}/${id}`, item);
   }
 
+  add(id: string, item: Type | NullableOptional<Type>) {
+    const createdAt = new Date().toISOString();
+    return this.set(id, {...item, createdAt, updatedAt: createdAt});
+  }
+
   update(id: string, item: Partial<Type> | NullableOptional<Partial<Type>>) {
-    return this.databaseService.update(`${this.name}/${id}`, item);
+    const updatedAt = new Date().toISOString();
+    return this.databaseService.update(`${this.name}/${id}`, {...item, updatedAt});
   }
 
   trash(id: string) {
-    return this.databaseService.trash(`${this.name}/${id}`);
+    return this.update(id, {status: 'trash'} as unknown as Partial<Type>);
   }
 
   delete(id: string) {
