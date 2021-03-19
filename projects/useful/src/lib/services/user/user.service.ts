@@ -459,7 +459,6 @@ export class UserService {
   }
 
   private profileInitializer(nativeUser: NativeUser, data: User) {
-    const time = new Date().toISOString();
     const uid = nativeUser.uid;
     const username = data.username as string;
     const displayName = data.displayName as string;
@@ -470,8 +469,6 @@ export class UserService {
       id: username,
       title: profilePublished ? displayName : username,
       status: profilePublished ? 'publish' : 'draft',
-      createdAt: time,
-      updatedAt: time,
     };
     // custom fields
     if (profilePublished) {
