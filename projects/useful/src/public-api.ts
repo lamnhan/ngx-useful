@@ -50,6 +50,10 @@ export * from './lib/services/auth/auth.service';
 export * from './lib/services/user/user.service';
 export * from './lib/services/database/database.service';
 
+export * from './lib/schematas/tag/tag.service';
+export * from './lib/schematas/category/category.service';
+export * from './lib/schematas/page/page.service';
+export * from './lib/schematas/post/post.service';
 export * from './lib/schematas/option/option.service';
 export * from './lib/schematas/profile/profile.service';
 export * from './lib/schematas/user/user.service';
