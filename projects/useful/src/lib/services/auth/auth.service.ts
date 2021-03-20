@@ -8,12 +8,16 @@ import { NativeUser, NativeUserCredential } from '../user/user.service';
 
 export type VendorAuthService = AngularFireAuth; // | AngularSheetbaseAuth
 
+export interface AuthOptions {
+  driver?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private driver?: string;
-  private service?: VendorAuthService;
+  private options: AuthOptions = {};
+  private service!: VendorAuthService;
 
   private redirectUrl?: null | string;
   private isAuth?: boolean;
@@ -26,9 +30,9 @@ export class AuthService {
 
   constructor() {}
 
-  init(service: VendorAuthService, driver?: string) {
+  init(service: VendorAuthService, options: AuthOptions = {}) {
+    this.options = options;
     this.service = service;
-    this.driver = driver || (service as any).name;
     // watch for changed
     this.service.onAuthStateChanged(user => {
       this.isAuth = !!user; // change status
@@ -38,18 +42,12 @@ export class AuthService {
     return this as AuthService;
   }
 
-  get DRIVER() {
-    if (!this.driver) {
-      throw new Error('Invalid driver, please provide when init().');
-    }
-    return this.driver;
+  get SERVICE() {
+    return this.service;
   }
 
-  get SERVICE() {
-    if (!this.service) {
-      throw new Error('No auth service, please run init() first!');
-    }
-    return this.service;
+  get DRIVER() {
+    return this.options.driver || 'firebase';
   }
 
   get REDIRECT_URL() {

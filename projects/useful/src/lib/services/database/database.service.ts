@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { from, Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { of, from, Observable } from 'rxjs';
+import { map, switchMap, take } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
+
+import { SettingService } from '../setting/setting.service';
 
 export type NullableOptional<T> = PickRequired<T> & Nullable<PickOptional<T>>;
 
@@ -11,34 +13,37 @@ export type DatabaseItem<T> = AngularFirestoreDocument<T>;
 
 export type DatabaseCollection<T> = AngularFirestoreCollection<T>;
 
+export interface DatabaseOptions {
+  driver?: string;
+  settingService?: SettingService;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class DatabaseService {
-  private driver?: string;
-  private service?: VendorDatabaseService;
+  private options: DatabaseOptions = {};
+  private service!: VendorDatabaseService;
 
   constructor() {}
 
-  init(service: VendorDatabaseService, driver?: string) {
+  init(service: VendorDatabaseService, options: DatabaseOptions = {}) {
+    this.options = options;
     this.service = service;
-    this.driver = driver || (service as any).name;
     // done
     return this as DatabaseService;
   }
 
-  get DRIVER() {
-    if (!this.driver) {
-      throw new Error('Invalid driver, please provide when init().');
-    }
-    return this.driver;
+  get OPTIONS() {
+    return this.options;
   }
 
   get SERVICE() {
-    if (!this.service) {
-      throw new Error('No auth service, please run init() first!');
-    }
     return this.service;
+  }
+
+  get DRIVER() {
+    return this.options.driver || 'firebase';
   }
 
   exists(path: string, queryFn?: QueryFn) {
@@ -152,7 +157,7 @@ export class DataService<Type> {
     return this.databaseService.doc<Type>(`${this.name}/${id}`); 
   }
 
-  collection(queryfn?: any) {
+  collection(queryfn?: QueryFn) {
     return this.databaseService.collection<Type>(this.name, queryfn);
   }
 
@@ -162,11 +167,11 @@ export class DataService<Type> {
       : this.databaseService.flatDoc<Type>(this.name, idOrQuery);
   }
 
-  flatCollection(queryfn?: any) {
+  flatCollection(queryfn?: QueryFn) {
     return this.databaseService.flatCollection<Type>(this.name, queryfn);
   }
 
-  flatRecord(queryfn?: any) {
+  flatRecord(queryfn?: QueryFn) {
     return this.databaseService.flatRecord<Type>(this.name, queryfn);
   }
 
@@ -176,12 +181,47 @@ export class DataService<Type> {
       : this.databaseService.streamDoc<Type>(this.name, idOrQuery);
   }
 
-  streamCollection(queryfn?: any) {
+  streamCollection(queryfn?: QueryFn) {
     return this.databaseService.streamCollection<Type>(this.name, queryfn);
   }
 
-  streamRecord(queryfn?: any) {
+  streamRecord(queryfn?: QueryFn) {
     return this.databaseService.streamRecord<Type>(this.name, queryfn);
+  }
+
+  flatDocLocalized(id: string) {
+    return (this.databaseService.OPTIONS?.settingService?.onLocaleChanged || of('en-US')).pipe(
+      switchMap(locale =>
+        this.flatDoc(ref => ref
+          .where('origin', '==', id)
+          .where('locale', '==', locale)
+        )
+      ),
+    );
+  }
+
+  flatCollectionLocalized(limit = 30, orderBy = 'locale') {
+    return (this.databaseService.OPTIONS?.settingService?.onLocaleChanged || of('en-US')).pipe(
+      switchMap(locale =>
+        this.flatCollection(ref => ref
+          .where('locale', '==', locale)
+          .orderBy(orderBy)
+          .limit(limit)
+        )
+      ),
+    );
+  }
+
+  flatRecordLocalized(limit = 30, orderBy = 'locale') {
+    return (this.databaseService.OPTIONS?.settingService?.onLocaleChanged || of('en-US')).pipe(
+      switchMap(locale =>
+        this.flatRecord(ref => ref
+          .where('locale', '==', locale)
+          .orderBy(orderBy)
+          .limit(limit)
+        )
+      ),
+    );
   }
 
   set(id: string, item: Type | NullableOptional<Type>) {
