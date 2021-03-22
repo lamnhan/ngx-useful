@@ -17,6 +17,7 @@ import { RouterLinkDirectiveModule } from './directives/router-link/router-link.
 
 import {HelperService} from './services/helper/helper.service';
 import {ErrorService} from './services/error/error.service';
+import {NetworkService} from './services/network/network.service';
 import {LocalstorageService} from './services/localstorage/localstorage.service';
 import {CacheService} from './services/cache/cache.service';
 import {FetchService} from './services/fetch/fetch.service';
@@ -61,8 +62,9 @@ import {UserDataService} from './schematas/user/user.service';
   ],
   providers: [
     // normal services
-    ErrorService,
     HelperService,
+    ErrorService,
+    NetworkService,
     LocalstorageService,
     CacheService,
     FetchService,
