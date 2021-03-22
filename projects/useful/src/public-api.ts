@@ -32,6 +32,7 @@ export * from './lib/directives/router-link/router-link.directive';
 export {RouterLinkDirectiveModule} from './lib/directives/router-link/router-link.module';
 
 export * from './lib/services/helper/helper.service';
+export * from './lib/services/error/error.service';
 export * from './lib/services/localstorage/localstorage.service';
 export * from './lib/services/cache/cache.service';
 export * from './lib/services/fetch/fetch.service';
