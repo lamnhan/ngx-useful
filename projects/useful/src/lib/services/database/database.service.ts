@@ -189,13 +189,20 @@ export class DataService<Type> {
     return this.databaseService.streamRecord<Type>(this.name, queryfn);
   }
 
-  flatDocLocalized(id: string) {
+  flatDocLocalized(id: string, defaultFallback = true) {
     return (this.databaseService.OPTIONS?.settingService?.onLocaleChanged || of('en-US')).pipe(
       switchMap(locale =>
         this.flatDoc(ref => ref
           .where('origin', '==', id)
           .where('locale', '==', locale)
         )
+      ),
+      switchMap(item =>
+        item
+          ? of(item)
+          : !defaultFallback
+            ? of(undefined)
+            : this.flatDoc(id)
       ),
     );
   }
