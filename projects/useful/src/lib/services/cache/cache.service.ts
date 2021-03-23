@@ -63,7 +63,6 @@ export class CacheService {
     key: string,
     refresher?: CacheRefresher<Data>,
     cacheTime = 0,
-    keyBuilder?: (data: Data) => string
   ) {
     return this.localstorageService
     .get<number>(key + '__expiration')
@@ -92,11 +91,7 @@ export class CacheService {
         // return value if cache time = 0
         ? of(data)
         // save cache and return value
-        : this.set(
-            keyBuilder ? keyBuilder(data as Data) : key,
-            data,
-            cacheTime
-          )
+        : this.set(key, data, cacheTime)
       ),
       // no refresher or error while refreshing
       catchError(() => refresher

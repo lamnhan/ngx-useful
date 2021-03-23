@@ -3,6 +3,7 @@ import { of, from, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
 
+import { CacheService } from '../cache/cache.service';
 import { SettingService } from '../setting/setting.service';
 
 export type NullableOptional<T> = PickRequired<T> & Nullable<PickOptional<T>>;
@@ -12,6 +13,11 @@ export type VendorDatabaseService = AngularFirestore;
 export type DatabaseItem<T> = AngularFirestoreDocument<T>;
 
 export type DatabaseCollection<T> = AngularFirestoreCollection<T>;
+
+export interface DatabaseCaching {
+  id?: string;
+  for?: number;
+}
 
 export interface DatabaseOptions {
   driver?: string;
@@ -25,7 +31,7 @@ export class DatabaseService {
   private options: DatabaseOptions = {};
   private service!: VendorDatabaseService;
 
-  constructor() {}
+  constructor(private readonly cacheService: CacheService) {}
 
   init(service: VendorDatabaseService, options: DatabaseOptions = {}) {
     this.options = options;
@@ -60,20 +66,31 @@ export class DatabaseService {
     return this.SERVICE.collection(path, queryFn) as DatabaseCollection<Type>;
   }
 
-  flatDoc<Type>(path: string, queryFn?: QueryFn) {
-    return !queryFn
+  flatDoc<Type>(
+    path: string,
+    queryFn?: QueryFn,
+    caching?: DatabaseCaching
+  ) {
+    const cacheTime = caching?.for || 0;
+    const cacheId = caching?.id ? caching.id : !queryFn ? path : null;
+    const dataFetcher = () => !queryFn
       ? this.doc<Type>(path).get().pipe(
-        map(doc => doc.data()),
+        map(doc => doc.data() || null),
         take(1)
       )
       : this.collection<Type>(path, queryFn).get().pipe(
         map(collection =>
           collection.docs.length === 1
           ? collection.docs[0].data()
-          : undefined
+          : null
         ),
         take(1)
       );
+    if (cacheTime && cacheId) {
+      return this.cacheService.get(cacheId, dataFetcher);
+    } else {
+      return dataFetcher();
+    }
   }
 
   flatCollection<Type>(path: string, queryFn?: QueryFn) {
