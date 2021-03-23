@@ -409,8 +409,8 @@ export class UserService {
 
   private handleAuthChanged(
     nativeUser: null | NativeUser,
-    userDoc?: User,
-    profileDoc?: Profile
+    userDoc?: null | User,
+    profileDoc?: null | Profile
   ) {
     // no user (not yet signed in or signed out)
     if (!nativeUser) {

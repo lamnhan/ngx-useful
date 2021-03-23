@@ -13,6 +13,10 @@ export class FetchService {
     private cacheService: CacheService
   ) {}
 
+  init() {
+    return this as FetchService;
+  }
+
   fetch<Data>(
     input: RequestInfo,
     requestInit?: RequestInit,
