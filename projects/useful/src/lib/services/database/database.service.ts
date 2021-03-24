@@ -3,7 +3,8 @@ import { of, from, Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
 
-import { CacheService } from '../cache/cache.service';
+import { HelperService } from '../helper/helper.service';
+import { CacheService, CacheCaching } from '../cache/cache.service';
 import { SettingService } from '../setting/setting.service';
 
 export type NullableOptional<T> = PickRequired<T> & Nullable<PickOptional<T>>;
@@ -14,13 +15,13 @@ export type DatabaseItem<T> = AngularFirestoreDocument<T>;
 
 export type DatabaseCollection<T> = AngularFirestoreCollection<T>;
 
-export interface DatabaseCaching {
-  id?: string;
-  for?: number;
-}
-
 export interface DatabaseOptions {
   driver?: string;
+  cacheTime?: number;
+}
+
+export interface DatabaseIntegrations {
+  cacheService?: CacheService;
   settingService?: SettingService;
 }
 
@@ -28,20 +29,22 @@ export interface DatabaseOptions {
   providedIn: 'root'
 })
 export class DatabaseService {
-  private options: DatabaseOptions = {};
   private service!: VendorDatabaseService;
+  private options: DatabaseOptions = {};
+  private integrations: DatabaseIntegrations = {};
 
-  constructor(private readonly cacheService: CacheService) {}
+  constructor(private readonly helperService: HelperService) {}
 
-  init(service: VendorDatabaseService, options: DatabaseOptions = {}) {
-    this.options = options;
+  init(
+    service: VendorDatabaseService,
+    options: DatabaseOptions = {},
+    integrations: DatabaseIntegrations = {},
+  ) {
     this.service = service;
+    this.options = options;
+    this.integrations = integrations;
     // done
     return this as DatabaseService;
-  }
-
-  get OPTIONS() {
-    return this.options;
   }
 
   get SERVICE() {
@@ -52,10 +55,18 @@ export class DatabaseService {
     return this.options.driver || 'firebase';
   }
 
+  get OPTIONS() {
+    return this.options;
+  }
+
+  get INTEGRATIONS() {
+    return this.integrations;
+  }
+
   exists(path: string, queryFn?: QueryFn) {
     return !queryFn 
       ? this.flatDoc(path).pipe(map(item => !!item))
-      : this.flatCollection(path, queryFn).pipe(map(items => !!items.length));
+      : this.flatCollection(path, queryFn).pipe(map(items => !!(items || []).length));
   }
 
   doc<Type>(path: string) {
@@ -66,52 +77,16 @@ export class DatabaseService {
     return this.SERVICE.collection(path, queryFn) as DatabaseCollection<Type>;
   }
 
-  flatDoc<Type>(
-    path: string,
-    queryFn?: QueryFn,
-    caching?: DatabaseCaching
-  ) {
-    const cacheTime = caching?.for || 0;
-    const cacheId = caching?.id ? caching.id : !queryFn ? path : null;
-    const dataFetcher = () => !queryFn
-      ? this.doc<Type>(path).get().pipe(
-        map(doc => doc.data() || null),
-        take(1)
-      )
-      : this.collection<Type>(path, queryFn).get().pipe(
-        map(collection =>
-          collection.docs.length === 1
-          ? collection.docs[0].data()
-          : null
-        ),
-        take(1)
-      );
-    if (cacheTime && cacheId) {
-      return this.cacheService.get(cacheId, dataFetcher);
-    } else {
-      return dataFetcher();
-    }
+  set<Type>(path: string, item: Type) {
+    return from(this.doc(path).set(item));
   }
 
-  flatCollection<Type>(path: string, queryFn?: QueryFn) {
-    return this.collection<Type>(path, queryFn).get().pipe(
-      map(collection => collection.docs.map(doc => doc.data())),
-      take(1)
-    );
+  update<Type>(path: string, item: Type) {
+    return from(this.doc(path).update(item));
   }
 
-  flatRecord<Type>(path: string, queryFn?: QueryFn) {
-    return this.collection<Type>(path, queryFn).get().pipe(
-      map(collection => {
-        const record = {} as Record<string, Type>;
-        collection.docs.forEach(doc => {
-          const data = doc.data();
-          record[(data as Record<string, unknown>).id as string] = data;
-        });
-        return record;
-      }),
-      take(1)
-    );;
+  delete(path: string) {
+    return from(this.doc(path).delete());
   }
 
   streamDoc<Type>(path: string, queryFn?: QueryFn) {
@@ -144,17 +119,92 @@ export class DatabaseService {
       })
     );
   }
-
-  set<Type>(path: string, item: Type) {
-    return from(this.doc(path).set(item));
+  
+  flatDoc<Type>(
+    path: string,
+    queryFn?: QueryFn,
+    caching?: false | CacheCaching
+  ) {
+    return this.getFlatData(
+      !queryFn
+        ? this.doc<Type>(path).get().pipe(
+          map(doc => doc.data() || null),
+          take(1)
+        )
+        : this.collection<Type>(path, queryFn).get().pipe(
+          map(collection =>
+            collection.docs.length === 1
+            ? collection.docs[0].data()
+            : null
+          ),
+          take(1)
+        ),
+      path,
+      queryFn,
+      caching,
+    );
   }
 
-  update<Type>(path: string, item: Type) {
-    return from(this.doc(path).update(item));
+  flatCollection<Type>(
+    path: string,
+    queryFn?: QueryFn,
+    caching?: false | CacheCaching
+  ) {
+    return this.getFlatData(
+      this.collection<Type>(path, queryFn).get().pipe(
+        map(collection => collection.docs.map(doc => doc.data())),
+        take(1)
+      ),
+      path,
+      queryFn,
+      caching,
+    ).pipe(
+      map(value => value ? value : []),
+    );
   }
 
-  delete(path: string) {
-    return from(this.doc(path).delete());
+  flatRecord<Type>(
+    path: string,
+    queryFn?: QueryFn,
+    caching?: false | CacheCaching
+  ) {
+    return this.getFlatData(
+      this.collection<Type>(path, queryFn).get().pipe(
+        map(collection => {
+          const record = {} as Record<string, Type>;
+          collection.docs.forEach(doc => {
+            const data = doc.data();
+            record[(data as Record<string, unknown>).id as string] = data;
+          });
+          return record;
+        }),
+        take(1)
+      ),
+      path,
+      queryFn,
+      caching,
+    ).pipe(
+      map(value => value ? value : {}),
+    );
+  }
+
+  private getFlatData<Type>(
+    dataFetcher: Observable<Type>,
+    path: string,
+    queryFn?: QueryFn,
+    caching?: false | CacheCaching
+  ) {
+    if (!this.integrations.cacheService || caching === false) {
+      return dataFetcher;
+    }
+    const cacheTime = caching?.for || this.options.cacheTime || 0;
+    const cacheId = caching?.id
+      ? 'id=' + caching.id
+      : queryFn
+        ? 'path=' + path + '&query=' + this.helperService.md5(queryFn.toString())
+        : 'path=' + path;
+    return this.integrations.cacheService
+      .get('database?' + cacheId, dataFetcher, cacheTime);
   }
 }
 
@@ -178,76 +228,6 @@ export class DataService<Type> {
     return this.databaseService.collection<Type>(this.name, queryfn);
   }
 
-  flatDoc(idOrQuery: string | QueryFn) {
-    return typeof idOrQuery === 'string'
-      ? this.databaseService.flatDoc<Type>(`${this.name}/${idOrQuery}`)
-      : this.databaseService.flatDoc<Type>(this.name, idOrQuery);
-  }
-
-  flatCollection(queryfn?: QueryFn) {
-    return this.databaseService.flatCollection<Type>(this.name, queryfn);
-  }
-
-  flatRecord(queryfn?: QueryFn) {
-    return this.databaseService.flatRecord<Type>(this.name, queryfn);
-  }
-
-  streamDoc(idOrQuery: string | QueryFn) {
-    return typeof idOrQuery === 'string'
-      ? this.databaseService.streamDoc<Type>(`${this.name}/${idOrQuery}`)
-      : this.databaseService.streamDoc<Type>(this.name, idOrQuery);
-  }
-
-  streamCollection(queryfn?: QueryFn) {
-    return this.databaseService.streamCollection<Type>(this.name, queryfn);
-  }
-
-  streamRecord(queryfn?: QueryFn) {
-    return this.databaseService.streamRecord<Type>(this.name, queryfn);
-  }
-
-  flatDocLocalized(id: string, defaultFallback = true) {
-    return (this.databaseService.OPTIONS?.settingService?.onLocaleChanged || of('en-US')).pipe(
-      switchMap(locale =>
-        this.flatDoc(ref => ref
-          .where('origin', '==', id)
-          .where('locale', '==', locale)
-        )
-      ),
-      switchMap(item =>
-        item
-          ? of(item)
-          : !defaultFallback
-            ? of(undefined)
-            : this.flatDoc(id)
-      ),
-    );
-  }
-
-  flatCollectionLocalized(limit = 30, orderBy = 'locale') {
-    return (this.databaseService.OPTIONS?.settingService?.onLocaleChanged || of('en-US')).pipe(
-      switchMap(locale =>
-        this.flatCollection(ref => ref
-          .where('locale', '==', locale)
-          .orderBy(orderBy)
-          .limit(limit)
-        )
-      ),
-    );
-  }
-
-  flatRecordLocalized(limit = 30, orderBy = 'locale') {
-    return (this.databaseService.OPTIONS?.settingService?.onLocaleChanged || of('en-US')).pipe(
-      switchMap(locale =>
-        this.flatRecord(ref => ref
-          .where('locale', '==', locale)
-          .orderBy(orderBy)
-          .limit(limit)
-        )
-      ),
-    );
-  }
-
   set(id: string, item: Type | NullableOptional<Type>) {
     return this.databaseService.set(`${this.name}/${id}`, item);
   }
@@ -268,6 +248,104 @@ export class DataService<Type> {
 
   delete(id: string) {
     return this.databaseService.delete(`${this.name}/${id}`);
+  }
+
+  streamDoc(idOrQuery: string | QueryFn) {
+    return typeof idOrQuery === 'string'
+      ? this.databaseService.streamDoc<Type>(`${this.name}/${idOrQuery}`)
+      : this.databaseService.streamDoc<Type>(this.name, idOrQuery);
+  }
+
+  streamCollection(queryfn?: QueryFn) {
+    return this.databaseService.streamCollection<Type>(this.name, queryfn);
+  }
+
+  streamRecord(queryfn?: QueryFn) {
+    return this.databaseService.streamRecord<Type>(this.name, queryfn);
+  }
+
+  flatDoc(idOrQuery: string | QueryFn, caching?: false | CacheCaching) {
+    return typeof idOrQuery === 'string'
+      ? this.databaseService.flatDoc<Type>(
+        `${this.name}/${idOrQuery}`, undefined, caching)
+      : this.databaseService.flatDoc<Type>(this.name, idOrQuery, caching);
+  }
+
+  flatCollection(queryfn?: QueryFn, caching?: false | CacheCaching) {
+    return this.databaseService.flatCollection<Type>(this.name, queryfn, caching);
+  }
+
+  flatRecord(queryfn?: QueryFn, caching?: false | CacheCaching) {
+    return this.databaseService.flatRecord<Type>(this.name, queryfn, caching);
+  }
+
+  flatDocLocalized(
+    id: string,
+    defaultFallback = true,
+    caching?: false | CacheCaching
+  ) {
+    return (
+      this.databaseService.INTEGRATIONS?.settingService?.onLocaleChanged
+      || of('en-US')
+    ).pipe(
+      switchMap(locale =>
+        this.flatDoc(
+          ref => ref
+            .where('origin', '==', id)
+            .where('locale', '==', locale),
+          caching,
+        )
+      ),
+      switchMap(item =>
+        item
+          ? of(item)
+          : !defaultFallback
+            ? of(undefined)
+            : this.flatDoc(id, caching)
+      ),
+    );
+  }
+
+  flatCollectionLocalized(
+    limit = 30,
+    orderBy = 'locale',
+    caching?: false | CacheCaching
+  ) {
+    return (
+      this.databaseService.INTEGRATIONS?.settingService?.onLocaleChanged
+      || of('en-US')
+    ).pipe(
+      switchMap(locale =>
+        this.flatCollection(
+          ref => ref
+            .where('locale', '==', locale)
+            .orderBy(orderBy)
+            .limit(limit),
+          caching,
+        )
+      ),
+    );
+  }
+
+  flatRecordLocalized(
+    limit = 30,
+    orderBy = 'locale',
+    caching?: false | CacheCaching
+  ) {
+    return (
+      this.databaseService.INTEGRATIONS?.settingService?.onLocaleChanged
+      || of('en-US')
+    ).pipe(
+      switchMap(locale =>
+        this.flatRecord(
+          ref => ref
+            .where('locale', '==', locale)
+            .orderBy(orderBy)
+            .limit(limit),
+          caching,
+        )
+      ),
+    );
   }
 }
 

@@ -29,7 +29,7 @@ export class PwaService {
   private reminderShowed = false;
 
   constructor(
-    private localstorageService: LocalstorageService
+    private readonly localstorageService: LocalstorageService
   ) {}
 
   init(options: PWAOptions = {}) {

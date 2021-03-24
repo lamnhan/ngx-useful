@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { from } from 'rxjs';
 import {createInstance} from 'localforage';
 
 import { LocalForage } from '../../vendors/localforage.vendor';
 
-export interface LocalstorageConfigs {
+export interface LocalForageOptions {
   name?: string;
   storeName?: string;
   driver?: string | string[];
@@ -30,12 +30,12 @@ export type LocalstorageIterateKeysHandler = (
 export class LocalstorageService {
   private localforage?: LocalForage;
 
-  constructor() { }
+  constructor() {}
 
-  init(storageConfigs: LocalstorageConfigs = {}) {
+  init(config: LocalForageOptions = {}) {
     this.localforage = createInstance({
       name: 'APP_LOCAL_STORAGE',
-      ...storageConfigs
+      ...config,
     });
     // done
     return this as LocalstorageService;
@@ -46,11 +46,6 @@ export class LocalstorageService {
       throw new Error('No localforage instance, please init first!');
     }
     return this.localforage;
-  }
-
-  extend(storageConfigs: LocalstorageConfigs) {
-    return new LocalstorageService()
-      .init(storageConfigs);
   }
 
   set<Data>(key: string, data: Data) {

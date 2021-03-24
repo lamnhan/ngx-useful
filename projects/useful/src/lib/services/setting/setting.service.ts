@@ -19,10 +19,14 @@ export interface AppSettings extends BuiltinUISettings, BuiltinGeneralSettings {
 export interface SettingOptions {
   browserColor?: boolean;
   browserLocale?: boolean;
-  userService?: UserService;
-  translateService?: TranslateService;
   onReady?: () => void;
   personaValidator?: (persona: string, userService?: UserService) => boolean;
+}
+
+export interface SettingIntegrations {
+  localstorageService?: LocalstorageService;
+  translateService?: TranslateService;
+  userService?: UserService;
 }
 
 @Injectable({
@@ -34,7 +38,7 @@ export class SettingService {
   private readonly LSK_LOCALE = 'setting_locale';
 
   private options: SettingOptions = {};
-  private defaultSettings: AppSettings = {};
+  private integrations: SettingIntegrations = {};
 
   // UI intensive settings
   private theme?: string;
@@ -49,24 +53,14 @@ export class SettingService {
   public readonly onPersonaChanged = new ReplaySubject<string>(1);
   public readonly onLocaleChanged = new ReplaySubject<string>(1);
 
-  constructor(
-    private zone: NgZone,
-    private localstorageService: LocalstorageService
-  ) {}
+  constructor(private readonly zone: NgZone) {}
 
   init(
     options: SettingOptions = {},
-    defaultSettings: AppSettings = {}
+    integrations: SettingIntegrations = {},
   ) {
     this.options = options;
-    this.defaultSettings = {
-      // defaults
-      theme: 'light',
-      persona: 'default',
-      locale: 'en-US',
-      // custom
-      ...defaultSettings
-    };
+    this.integrations = integrations;
     // handle UI intensive settings
     this.remoteLoader()
     .pipe(
@@ -94,15 +88,15 @@ export class SettingService {
   }
 
   get THEME() {
-    return this.theme || this.defaultSettings.theme as string;
+    return this.theme || 'light';
   }
 
   get PERSONA() {
-    return this.persona || this.defaultSettings.persona as string;
+    return this.persona || 'default';
   }
 
   get LOCALE() {
-    return this.locale || this.defaultSettings.locale as string;
+    return this.locale || 'en-US';
   }
 
   changeTheme(name: string) {
@@ -111,12 +105,14 @@ export class SettingService {
       document.body.setAttribute('data-theme', name);
       // set value
       this.theme = name;
-      this.localstorageService.set(this.LSK_THEME, name);
+      if (this.integrations.localstorageService) {
+        this.integrations.localstorageService.set(this.LSK_THEME, name);
+      }
       if (
-        this.options.userService?.IS_USER
-        && this.options.userService.DATA?.settings?.theme !== name
+        this.integrations.userService?.IS_USER
+        && this.integrations.userService.DATA?.settings?.theme !== name
       ) {
-        this.options.userService.updateSettings({ theme: name });
+        this.integrations.userService.updateSettings({ theme: name });
       }
       // event
       this.onThemeChanged.next(name);
@@ -126,17 +122,19 @@ export class SettingService {
   changePersona(name: string) {
     const isValid = !this.options.personaValidator
       ? true
-      : this.options.personaValidator(name, this.options.userService);
+      : this.options.personaValidator(name, this.integrations.userService);
     name = isValid ? name : 'default';
     if (!this.persona || this.persona !== name) {
       // set value
       this.persona = name;
-      this.localstorageService.set(this.LSK_PERSONA, name);
+      if (this.integrations.localstorageService) {
+        this.integrations.localstorageService.set(this.LSK_PERSONA, name);
+      }
       if (
-        this.options.userService?.IS_USER
-        && this.options.userService.DATA?.settings?.persona !== name
+        this.integrations.userService?.IS_USER
+        && this.integrations.userService.DATA?.settings?.persona !== name
       ) {
-        this.options.userService.updateSettings({ persona: name });
+        this.integrations.userService.updateSettings({ persona: name });
       }
       // event
       this.onPersonaChanged.next(name);
@@ -146,17 +144,19 @@ export class SettingService {
   changeLocale(value: string) {
     if (!this.locale || this.locale !== value) {
       // affect
-      if (this.options.translateService) {
-        this.options.translateService.use(value);
+      if (this.integrations.translateService) {
+        this.integrations.translateService.use(value);
       }
       // set value
       this.locale = value;
-      this.localstorageService.set(this.LSK_LOCALE, value);
+      if (this.integrations.localstorageService) {
+        this.integrations.localstorageService.set(this.LSK_LOCALE, value);
+      }
       if (
-        this.options.userService?.IS_USER
-        && this.options.userService.DATA?.settings?.locale !== value
+        this.integrations.userService?.IS_USER
+        && this.integrations.userService.DATA?.settings?.locale !== value
       ) {
-        this.options.userService.updateSettings({ locale: value });
+        this.integrations.userService.updateSettings({ locale: value });
       }
       // event
       this.onLocaleChanged.next(value);
@@ -164,65 +164,68 @@ export class SettingService {
   }
 
   private remoteLoader() {
-    return !this.options.userService
+    return !this.integrations.userService
       ? of({} as AppSettings)
-      : this.options.userService.onUserChanged.pipe(
+      : this.integrations.userService.onUserChanged.pipe(
         switchMap(data => of(data?.settings ? data.settings : {})),
       );
   }
 
   private loadTheme(remoteTheme?: string) {
     return remoteTheme
-      ? of(remoteTheme) // remote
+      // remote
+      ? of(remoteTheme)
       // local
-      : this.localstorageService
-        .get<string>(this.LSK_THEME)
-        .pipe(
-          switchMap(theme => of(
-            theme
-              ? theme
-              // default
-              : (
-                this.options.browserColor
-                && (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-              )
-                ? 'dark'
-                : this.defaultSettings.theme as string
-          ))
-        );
+      : !this.integrations.localstorageService
+        ? of('light')
+        : this.integrations.localstorageService
+          .get<string>(this.LSK_THEME)
+          .pipe(
+            switchMap(theme => of(
+              theme
+                ? theme
+                // default
+                : (
+                  this.options.browserColor
+                  && (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+                )
+                  ? 'dark'
+                  : 'light'
+            ))
+          );
   }
 
   private loadPersona(remotePersona?: string) {
     return remotePersona
-      ? of(remotePersona) // remote
-      : this.localstorageService
-        .get<string>(this.LSK_PERSONA)
-        .pipe(
-          switchMap(persona => of(
-            // local
-            persona
-              ? persona
-              //default
-              : this.defaultSettings.persona as string
-          ))
-        );
+      // remote
+      ? of(remotePersona)
+      // local
+      : !this.integrations.localstorageService
+        ? of('default')
+        : this.integrations.localstorageService
+          .get<string>(this.LSK_PERSONA)
+          .pipe(
+            switchMap(persona => of(persona ? persona : 'default'))
+          );
   }
   
   private loadLocale(remoteLocale?: string) {
     return remoteLocale
-      ? of(remoteLocale) // remote
-      : this.localstorageService
-        .get<string>(this.LSK_LOCALE)
-        .pipe(
-          switchMap(locale => of(
-            // local
-            locale
-              ? locale
-              : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
-              ? navigator.language
-              //default
-              : this.defaultSettings.locale as string
-          ))
-        );
+      // remote
+      ? of(remoteLocale)
+      // locale
+      : !this.integrations.localstorageService
+        ? of('en-US')
+        : this.integrations.localstorageService
+          .get<string>(this.LSK_LOCALE)
+          .pipe(
+            switchMap(locale => of(
+              locale
+                ? locale
+                : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
+                  ? navigator.language
+                  : 'en-US'
+            ))
+          );
   }
 }

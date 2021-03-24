@@ -4,43 +4,33 @@ import { switchMap, catchError } from 'rxjs/operators';
 
 import {
   LocalstorageService,
-  LocalstorageConfigs,
+  LocalForageOptions,
   LocalstorageIterateHandler,
   LocalstorageIterateKeysHandler
 } from '../localstorage/localstorage.service';
 
-export type CacheRefresher<Data> = () => Observable<Data>;
+export interface CacheCaching {
+  id?: string;
+  for?: number;
+}
+
+export type CacheRefresher<Data> = Observable<Data>;
 
 @Injectable({
   providedIn: 'root'
 })
 export class CacheService {
+  private localstorage!: LocalstorageService;
 
-  private localstorage?: LocalstorageService;
+  constructor() {}
 
-  constructor(
-    private localstorageService: LocalstorageService
-  ) {}
-
-  init(storageConfigs: LocalstorageConfigs = {}) {
-    this.localstorage = this.localstorageService.extend({
+  init(config: LocalForageOptions = {}) {
+    this.localstorage = new LocalstorageService().init({
       name: 'APP_LOCAL_CACHE',
-      ...storageConfigs,
+      ...config,
     });
     // done
     return this as CacheService;
-  }
-
-  getLocalstorage() {
-    if (!this.localstorage) {
-      throw new Error('No localstorage instance, please init first!');
-    }
-    return this.localstorage;
-  }
-
-  extend(storageConfigs: LocalstorageConfigs) {
-    return new CacheService(this.localstorageService)
-      .init(storageConfigs);
   }
 
   set<Data>(key: string, data: Data, cacheTime = 0) {
@@ -52,10 +42,10 @@ export class CacheService {
       throw new Error('No cache time provided.');
     }
     // save expiration
-    return this.localstorageService
+    return this.localstorage
       .set<number>(key + '__expiration', new Date().getTime() + cacheTime * 60000)
       .pipe(
-        switchMap(() => this.localstorageService.set<Data>(key, data))
+        switchMap(() => this.localstorage.set<Data>(key, data))
       );
   }
 
@@ -64,18 +54,18 @@ export class CacheService {
     refresher?: CacheRefresher<Data>,
     cacheTime = 0,
   ) {
-    return this.localstorageService
+    return this.localstorage
     .get<number>(key + '__expiration')
     .pipe(
       switchMap(expiration => {
         const isExpired = !expiration || expiration <= new Date().getTime();
         // not expired
         if (!isExpired) {
-          return this.localstorageService.get<Data>(key);
+          return this.localstorage.get<Data>(key);
         }
         // expired, try to refresh
         else if (refresher) {
-          return refresher();
+          return refresher;
         }
         // no cached
         else {
@@ -88,15 +78,15 @@ export class CacheService {
         ? of(null)
         // has data
         : cacheTime === 0
-        // return value if cache time = 0
-        ? of(data)
-        // save cache and return value
-        : this.set(key, data, cacheTime)
+          // return value if cache time = 0
+          ? of(data)
+          // save cache and return value
+          : this.set(key, data, cacheTime)
       ),
       // no refresher or error while refreshing
       catchError(() => refresher
         // use cached any value
-        ? this.localstorageService.get<Data>(key)
+        ? this.localstorage.get<Data>(key)
         // null
         : of(null)
       ),
@@ -104,54 +94,54 @@ export class CacheService {
   }
 
   iterate<Data>(handler: LocalstorageIterateHandler<Data>) {
-    return this.localstorageService.iterate(handler);
+    return this.localstorage.iterate(handler);
   }
 
   iterateKeys(handler: LocalstorageIterateKeysHandler) {
-    return this.localstorageService.iterateKeys(handler);
+    return this.localstorage.iterateKeys(handler);
   }
 
   remove(key: string) {
-    return this.localstorageService
+    return this.localstorage
       .remove(key + '__expiration')
       .pipe(
-        switchMap(() => this.localstorageService.remove(key))
+        switchMap(() => this.localstorage.remove(key))
       );
   }
 
   removeBulk(keys: string[]) {
-    return this.localstorageService.removeBulk(keys);
+    return this.localstorage.removeBulk(keys);
   }
 
   removeByPrefix(prefix: string) {
-    return this.localstorageService.removeByPrefix(prefix);
+    return this.localstorage.removeByPrefix(prefix);
   }
 
   removeBySuffix(suffix: string) {
-    return this.localstorageService.removeBySuffix(suffix);
+    return this.localstorage.removeBySuffix(suffix);
   }
 
   flush() {
-    return this.localstorageService.clear();
+    return this.localstorage.clear();
   }
 
   flushExpired() {
-    return this.localstorageService
+    return this.localstorage
       .iterateKeys(async key => {
       // loop through all expiration keys
       if (key.indexOf('__expiration') !== -1) {
         // retrieve expiration
-        const cacheExpiration = await this.localstorageService
+        const cacheExpiration = await this.localstorage
           .getLocalforage()
           .getItem<number>(key);
         // remove if expired
         if (!cacheExpiration || cacheExpiration <= new Date().getTime()) {
           // expiration value
-          await this.localstorageService
+          await this.localstorage
             .getLocalforage()
             .removeItem(key);
           // data value
-          await this.localstorageService.
+          await this.localstorage.
             getLocalforage()
             .removeItem(key.replace('__expiration', ''));
         }

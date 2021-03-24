@@ -42,6 +42,10 @@ export interface NavOptions {
   i18nRedirect?: boolean
 }
 
+export interface NavIntegrations {
+  settingService?: SettingService;
+}
+
 export interface RouteTranslations {
   [path: string]: Record<string, true | string>;
 }
@@ -91,6 +95,7 @@ export function i18nRoutes(
 })
 export class NavService {
   private options: NavOptions = {};
+  private integrations: NavIntegrations = {};
 
   private routingData: Record<string, unknown> = {};
   // private routingMetaRecords: Record<string, AppCustomMetas> = {};
@@ -108,17 +113,19 @@ export class NavService {
   // router link
   public readonly onRefreshRouterLink = new ReplaySubject<void>(1);
 
-  constructor(
-    private router: Router,
-    private settingService: SettingService,
-  ) {}
+  constructor(private readonly router: Router) {}
 
   init(
     options: NavOptions = {},
-    i18nRegistry?: {routes: Routes; routeTranslations: RouteTranslations},
+    integrations: NavIntegrations = {},
     hooks: {[key in NavRouterEventHooks]?: (event: Event) => void} = {},
+    i18nRegistry?: {
+      routes: Routes;
+      routeTranslations: RouteTranslations
+    },
   ) {
     this.options = options;
+    this.integrations = integrations;
     // handle i18n
     if (i18nRegistry) {
       // has i18n
@@ -155,8 +162,8 @@ export class NavService {
         });
       });
       // watch for locale
-      if (this.options.i18nRedirect) {
-        this.settingService.onLocaleChanged.subscribe(locale => {
+      if (this.integrations.settingService && this.options.i18nRedirect) {
+        this.integrations.settingService.onLocaleChanged.subscribe(locale => {
           // refresh router link
           this.onRefreshRouterLink.next();
           // redirect i18n route
@@ -255,7 +262,9 @@ export class NavService {
     }
     // get i18n
     else {
-      const locale = withLocale || this.settingService.LOCALE;
+      const locale = withLocale
+        || this.integrations?.settingService?.LOCALE
+        || 'en-US';
       const inputMap = (typeof input === 'string'
         ? input.split('/')
         : input.map(value => value.startsWith('/') ? value.substr(1) : value)

@@ -3,6 +3,12 @@ import { Title, Meta } from '@angular/platform-browser';
 
 import { SettingService } from '../setting/setting.service';
 
+export interface MetaOptions {}
+
+export interface MetaIntegrations {
+  settingService?: SettingService;
+}
+
 export interface AppCustomMetas {
   title?: string;
   description?: string;
@@ -32,21 +38,31 @@ export interface MetaTranslations {
 export class MetaService {
   private defaultMetas: AppMetas = {};
   private metaTranslations: MetaTranslations = {};
+  private options: MetaOptions = {};
+  private integrations: MetaIntegrations = {};
 
   constructor(
     private title: Title,
     private meta: Meta,
-    private settingService: SettingService,
+    // private settingService: SettingService,
   ) {}
 
   init(
-    defaultMetas: AppMetas = {},
+    defaultMetas: AppMetas,
+    options: MetaOptions = {},
+    integrations: MetaIntegrations = {},
     metaTranslations: MetaTranslations = {},
   ) {
     this.defaultMetas = defaultMetas;
     this.metaTranslations = metaTranslations;
+    this.options = options;
+    this.integrations = integrations;
     // watch for locale changed
-    this.settingService.onLocaleChanged.subscribe(locale => this.changePageMetas({}, locale));
+    if (this.integrations.settingService) {
+      this.integrations.settingService
+        .onLocaleChanged
+        .subscribe(locale => this.changePageMetas({}, locale));
+    }
     // done
     return this as MetaService;
   }
@@ -94,7 +110,9 @@ export class MetaService {
   }
 
   private getAppMetas(withLocale?: string) {
-    const locale = withLocale || this.settingService.LOCALE;
+    const locale = withLocale
+      || this.integrations?.settingService?.LOCALE
+      || 'en-US';
     return this.metaTranslations[locale] || this.defaultMetas;
   }
 

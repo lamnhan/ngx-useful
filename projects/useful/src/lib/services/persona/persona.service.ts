@@ -14,19 +14,31 @@ export interface PersonaProperties extends PersonaBuiltinProperties {
 
 export type PersonaData = Record<string, PersonaProperties>; 
 
+export interface PersonaOptions {}
+
+export interface PersonaIntegrations {
+  settingService?: SettingService;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class PersonaService {
   private data: PersonaData = {};
   private menuRegistry?: Record<string, MenuItem>;
+  private options: PersonaOptions = {};
+  private integrations: PersonaIntegrations = {};
 
-  constructor(private settingService: SettingService) {}
+  constructor() {}
 
   init(
-    data: PersonaData = {},
+    data: PersonaData,
+    options: PersonaOptions = {},
+    integrations: PersonaIntegrations = {},
     menuRegistry?: Record<string, MenuItem>,
   ) {
+    this.options = options;
+    this.integrations = integrations;
     // proccess menu & secondary menu
     if (menuRegistry) {
       Object.keys(data).forEach(persona => {
@@ -48,23 +60,22 @@ export class PersonaService {
     return this as PersonaService;
   }
 
-  get ACTIVE() {
-    return this.settingService.PERSONA;
-  }
-
   get MENU_REGISTRY() {
     return this.menuRegistry;
   }
 
   get MENU() {
-    return this.getData('menu') as MenuItem[];
+    return this.get('menu') as MenuItem[];
   }
 
   get TABS() {
-    return this.getData('tabs') as MenuItem[];
+    return this.get('tabs') as MenuItem[];
   }
 
-  getData(key: string) {
-    return (this.data[this.ACTIVE] || {})[key] || (this.data['default'] || {})[key];
+  get(key: string, withPersona?: string) {
+    const persona = withPersona
+      || this.integrations?.settingService?.PERSONA
+      || 'default';
+    return (this.data[persona] || {})[key] || (this.data['default'] || {})[key];
   }
 }

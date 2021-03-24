@@ -2,36 +2,45 @@ import { Injectable } from '@angular/core';
 
 import { UserService } from '../user/user.service';
 
-export interface ErrorOptions {
-  userService?: UserService;
-}
-
 export interface ErrorConfig {
   projectId: string;
   apiKey: string;
   service?: string;
   version?: string;
+}
+
+export interface ErrorOptions {
   disabled?: boolean;
+}
+
+export interface ErrorIntegrations {
+  userService?: UserService;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ErrorService {
-  private options: ErrorOptions = {};
   private config!: ErrorConfig;
+  private options: ErrorOptions = {};
+  private integrations: ErrorIntegrations = {};
 
   private user?: string;
   private readonly baseAPIUrl = 'https://clouderrorreporting.googleapis.com/v1beta1/projects/';
 
   constructor() {}
 
-  init(config: ErrorConfig, options: ErrorOptions = {}) {
+  init(
+    config: ErrorConfig,
+    options: ErrorOptions = {},
+    integrations: ErrorIntegrations = {},
+  ) {
     this.config = config;
     this.options = options;
+    this.integrations = integrations;
     // watch for user
-    if (this.options.userService) {
-      this.options.userService
+    if (this.integrations.userService) {
+      this.integrations.userService
         .onUserChanged
         .subscribe(user => this.user = user ? user.uid : undefined)
     }
@@ -62,7 +71,7 @@ export class ErrorService {
       message: (error as Error).message,
     } as Record<string, unknown>;
     // dev
-    if (this.config.disabled) {
+    if (this.options.disabled) {
       console.error('[Error] ' + payload.message, payload);
     }
     // production

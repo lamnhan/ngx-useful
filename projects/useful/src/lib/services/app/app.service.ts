@@ -41,7 +41,7 @@ export class AppService {
     options: AppOptions = {},
     builtinData: BuiltinData = {},
     customData: Record<string, unknown> = {},
-    dataLoader?: () => Observable<Record<string, unknown>>,
+    dataLoader?: Observable<Record<string, unknown>>,
   ) {
     this.options = options;
     // set builtin
@@ -59,7 +59,7 @@ export class AppService {
     this.customData = customData;
     // remote custom data
     if (dataLoader) {
-      dataLoader().subscribe(remoteData => this.customData = {
+      dataLoader.subscribe(remoteData => this.customData = {
         ...this.customData,
         ...remoteData,
       });
