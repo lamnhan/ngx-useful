@@ -34,23 +34,17 @@ export class FetchService {
   get<Data>(
     url: string,
     requestInit?: RequestInit,
-    isJson = true,
     caching?: false | CacheCaching,
+    isJson = true,
   ) {
-    const fetcher = this.fetch<Data>(
-      url,
-      {...requestInit, method: 'GET'},
-      isJson
-    );
+    const fetcher = this.fetch<Data>(url, {...requestInit, method: 'GET'}, isJson);
     if (!this.integrations.cacheService || caching === false) {
       return fetcher;
     }
     const cacheTime = caching?.for || this.options.cacheTime || 0;
-    const cacheId = caching?.id
-      ? 'id=' + caching.id
-      : 'url=' + this.helperService.md5(url);
+    const cacheId = this.helperService.md5(caching?.id || url);
     return this.integrations.cacheService
-      .get('fetch?' + cacheId, fetcher, cacheTime);
+      .get('fetch/' + cacheId, fetcher, cacheTime);
   }
 
   post<Data>(url: string, requestInit?: RequestInit) {

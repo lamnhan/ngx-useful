@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { from } from 'rxjs';
+import { Observable, from, combineLatest } from 'rxjs';
 import {createInstance} from 'localforage';
 
 import { LocalForage } from '../../vendors/localforage.vendor';
@@ -52,7 +52,12 @@ export class LocalstorageService {
     return from(this.getLocalforage().setItem(key, data));
   }
 
-  increase(key: string, by = 1) {
+  setBulk(input: Record<string, unknown>) {
+    const actions = Object.keys(input).map(key => this.set(key, input[key]));
+    return combineLatest(actions);
+  }
+
+  increment(key: string, by = 1) {
     const handler = async (_key: string, _by: number) => {
       const value = await this.getLocalforage().getItem<number>(_key);
       const newValue = +(value || 0) + _by;
@@ -66,7 +71,7 @@ export class LocalstorageService {
     return from(this.getLocalforage().getItem<Data>(key));
   }
 
-  getBulk(keys: string[]) {
+  getBulk<Result>(keys: string[]) {
     const handler = async (_keys: string[]) => {
       const result = [] as unknown[];
       for (let i = 0; i < _keys.length; i++) {
@@ -75,7 +80,7 @@ export class LocalstorageService {
       }
       return result;
     };
-    return from(handler(keys));
+    return from(handler(keys)) as unknown as Observable<Result>;
   }
 
   iterate<Data>(handler: LocalstorageIterateHandler<Data>) {

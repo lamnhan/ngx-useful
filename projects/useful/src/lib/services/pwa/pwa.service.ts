@@ -138,7 +138,7 @@ export class PwaService {
   }
 
   private loadLocalMetrics() {
-    return this.localstorageService.getBulk([
+    return this.localstorageService.getBulk<[boolean, number, number, boolean]>([
       this.LSK_INSTALLED,
       this.LSK_REMINDER_COUNT,
       this.LSK_REMINDER_TIMESTAMP
@@ -168,11 +168,6 @@ export class PwaService {
           reminderCount,
           reminderTimestamp,
           reminderShowed,
-        } as {
-          installed: boolean;
-          reminderCount: number;
-          reminderTimestamp: number;
-          reminderShowed: boolean;
         });
       })
     );

@@ -159,7 +159,7 @@ export class DatabaseService {
       queryFn,
       caching,
     ).pipe(
-      map(value => value ? value : []),
+      map(value => value ? value : []), // null/undefined -> []
     );
   }
 
@@ -184,7 +184,7 @@ export class DatabaseService {
       queryFn,
       caching,
     ).pipe(
-      map(value => value ? value : {}),
+      map(value => value ? value : {}), // null/undefined -> {}
     );
   }
 
@@ -194,17 +194,17 @@ export class DatabaseService {
     queryFn?: QueryFn,
     caching?: false | CacheCaching
   ) {
-    if (!this.integrations.cacheService || caching === false) {
+    if (
+      !this.integrations.cacheService
+      || caching === false
+      || (queryFn && !caching?.id)
+    ) {
       return dataFetcher;
     }
     const cacheTime = caching?.for || this.options.cacheTime || 0;
-    const cacheId = caching?.id
-      ? 'id=' + caching.id
-      : queryFn
-        ? 'path=' + path + '&query=' + this.helperService.md5(queryFn.toString())
-        : 'path=' + path;
+    const cacheId = this.helperService.md5(caching?.id || path);
     return this.integrations.cacheService
-      .get('database?' + cacheId, dataFetcher, cacheTime);
+      .get('database/' + cacheId, dataFetcher, cacheTime);
   }
 }
 
@@ -224,8 +224,8 @@ export class DataService<Type> {
     return this.databaseService.doc<Type>(`${this.name}/${id}`); 
   }
 
-  collection(queryfn?: QueryFn) {
-    return this.databaseService.collection<Type>(this.name, queryfn);
+  collection(queryFn?: QueryFn) {
+    return this.databaseService.collection<Type>(this.name, queryFn);
   }
 
   set(id: string, item: Type | NullableOptional<Type>) {
@@ -256,95 +256,130 @@ export class DataService<Type> {
       : this.databaseService.streamDoc<Type>(this.name, idOrQuery);
   }
 
-  streamCollection(queryfn?: QueryFn) {
-    return this.databaseService.streamCollection<Type>(this.name, queryfn);
+  streamCollection(queryFn?: QueryFn) {
+    return this.databaseService.streamCollection<Type>(this.name, queryFn);
   }
 
-  streamRecord(queryfn?: QueryFn) {
-    return this.databaseService.streamRecord<Type>(this.name, queryfn);
+  streamRecord(queryFn?: QueryFn) {
+    return this.databaseService.streamRecord<Type>(this.name, queryFn);
   }
 
   flatDoc(idOrQuery: string | QueryFn, caching?: false | CacheCaching) {
     return typeof idOrQuery === 'string'
-      ? this.databaseService.flatDoc<Type>(
-        `${this.name}/${idOrQuery}`, undefined, caching)
+      ? this.databaseService.flatDoc<Type>(`${this.name}/${idOrQuery}`, undefined, caching)
       : this.databaseService.flatDoc<Type>(this.name, idOrQuery, caching);
   }
 
-  flatCollection(queryfn?: QueryFn, caching?: false | CacheCaching) {
-    return this.databaseService.flatCollection<Type>(this.name, queryfn, caching);
+  flatCollection(queryFn?: QueryFn, caching?: false | CacheCaching) {
+    return this.databaseService.flatCollection<Type>(this.name, queryFn, caching);
   }
 
-  flatRecord(queryfn?: QueryFn, caching?: false | CacheCaching) {
-    return this.databaseService.flatRecord<Type>(this.name, queryfn, caching);
+  flatRecord(queryFn?: QueryFn, caching?: false | CacheCaching) {
+    return this.databaseService.flatRecord<Type>(this.name, queryFn, caching);
+  }
+
+  flatDocPublished(idOrQuery: string | QueryFn, caching?: false | CacheCaching) {
+    const queryFn: QueryFn = typeof idOrQuery === 'string'
+      ? ref => ref
+        .where('id', '==', idOrQuery)
+        .where('status', '==', 'publish')
+      : ref => idOrQuery(ref)
+        .where('status', '==', 'publish');
+    return this.databaseService.flatDoc<Type>(this.name, queryFn, caching);
+  }
+
+  flatCollectionPublished(queryFn?: QueryFn, caching?: false | CacheCaching) {
+    return this.flatCollection(
+      ref => (queryFn ? queryFn(ref) : ref).where('status', '==', 'publish'),
+      caching,
+    );
+  }
+
+  flatRecordPublished(queryFn?: QueryFn, caching?: false | CacheCaching) {
+    return this.flatRecord(
+      ref => (queryFn ? queryFn(ref) : ref).where('status', '==', 'publish'),
+      caching,
+    );
   }
 
   flatDocLocalized(
-    id: string,
-    defaultFallback = true,
+    origin: string,
     caching?: false | CacheCaching
   ) {
-    return (
-      this.databaseService.INTEGRATIONS?.settingService?.onLocaleChanged
-      || of('en-US')
-    ).pipe(
-      switchMap(locale =>
-        this.flatDoc(
-          ref => ref
-            .where('origin', '==', id)
-            .where('locale', '==', locale),
-          caching,
-        )
-      ),
-      switchMap(item =>
-        item
-          ? of(item)
-          : !defaultFallback
-            ? of(undefined)
-            : this.flatDoc(id, caching)
-      ),
+    const locale = this.databaseService.INTEGRATIONS?.settingService?.LOCALE || 'en-US';
+    if (caching !== false) {
+      caching = {
+        id: `${this.name}/${origin}?${locale}`,
+        ...caching,
+      };
+    }
+    return this.flatDoc(
+      ref => ref
+        .where('origin', '==', origin)
+        .where('locale', '==', locale),
+      caching,
     );
   }
 
   flatCollectionLocalized(
-    limit = 30,
-    orderBy = 'locale',
+    queryFn?: QueryFn,
     caching?: false | CacheCaching
   ) {
-    return (
-      this.databaseService.INTEGRATIONS?.settingService?.onLocaleChanged
-      || of('en-US')
-    ).pipe(
-      switchMap(locale =>
-        this.flatCollection(
-          ref => ref
-            .where('locale', '==', locale)
-            .orderBy(orderBy)
-            .limit(limit),
-          caching,
-        )
-      ),
+    const locale = this.databaseService.INTEGRATIONS?.settingService?.LOCALE || 'en-US';
+    return this.flatCollection(
+      ref => (queryFn ? queryFn(ref) : ref).where('locale', '==', locale),
+      caching,
     );
   }
 
   flatRecordLocalized(
-    limit = 30,
-    orderBy = 'locale',
+    queryFn?: QueryFn,
+    caching?: false | CacheCaching,
+  ) {
+    const locale = this.databaseService.INTEGRATIONS?.settingService?.LOCALE || 'en-US';
+    return this.flatRecord(
+      ref => (queryFn ? queryFn(ref) : ref).where('locale', '==', locale),
+      caching,
+    );
+  }
+
+  flatDocLocalizedPublished(
+    origin: string,
     caching?: false | CacheCaching
   ) {
-    return (
-      this.databaseService.INTEGRATIONS?.settingService?.onLocaleChanged
-      || of('en-US')
-    ).pipe(
-      switchMap(locale =>
-        this.flatRecord(
-          ref => ref
-            .where('locale', '==', locale)
-            .orderBy(orderBy)
-            .limit(limit),
-          caching,
-        )
-      ),
+    const locale = this.databaseService.INTEGRATIONS?.settingService?.LOCALE || 'en-US';
+    if (caching !== false) {
+      caching = {
+        id: `${this.name}/${origin}?${locale}&published`,
+        ...caching,
+      };
+    }
+    return this.flatDoc(
+      ref => ref
+        .where('status', '==', 'published')
+        .where('origin', '==', origin)
+        .where('locale', '==', locale),
+      caching,
+    );
+  }
+
+  flatCollectionLocalizedPublished(
+    queryFn?: QueryFn,
+    caching?: false | CacheCaching
+  ) {
+    return this.flatCollectionLocalized(
+      ref => (queryFn ? queryFn(ref) : ref).where('status', '==', 'published'),
+      caching,
+    );
+  }
+
+  flatRecordLocalizedPublished(
+    queryFn?: QueryFn,
+    caching?: false | CacheCaching
+  ) {
+    return this.flatRecordLocalized(
+      ref => (queryFn ? queryFn(ref) : ref).where('status', '==', 'published'),
+      caching,
     );
   }
 }

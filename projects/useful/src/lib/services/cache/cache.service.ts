@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
+import { switchMap, map } from 'rxjs/operators';
 
 import {
   LocalstorageService,
@@ -14,7 +14,7 @@ export interface CacheCaching {
   for?: number;
 }
 
-export type CacheRefresher<Data> = Observable<Data>;
+export type CacheRefresher<Data> = Observable<undefined | null | Data>;
 
 @Injectable({
   providedIn: 'root'
@@ -33,63 +33,50 @@ export class CacheService {
     return this as CacheService;
   }
 
-  set<Data>(key: string, data: Data, cacheTime = 0) {
-    cacheTime = Math.abs(cacheTime);
-    if (!key) {
-      throw new Error('No cache key provided.');
-    }
-    if (cacheTime === 0) {
-      throw new Error('No cache time provided.');
-    }
-    // save expiration
-    return this.localstorage
-      .set<number>(key + '__expiration', new Date().getTime() + cacheTime * 60000)
-      .pipe(
-        switchMap(() => this.localstorage.set<Data>(key, data))
-      );
+  set<Data>(key: string, data: Data, cacheTime: number) {
+    return this.localstorage.setBulk({
+      [key + '__expiration']: new Date().getTime() + Math.abs(cacheTime) * 60000,
+      [key]: data,
+    }).pipe(
+      map(() => data),
+    );
   }
 
   get<Data>(
     key: string,
     refresher?: CacheRefresher<Data>,
-    cacheTime = 0,
+    cacheTime?: number,
   ) {
-    return this.localstorage
-    .get<number>(key + '__expiration')
-    .pipe(
-      switchMap(expiration => {
-        const isExpired = !expiration || expiration <= new Date().getTime();
-        // not expired
-        if (!isExpired) {
-          return this.localstorage.get<Data>(key);
+    return this.localstorage.getBulk<[null | number, null | Data]>([
+      `${key}__expiration`,
+      key
+    ]).pipe(
+      switchMap(values => {
+        const [expiration, data] = values;
+        const cacheDataAnyway = of(data);
+        const refreshHandler = !refresher ? cacheDataAnyway : refresher.pipe(
+          switchMap(freshData =>  freshData && cacheTime
+            ? this.set(key, freshData, cacheTime)
+            : cacheDataAnyway
+          ),
+        );
+        // no cache value
+        if (!data) {
+          return !refresher
+            ? cacheDataAnyway // no refresher
+            : refreshHandler; // has refresher
         }
-        // expired, try to refresh
-        else if (refresher) {
-          return refresher;
-        }
-        // no cached
+        // has cache value
         else {
-          return of(null);
+          const isExpired = !expiration || expiration <= new Date().getTime();
+          return (
+            !isExpired // still valid
+            || !refresher // invalid, no refresher
+          )
+            ? cacheDataAnyway
+            : refreshHandler; // invalid, has refresher
         }
-      }),
-      // result
-      switchMap(data => !data
-        // no data
-        ? of(null)
-        // has data
-        : cacheTime === 0
-          // return value if cache time = 0
-          ? of(data)
-          // save cache and return value
-          : this.set(key, data, cacheTime)
-      ),
-      // no refresher or error while refreshing
-      catchError(() => refresher
-        // use cached any value
-        ? this.localstorage.get<Data>(key)
-        // null
-        : of(null)
-      ),
+      })
     );
   }
 
