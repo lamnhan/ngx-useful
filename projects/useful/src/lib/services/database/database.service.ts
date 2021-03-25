@@ -278,32 +278,9 @@ export class DataService<Type> {
     return this.databaseService.flatRecord<Type>(this.name, queryFn, caching);
   }
 
-  flatDocPublished(idOrQuery: string | QueryFn, caching?: false | CacheCaching) {
-    const queryFn: QueryFn = typeof idOrQuery === 'string'
-      ? ref => ref
-        .where('id', '==', idOrQuery)
-        .where('status', '==', 'publish')
-      : ref => idOrQuery(ref)
-        .where('status', '==', 'publish');
-    return this.databaseService.flatDoc<Type>(this.name, queryFn, caching);
-  }
-
-  flatCollectionPublished(queryFn?: QueryFn, caching?: false | CacheCaching) {
-    return this.flatCollection(
-      ref => (queryFn ? queryFn(ref) : ref).where('status', '==', 'publish'),
-      caching,
-    );
-  }
-
-  flatRecordPublished(queryFn?: QueryFn, caching?: false | CacheCaching) {
-    return this.flatRecord(
-      ref => (queryFn ? queryFn(ref) : ref).where('status', '==', 'publish'),
-      caching,
-    );
-  }
-
   flatDocLocalized(
     origin: string,
+    queryFn?: QueryFn,
     caching?: false | CacheCaching
   ) {
     const locale = this.databaseService.INTEGRATIONS?.settingService?.LOCALE || 'en-US';
@@ -314,7 +291,7 @@ export class DataService<Type> {
       };
     }
     return this.flatDoc(
-      ref => ref
+      ref => (queryFn ? queryFn(ref) : ref)
         .where('origin', '==', origin)
         .where('locale', '==', locale),
       caching,
@@ -339,46 +316,6 @@ export class DataService<Type> {
     const locale = this.databaseService.INTEGRATIONS?.settingService?.LOCALE || 'en-US';
     return this.flatRecord(
       ref => (queryFn ? queryFn(ref) : ref).where('locale', '==', locale),
-      caching,
-    );
-  }
-
-  flatDocLocalizedPublished(
-    origin: string,
-    caching?: false | CacheCaching
-  ) {
-    const locale = this.databaseService.INTEGRATIONS?.settingService?.LOCALE || 'en-US';
-    if (caching !== false) {
-      caching = {
-        id: `${this.name}/${origin}?${locale}&published`,
-        ...caching,
-      };
-    }
-    return this.flatDoc(
-      ref => ref
-        .where('status', '==', 'published')
-        .where('origin', '==', origin)
-        .where('locale', '==', locale),
-      caching,
-    );
-  }
-
-  flatCollectionLocalizedPublished(
-    queryFn?: QueryFn,
-    caching?: false | CacheCaching
-  ) {
-    return this.flatCollectionLocalized(
-      ref => (queryFn ? queryFn(ref) : ref).where('status', '==', 'published'),
-      caching,
-    );
-  }
-
-  flatRecordLocalizedPublished(
-    queryFn?: QueryFn,
-    caching?: false | CacheCaching
-  ) {
-    return this.flatRecordLocalized(
-      ref => (queryFn ? queryFn(ref) : ref).where('status', '==', 'published'),
       caching,
     );
   }
