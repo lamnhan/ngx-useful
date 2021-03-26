@@ -34,17 +34,28 @@ export class FetchService {
   get<Data>(
     url: string,
     requestInit?: RequestInit,
-    caching?: false | CacheCaching,
     isJson = true,
   ) {
-    const fetcher = this.fetch<Data>(url, {...requestInit, method: 'GET'}, isJson);
-    if (!this.integrations.cacheService || caching === false) {
-      return fetcher;
+    return this.fetch<Data>(url, {...requestInit, method: 'GET'}, isJson);
+  }
+
+  cachingGet<Data>(
+    url: string,
+    caching?: CacheCaching,
+    requestInit?: RequestInit,
+    isJson = true,
+  ) {
+    if (!this.integrations.cacheService) {
+      throw new Error('No cache service integration.');
     }
-    const cacheTime = caching?.for || this.options.cacheTime || 0;
+    const cacheTime = caching?.time || this.options.cacheTime || 0;
     const cacheId = this.helperService.md5(caching?.id || url);
-    return this.integrations.cacheService
-      .get('fetch/' + cacheId, fetcher, cacheTime);
+    const cacheGroup = caching?.group || 'app';
+    return this.integrations.cacheService.caching(
+      `fetch/${cacheGroup}/${cacheId}`,
+      this.get<Data>(url, requestInit, isJson),
+      cacheTime
+    );
   }
 
   post<Data>(url: string, requestInit?: RequestInit) {

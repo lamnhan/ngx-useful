@@ -22,7 +22,6 @@ export interface DatabaseOptions {
 
 export interface DatabaseIntegrations {
   cacheService?: CacheService;
-  settingService?: SettingService;
 }
 
 @Injectable({
@@ -53,14 +52,6 @@ export class DatabaseService {
 
   get DRIVER() {
     return this.options.driver || 'firebase';
-  }
-
-  get OPTIONS() {
-    return this.options;
-  }
-
-  get INTEGRATIONS() {
-    return this.integrations;
   }
 
   exists(path: string, queryFn?: QueryFn) {
@@ -119,92 +110,103 @@ export class DatabaseService {
       })
     );
   }
-  
-  flatDoc<Type>(
-    path: string,
-    queryFn?: QueryFn,
-    caching?: false | CacheCaching
-  ) {
-    return this.getFlatData(
-      !queryFn
-        ? this.doc<Type>(path).get().pipe(
-          map(doc => doc.data() || null),
-          take(1)
-        )
-        : this.collection<Type>(path, queryFn).get().pipe(
-          map(collection =>
-            collection.docs.length === 1
-            ? collection.docs[0].data()
-            : null
-          ),
-          take(1)
+
+  flatDoc<Type>(path: string, queryFn?: QueryFn) {
+    return !queryFn
+      ? this.doc<Type>(path).get().pipe(
+        map(doc => doc.data() || null),
+        take(1)
+      )
+      : this.collection<Type>(path, queryFn).get().pipe(
+        map(collection =>
+          collection.docs.length === 1
+          ? collection.docs[0].data()
+          : null
         ),
-      path,
-      queryFn,
-      caching,
+        take(1)
+      );
+  }
+
+  flatCollection<Type>(path: string, queryFn?: QueryFn) {
+    return this.collection<Type>(path, queryFn).get().pipe(
+      map(collection => collection.docs.map(doc => doc.data())),
+      take(1)
     );
   }
 
-  flatCollection<Type>(
+  flatRecord<Type>(path: string, queryFn?: QueryFn) {
+    return this.collection<Type>(path, queryFn).get().pipe(
+      map(collection => {
+        const record = {} as Record<string, Type>;
+        collection.docs.forEach(doc => {
+          const data = doc.data();
+          record[(data as Record<string, unknown>).id as string] = data;
+        });
+        return record;
+      }),
+      take(1)
+    )
+  }
+
+  cachingDoc<Type>(
     path: string,
     queryFn?: QueryFn,
-    caching?: false | CacheCaching
+    caching?: CacheCaching
   ) {
-    return this.getFlatData(
-      this.collection<Type>(path, queryFn).get().pipe(
-        map(collection => collection.docs.map(doc => doc.data())),
-        take(1)
-      ),
+    return this.getCachingData(
+      this.flatDoc<Type>(path, queryFn),
       path,
       queryFn,
       caching,
-    ).pipe(
-      map(value => value ? value : []), // null/undefined -> []
     );
   }
 
-  flatRecord<Type>(
+  cachingCollection<Type>(
     path: string,
     queryFn?: QueryFn,
-    caching?: false | CacheCaching
+    caching?: CacheCaching
   ) {
-    return this.getFlatData(
-      this.collection<Type>(path, queryFn).get().pipe(
-        map(collection => {
-          const record = {} as Record<string, Type>;
-          collection.docs.forEach(doc => {
-            const data = doc.data();
-            record[(data as Record<string, unknown>).id as string] = data;
-          });
-          return record;
-        }),
-        take(1)
-      ),
+    return this.getCachingData(
+      this.flatCollection<Type>(path, queryFn),
       path,
       queryFn,
       caching,
-    ).pipe(
-      map(value => value ? value : {}), // null/undefined -> {}
     );
   }
 
-  private getFlatData<Type>(
+  cachingRecord<Type>(
+    path: string,
+    queryFn?: QueryFn,
+    caching?: CacheCaching
+  ) {
+    return this.getCachingData(
+      this.flatRecord<Type>(path, queryFn),
+      path,
+      queryFn,
+      caching,
+    );
+  }
+
+  private getCachingData<Type>(
     dataFetcher: Observable<Type>,
     path: string,
     queryFn?: QueryFn,
-    caching?: false | CacheCaching
+    caching?: CacheCaching,
   ) {
-    if (
-      !this.integrations.cacheService
-      || caching === false
-      || (queryFn && !caching?.id)
-    ) {
-      return dataFetcher;
+    if (!this.integrations.cacheService) {
+      throw new Error('No cache service integration');
     }
-    const cacheTime = caching?.for || this.options.cacheTime || 0;
+    if (queryFn && !caching?.id) {
+      throw new Error('Querying without a cache id');
+    }
+    const cacheTime = caching?.time || this.options.cacheTime || 0;
     const cacheId = this.helperService.md5(caching?.id || path);
-    return this.integrations.cacheService
-      .get('database/' + cacheId, dataFetcher, cacheTime);
+    const cacheGroup = caching?.group || path.split('/').shift() as string;
+    return this.integrations.cacheService.caching(
+      `database/${cacheGroup}/${cacheId}`,
+      dataFetcher,
+      cacheTime
+    );
   }
 }
 
@@ -264,60 +266,32 @@ export class DataService<Type> {
     return this.databaseService.streamRecord<Type>(this.name, queryFn);
   }
 
-  flatDoc(idOrQuery: string | QueryFn, caching?: false | CacheCaching) {
+  flatDoc(idOrQuery: string | QueryFn) {
     return typeof idOrQuery === 'string'
-      ? this.databaseService.flatDoc<Type>(`${this.name}/${idOrQuery}`, undefined, caching)
-      : this.databaseService.flatDoc<Type>(this.name, idOrQuery, caching);
+      ? this.databaseService.flatDoc<Type>(`${this.name}/${idOrQuery}`)
+      : this.databaseService.flatDoc<Type>(this.name, idOrQuery);
   }
 
-  flatCollection(queryFn?: QueryFn, caching?: false | CacheCaching) {
-    return this.databaseService.flatCollection<Type>(this.name, queryFn, caching);
+  flatCollection(queryFn?: QueryFn) {
+    return this.databaseService.flatCollection<Type>(this.name, queryFn);
   }
 
-  flatRecord(queryFn?: QueryFn, caching?: false | CacheCaching) {
-    return this.databaseService.flatRecord<Type>(this.name, queryFn, caching);
+  flatRecord(queryFn?: QueryFn) {
+    return this.databaseService.flatRecord<Type>(this.name, queryFn);
   }
 
-  flatDocLocalized(
-    origin: string,
-    queryFn?: QueryFn,
-    caching?: false | CacheCaching
-  ) {
-    const locale = this.databaseService.INTEGRATIONS?.settingService?.LOCALE || 'en-US';
-    if (caching !== false) {
-      caching = {
-        id: `${this.name}/${origin}?${locale}`,
-        ...caching,
-      };
-    }
-    return this.flatDoc(
-      ref => (queryFn ? queryFn(ref) : ref)
-        .where('origin', '==', origin)
-        .where('locale', '==', locale),
-      caching,
-    );
+  cachingDoc(idOrQuery: string | QueryFn, caching?: CacheCaching) {
+    return typeof idOrQuery === 'string'
+      ? this.databaseService.cachingDoc<Type>(`${this.name}/${idOrQuery}`, undefined, caching)
+      : this.databaseService.cachingDoc<Type>(this.name, idOrQuery, caching);
   }
 
-  flatCollectionLocalized(
-    queryFn?: QueryFn,
-    caching?: false | CacheCaching
-  ) {
-    const locale = this.databaseService.INTEGRATIONS?.settingService?.LOCALE || 'en-US';
-    return this.flatCollection(
-      ref => (queryFn ? queryFn(ref) : ref).where('locale', '==', locale),
-      caching,
-    );
+  cachingCollection(queryFn?: QueryFn, caching?: CacheCaching) {
+    return this.databaseService.cachingCollection<Type>(this.name, queryFn, caching);
   }
 
-  flatRecordLocalized(
-    queryFn?: QueryFn,
-    caching?: false | CacheCaching,
-  ) {
-    const locale = this.databaseService.INTEGRATIONS?.settingService?.LOCALE || 'en-US';
-    return this.flatRecord(
-      ref => (queryFn ? queryFn(ref) : ref).where('locale', '==', locale),
-      caching,
-    );
+  cachingRecord(queryFn?: QueryFn, caching?: CacheCaching) {
+    return this.databaseService.cachingRecord<Type>(this.name, queryFn, caching);
   }
 }
 

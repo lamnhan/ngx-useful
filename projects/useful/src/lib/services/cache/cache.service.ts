@@ -11,7 +11,8 @@ import {
 
 export interface CacheCaching {
   id?: string;
-  for?: number;
+  time?: number;
+  group?: string;
 }
 
 export type CacheRefresher<Data> = Observable<undefined | null | Data>;
@@ -33,13 +34,19 @@ export class CacheService {
     return this as CacheService;
   }
 
+  caching<Data>(
+    key: string,
+    refresher: CacheRefresher<Data>,
+    cacheTime: number
+  ) {
+    return new Caching<Data>(this, key, refresher, cacheTime);
+  }
+
   set<Data>(key: string, data: Data, cacheTime: number) {
     return this.localstorage.setBulk({
       [key + '__expiration']: new Date().getTime() + Math.abs(cacheTime) * 60000,
       [key]: data,
-    }).pipe(
-      map(() => data),
-    );
+    }).pipe(map(() => data));
   }
 
   get<Data>(
@@ -88,16 +95,18 @@ export class CacheService {
     return this.localstorage.iterateKeys(handler);
   }
 
-  remove(key: string) {
-    return this.localstorage
-      .remove(key + '__expiration')
-      .pipe(
-        switchMap(() => this.localstorage.remove(key))
-      );
+  remove(key: string, keepData = false) {
+    const keys = [key + '__expiration'];
+    if (!keepData) {
+      keys.push(key);
+    }
+    return this.localstorage.removeBulk(keys);
   }
 
   removeBulk(keys: string[]) {
-    return this.localstorage.removeBulk(keys);
+    const bulkKeys = [] as string[];
+    keys.forEach(key => bulkKeys.push(key + '__expiration', key));
+    return this.localstorage.removeBulk(bulkKeys);
   }
 
   removeByPrefix(prefix: string) {
@@ -134,5 +143,30 @@ export class CacheService {
         }
       }
     });
+  }
+}
+
+export class Caching<Data> {
+  public data$ = this.get();
+
+  constructor(
+    private readonly cacheService: CacheService,
+    private readonly key: string,
+    private readonly refresher: CacheRefresher<Data>,
+    private readonly cacheTime: number,
+  ) {}
+
+  get() {
+    return this.cacheService.get(this.key, this.refresher, this.cacheTime);
+  }
+
+  refresh() {
+    this.data$ = this.cacheService.remove(this.key, true).pipe(
+      switchMap(() => this.get()),
+    );
+  }
+
+  remove(keepData = false) {
+    this.cacheService.remove(this.key, keepData);
   }
 }
