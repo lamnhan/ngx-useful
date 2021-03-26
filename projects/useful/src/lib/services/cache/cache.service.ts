@@ -9,8 +9,8 @@ import {
   LocalstorageIterateKeysHandler
 } from '../localstorage/localstorage.service';
 
-export interface CacheCaching {
-  id?: string;
+export interface CacheConfig {
+  name?: string;
   time?: number;
   group?: string;
 }

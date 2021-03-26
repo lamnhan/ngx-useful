@@ -4,7 +4,7 @@ import { map, take } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
 
 import { HelperService } from '../helper/helper.service';
-import { CacheService, CacheCaching } from '../cache/cache.service';
+import { CacheService, CacheConfig, Caching } from '../cache/cache.service';
 
 export type NullableOptional<T> = PickRequired<T> & Nullable<PickOptional<T>>;
 
@@ -80,11 +80,11 @@ export class DatabaseService {
   }
 
   streamDoc<Type>(path: string, queryFn?: QueryFn) {
-    return new Observable<Type | undefined>(observer =>
+    return new Observable<null | Type>(observer =>
       !queryFn
         ? this.doc<Type>(path).ref.onSnapshot(doc => observer.next(doc.data()))
         : this.collection<Type>(path, queryFn).ref.onSnapshot(collection =>
-          observer.next(collection.docs.length === 1 ? collection.docs[0].data() : undefined)
+          observer.next(collection.docs.length === 1 ? collection.docs[0].data() : null)
         )
     );
   }
@@ -125,7 +125,7 @@ export class DatabaseService {
   cachingDoc<Type>(
     path: string,
     queryFn?: QueryFn,
-    caching?: CacheCaching
+    caching?: CacheConfig
   ) {
     return this.getCachingData(
       this.flatDoc<Type>(path, queryFn),
@@ -138,7 +138,7 @@ export class DatabaseService {
   cachingCollection<Type>(
     path: string,
     queryFn?: QueryFn,
-    caching?: CacheCaching
+    caching?: CacheConfig
   ) {
     return this.getCachingData(
       this.flatCollection<Type>(path, queryFn),
@@ -151,7 +151,7 @@ export class DatabaseService {
   cachingRecord<Type>(
     path: string,
     queryFn?: QueryFn,
-    caching?: CacheCaching
+    caching?: CacheConfig
   ) {
     return this.getCachingData(
       this.flatRecord<Type>(path, queryFn),
@@ -162,23 +162,23 @@ export class DatabaseService {
   }
 
   private getCachingData<Type>(
-    fetcher: Observable<Type>,
+    refresher: Observable<Type>,
     path: string,
     queryFn?: QueryFn,
-    caching?: CacheCaching,
+    caching?: CacheConfig,
   ) {
     if (!this.integrations.cacheService) {
-      throw new Error('No cache service integration');
+      throw new Error('No cache service integration.');
     }
-    if (queryFn && !caching?.id) {
-      throw new Error('Querying without a cache id');
+    if (queryFn && !caching?.name) {
+      throw new Error('Querying without a cache name.');
     }
     const cacheTime = caching?.time || this.options.cacheTime || 0;
-    const cacheId = this.helperService.md5(caching?.id || path);
+    const cacheId = this.helperService.md5(caching?.name || path);
     const cacheGroup = caching?.group || path.split('/').shift() as string;
     return this.integrations.cacheService.caching(
       `database/${cacheGroup}/${cacheId}`,
-      fetcher,
+      refresher,
       cacheTime
     );
   }
@@ -254,17 +254,17 @@ export class DatabaseData<Type> {
     return this.databaseService.flatRecord<Type>(this.name, queryFn);
   }
 
-  cachingDoc(idOrQuery: string | QueryFn, caching?: CacheCaching) {
+  cachingDoc(idOrQuery: string | QueryFn, caching?: CacheConfig) {
     return typeof idOrQuery === 'string'
       ? this.databaseService.cachingDoc<Type>(`${this.name}/${idOrQuery}`, undefined, caching)
       : this.databaseService.cachingDoc<Type>(this.name, idOrQuery, caching);
   }
 
-  cachingCollection(queryFn?: QueryFn, caching?: CacheCaching) {
+  cachingCollection(queryFn?: QueryFn, caching?: CacheConfig) {
     return this.databaseService.cachingCollection<Type>(this.name, queryFn, caching);
   }
 
-  cachingRecord(queryFn?: QueryFn, caching?: CacheCaching) {
+  cachingRecord(queryFn?: QueryFn, caching?: CacheConfig) {
     return this.databaseService.cachingRecord<Type>(this.name, queryFn, caching);
   }
 }

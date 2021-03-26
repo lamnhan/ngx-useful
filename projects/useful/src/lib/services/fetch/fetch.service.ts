@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { from } from 'rxjs';
 
 import { HelperService } from '../helper/helper.service';
-import { CacheService, CacheCaching } from '../cache/cache.service';
+import { CacheService, CacheConfig } from '../cache/cache.service';
 
 export interface FetchOptions {
   cacheTime?: number;
@@ -41,7 +41,7 @@ export class FetchService {
 
   cachingGet<Data>(
     url: string,
-    caching?: CacheCaching,
+    caching?: CacheConfig,
     requestInit?: RequestInit,
     isJson = true,
   ) {
@@ -49,7 +49,7 @@ export class FetchService {
       throw new Error('No cache service integration.');
     }
     const cacheTime = caching?.time || this.options.cacheTime || 0;
-    const cacheId = this.helperService.md5(caching?.id || url);
+    const cacheId = this.helperService.md5(caching?.name || url);
     const cacheGroup = caching?.group || 'app';
     return this.integrations.cacheService.caching(
       `fetch/${cacheGroup}/${cacheId}`,
