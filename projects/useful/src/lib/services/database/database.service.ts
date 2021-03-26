@@ -124,7 +124,7 @@ export class DatabaseService {
 
   getDoc<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
     return caching === false
-    ? this.flatDoc(path, queryFn)
+    ? this.flatDoc<Type>(path, queryFn)
     : this.cacheManager(
       this.flatDoc<Type>(path, queryFn),
       path,
@@ -135,7 +135,7 @@ export class DatabaseService {
 
   getCollection<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
     return caching === false
-    ? this.flatDoc(path, queryFn)
+    ? this.flatCollection<Type>(path, queryFn)
     : this.cacheManager(
       this.flatCollection<Type>(path, queryFn),
       path,
@@ -146,7 +146,7 @@ export class DatabaseService {
 
   getRecord<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
     return caching === false
-    ? this.flatDoc(path, queryFn)
+    ? this.flatRecord<Type>(path, queryFn)
     : this.cacheManager(
       this.flatRecord<Type>(path, queryFn),
       path,
