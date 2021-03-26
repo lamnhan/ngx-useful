@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Page } from '@lamnhan/schemata';
 
-import { DatabaseService, DataService } from '../../services/database/database.service';
+import { DatabaseService, DatabaseData } from '../../services/database/database.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PageDataService extends DataService<Page> {
+export class PageDataService extends DatabaseData<Page> {
   constructor(databaseService: DatabaseService) {
     super(databaseService, 'pages');
   }

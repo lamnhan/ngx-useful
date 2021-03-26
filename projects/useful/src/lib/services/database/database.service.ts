@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-import { of, from, Observable } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
 
 import { HelperService } from '../helper/helper.service';
 import { CacheService, CacheCaching } from '../cache/cache.service';
-import { SettingService } from '../setting/setting.service';
 
 export type NullableOptional<T> = PickRequired<T> & Nullable<PickOptional<T>>;
 
@@ -112,40 +111,15 @@ export class DatabaseService {
   }
 
   flatDoc<Type>(path: string, queryFn?: QueryFn) {
-    return !queryFn
-      ? this.doc<Type>(path).get().pipe(
-        map(doc => doc.data() || null),
-        take(1)
-      )
-      : this.collection<Type>(path, queryFn).get().pipe(
-        map(collection =>
-          collection.docs.length === 1
-          ? collection.docs[0].data()
-          : null
-        ),
-        take(1)
-      );
+    return this.streamDoc<Type>(path, queryFn).pipe(take(1));
   }
 
   flatCollection<Type>(path: string, queryFn?: QueryFn) {
-    return this.collection<Type>(path, queryFn).get().pipe(
-      map(collection => collection.docs.map(doc => doc.data())),
-      take(1)
-    );
+    return this.streamCollection<Type>(path, queryFn).pipe(take(1));
   }
 
   flatRecord<Type>(path: string, queryFn?: QueryFn) {
-    return this.collection<Type>(path, queryFn).get().pipe(
-      map(collection => {
-        const record = {} as Record<string, Type>;
-        collection.docs.forEach(doc => {
-          const data = doc.data();
-          record[(data as Record<string, unknown>).id as string] = data;
-        });
-        return record;
-      }),
-      take(1)
-    )
+    return this.streamRecord<Type>(path, queryFn).pipe(take(1));
   }
 
   cachingDoc<Type>(
@@ -188,7 +162,7 @@ export class DatabaseService {
   }
 
   private getCachingData<Type>(
-    dataFetcher: Observable<Type>,
+    fetcher: Observable<Type>,
     path: string,
     queryFn?: QueryFn,
     caching?: CacheCaching,
@@ -204,13 +178,13 @@ export class DatabaseService {
     const cacheGroup = caching?.group || path.split('/').shift() as string;
     return this.integrations.cacheService.caching(
       `database/${cacheGroup}/${cacheId}`,
-      dataFetcher,
+      fetcher,
       cacheTime
     );
   }
 }
 
-export class DataService<Type> {
+export class DatabaseData<Type> {
   constructor(
     public readonly databaseService: DatabaseService,
     public readonly name: string
