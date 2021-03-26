@@ -122,50 +122,75 @@ export class DatabaseService {
     return this.streamRecord<Type>(path, queryFn).pipe(take(1));
   }
 
-  cachingDoc<Type>(
-    path: string,
-    queryFn?: QueryFn,
-    caching?: CacheConfig
-  ) {
-    return this.getCachingData(
+  getDoc<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
+    return caching === false
+    ? this.flatDoc(path, queryFn)
+    : this.cacheManager(
       this.flatDoc<Type>(path, queryFn),
       path,
       queryFn,
       caching,
-    );
+    ) as Observable<null | Type>;
   }
 
-  cachingCollection<Type>(
-    path: string,
-    queryFn?: QueryFn,
-    caching?: CacheConfig
-  ) {
-    return this.getCachingData(
+  getCollection<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
+    return caching === false
+    ? this.flatDoc(path, queryFn)
+    : this.cacheManager(
+      this.flatCollection<Type>(path, queryFn),
+      path,
+      queryFn,
+      caching
+    ) as Observable<Type[]>;
+  }
+
+  getRecord<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
+    return caching === false
+    ? this.flatDoc(path, queryFn)
+    : this.cacheManager(
+      this.flatRecord<Type>(path, queryFn),
+      path,
+      queryFn,
+      caching
+    ) as Observable<Record<string, Type>>;
+  }
+
+  cachingDoc<Type>(path: string, queryFn?: QueryFn, caching?: CacheConfig) {
+    return this.cacheManager(
+      this.flatDoc<Type>(path, queryFn),
+      path,
+      queryFn,
+      caching,
+      true,
+    ) as Caching<null | Type>;
+  }
+
+  cachingCollection<Type>(path: string, queryFn?: QueryFn, caching?: CacheConfig) {
+    return this.cacheManager(
       this.flatCollection<Type>(path, queryFn),
       path,
       queryFn,
       caching,
-    );
+      true,
+    ) as Caching<Type[]>;
   }
 
-  cachingRecord<Type>(
-    path: string,
-    queryFn?: QueryFn,
-    caching?: CacheConfig
-  ) {
-    return this.getCachingData(
+  cachingRecord<Type>(path: string, queryFn?: QueryFn, caching?: CacheConfig) {
+    return this.cacheManager(
       this.flatRecord<Type>(path, queryFn),
       path,
       queryFn,
       caching,
-    );
+      true,
+    ) as Caching<Record<string, Type>>;
   }
 
-  private getCachingData<Type>(
+  private cacheManager<Type>(
     refresher: Observable<Type>,
     path: string,
     queryFn?: QueryFn,
     caching?: CacheConfig,
+    asCaching = false,
   ) {
     if (!this.integrations.cacheService) {
       throw new Error('No cache service integration.');
@@ -173,14 +198,20 @@ export class DatabaseService {
     if (queryFn && !caching?.name) {
       throw new Error('Querying without a cache name.');
     }
-    const cacheTime = caching?.time || this.options.cacheTime || 0;
+    const cacheTime = caching?.time || this.options.cacheTime || 1;
     const cacheId = this.helperService.md5(caching?.name || path);
     const cacheGroup = caching?.group || path.split('/').shift() as string;
-    return this.integrations.cacheService.caching(
-      `database/${cacheGroup}/${cacheId}`,
-      refresher,
-      cacheTime
-    );
+    return asCaching
+      ? this.integrations.cacheService.caching(
+        `database/${cacheGroup}/${cacheId}`,
+        refresher,
+        cacheTime
+      )
+      : this.integrations.cacheService.get(
+        `database/${cacheGroup}/${cacheId}`,
+        refresher,
+        cacheTime
+      );
   }
 }
 
@@ -252,6 +283,20 @@ export class DatabaseData<Type> {
 
   flatRecord(queryFn?: QueryFn) {
     return this.databaseService.flatRecord<Type>(this.name, queryFn);
+  }
+
+  getDoc(idOrQuery: string | QueryFn, caching?: false | CacheConfig) {
+    return typeof idOrQuery === 'string'
+      ? this.databaseService.getDoc<Type>(`${this.name}/${idOrQuery}`, undefined, caching)
+      : this.databaseService.getDoc<Type>(this.name, idOrQuery, caching);
+  }
+
+  getCollection(queryFn?: QueryFn, caching?: false | CacheConfig) {
+    return this.databaseService.getCollection<Type>(this.name, queryFn, caching);
+  }
+
+  getRecord(queryFn?: QueryFn, caching?: false | CacheConfig) {
+    return this.databaseService.getRecord<Type>(this.name, queryFn, caching);
   }
 
   cachingDoc(idOrQuery: string | QueryFn, caching?: CacheConfig) {
