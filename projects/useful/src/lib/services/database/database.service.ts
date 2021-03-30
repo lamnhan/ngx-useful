@@ -111,15 +111,36 @@ export class DatabaseService {
   }
 
   flatDoc<Type>(path: string, queryFn?: QueryFn) {
-    return this.streamDoc<Type>(path, queryFn).pipe(take(1));
+    return !queryFn
+      ? this.doc<Type>(path).get().pipe(
+        map(doc => doc.data() || null),
+        take(1)
+      )
+      : this.collection<Type>(path, queryFn).get().pipe(
+        map(collection => collection.docs.length === 1 ? collection.docs[0].data() : null),
+        take(1)
+      );
   }
 
   flatCollection<Type>(path: string, queryFn?: QueryFn) {
-    return this.streamCollection<Type>(path, queryFn).pipe(take(1));
+    return this.collection<Type>(path, queryFn).get().pipe(
+      map(collection => collection.docs.map(doc => doc.data())),
+      take(1)
+    );
   }
 
   flatRecord<Type>(path: string, queryFn?: QueryFn) {
-    return this.streamRecord<Type>(path, queryFn).pipe(take(1));
+    return this.collection<Type>(path, queryFn).get().pipe(
+      map(collection => {
+        const record = {} as Record<string, Type>;
+        collection.docs.forEach(doc => {
+          const data = doc.data();
+          record[(data as Record<string, unknown>).id as string] = data;
+        });
+        return record;
+      }),
+      take(1)
+    );
   }
 
   getDoc<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {

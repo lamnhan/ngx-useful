@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
+import { of, Observable, ReplaySubject } from 'rxjs';
+import { switchMap, map, tap, take } from 'rxjs/operators';
 
 import {
   LocalstorageService,
@@ -66,6 +66,7 @@ export class CacheService {
             ? this.set(key, freshData, cacheTime)
             : cacheDataAnyway
           ),
+          take(1),
         );
         // no cache value
         if (!data) {
@@ -147,26 +148,45 @@ export class CacheService {
 }
 
 export class Caching<Data> {
-  public data$ = this.get();
+  private data: null | Data = null;
+  public readonly onData = new ReplaySubject<null | Data>(1);
 
   constructor(
     private readonly cacheService: CacheService,
     private readonly key: string,
     private readonly refresher: CacheRefresher<Data>,
     private readonly cacheTime: number,
-  ) {}
-
+  ) {
+    this.get();
+  }
+  
   get() {
-    return this.cacheService.get(this.key, this.refresher, this.cacheTime);
+    return this.cacheService.get(this.key, this.refresher, this.cacheTime).pipe(
+      tap(data => this.handleData(data))
+    );
+  }
+
+  update(data: Data) {
+    return of(data).pipe(
+      tap(data => this.handleData(data)),
+    );
   }
 
   refresh() {
-    this.data$ = this.cacheService.remove(this.key, true).pipe(
+    return this.cacheService.remove(this.key, true).pipe(
       switchMap(() => this.get()),
     );
   }
 
-  remove(keepData = false) {
-    this.cacheService.remove(this.key, keepData);
+  remove() {
+    return this.cacheService.remove(this.key).pipe(
+      tap(() => this.handleData(null)),
+      map(() => null),
+    );
+  }
+
+  private handleData(data: null | Data) {
+    this.data = data;
+    this.onData.next(this.data);
   }
 }
