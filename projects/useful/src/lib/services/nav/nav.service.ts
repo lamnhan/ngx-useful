@@ -38,6 +38,20 @@ export interface MenuItem extends NavItem {
 //   | string
 //   | { (input: Record<string, unknown>): string };
 
+export interface NavHistoryItem {
+  url: string;
+  title?: string;
+  data?: Record<string, unknown>;
+}
+
+export interface NavConfig {
+  extras?: NavigationExtras;
+  title?: string;
+  data?: Record<string, unknown>;
+  withLocale?: string;
+  enableBackward?: boolean;
+}
+
 export interface NavOptions {
   i18nRedirect?: boolean
 }
@@ -97,14 +111,18 @@ export class NavService {
   private options: NavOptions = {};
   private integrations: NavIntegrations = {};
 
-  private routingData: Record<string, unknown> = {};
+  private routeTitle?: string;
+  private routeData?: Record<string, unknown>;
   // private routingMetaRecords: Record<string, AppCustomMetas> = {};
 
   // general
   private loading = false;
   private loadingIndicatorTimer?: any;
-  private previousUrls: string[] = [];
   private isMenuVisible = false; // secondary/mobile menu
+  private backwardEnabled = false;
+
+  // history
+  private previousRoutes: NavHistoryItem[] = [];
 
   // i18n
   private i18nRouting?: I18nRouting;
@@ -170,7 +188,7 @@ export class NavService {
           const url = this.router.url;
           const pathInit = url.substr(1).split('/').shift() as string;
           if (pathInit !== '' && this.i18nOrigins[pathInit] !== locale) {
-            this.navigate(url, undefined, {}, locale);
+            this.navigate(url, { withLocale: locale });
           }
         });
       }
@@ -196,13 +214,17 @@ export class NavService {
         eventName = 'NavigationEnd';
         // refresh router link
         this.onRefreshRouterLink.next();
-        // record urls for backing navigation
+        // record urls for backward navigation
         const url = event.urlAfterRedirects;
-        const backUrl = this.previousUrls[this.previousUrls.length - 2];
-        if (!backUrl || (backUrl && url !== backUrl)) {
-          this.previousUrls.push(url);
+        const backwardRoute = this.previousRoutes[this.previousRoutes.length - 2];
+        if (!backwardRoute?.url || (backwardRoute?.url && url !== backwardRoute?.url)) {
+          this.previousRoutes.push({
+            url,
+            title: this.routeTitle,
+            data: this.routeData,
+          });
         } else {
-          this.previousUrls.pop();
+          this.previousRoutes.pop();
         }
         // set title & meta
         // this.metaService.changePageMetas(
@@ -217,13 +239,21 @@ export class NavService {
     return this as NavService;
   }
 
+  get TITLE() {
+    return this.routeTitle;
+  }
+
+  get DATA() {
+    return this.routeData;
+  }
+
   get IS_LOADING() {
     return this.loading;
   }
 
-  get IS_BACKABLE() {
-    return this.router
-      && this.previousUrls.length > 1
+  get IS_BACKWARDABLE() {
+    return this.backwardEnabled
+      && this.previousRoutes.length > 1
       && this.router.url !== ''
       && this.router.url !== '/';
   }
@@ -237,7 +267,7 @@ export class NavService {
   }
 
   getMenuIcon(menuClass = 'icon-menu', backClass = 'icon-back') {
-    return this.IS_BACKABLE ? backClass : menuClass;
+    return this.IS_BACKWARDABLE ? backClass : menuClass;
   }
 
   getRouteUrl(input: string | string[], withLocale?: string) {
@@ -277,10 +307,6 @@ export class NavService {
     }
   }
 
-  get(key?: string) {
-    return key ? this.routingData[key] : this.routingData;
-  }
-
   // setMeta(
   //   input: Record<string, unknown>,
   //   modifiers: Record<string, NavMetaModifier> = {}
@@ -301,7 +327,7 @@ export class NavService {
   }
 
   menuAction() {
-    return this.IS_BACKABLE
+    return this.IS_BACKWARDABLE
       ? this.back()
       : this.toggleMenu();
   }
@@ -310,35 +336,36 @@ export class NavService {
     this.isMenuVisible = !this.isMenuVisible;
   }
 
-  isActive(href: string, exact = true) {
-    return this.router.isActive(href, exact);
+  isActive(url: string, exact = false) {
+    return this.router.isActive(url, exact);
   }
 
   back() {
-    const [ path, ... queryStringArr ] = (this.previousUrls[this.previousUrls.length - 2] || '/').split('?');
-    // query params
-    const queryParams = {} as Record<string, unknown>;
-    if (queryStringArr.length) {
-      const queryItems = queryStringArr.join('?').split('&');
-      for (const queryItem of queryItems) {
-        const [ key, value ] = queryItem.split('=');
-        if (key && value) {
-          queryParams[key] = value;
-        }
-      }
-    }
+    const { url = '/', title, data } = this.previousRoutes[this.previousRoutes.length - 2] || {};
+    // const [ path, ... queryStringArr ] = (url || '/').split('?');
+    // // query params
+    // const queryParams = {} as Record<string, unknown>;
+    // if (queryStringArr.length) {
+    //   const queryItems = queryStringArr.join('?').split('&');
+    //   for (const queryItem of queryItems) {
+    //     const [ key, value ] = queryItem.split('=');
+    //     if (key && value) {
+    //       queryParams[key] = value;
+    //     }
+    //   }
+    // }
     // navigate
-    return this.router.navigate([ path ], { queryParams });
+    return this.navigate(url, {title, data});
   }
 
-  navigate(
-    input: string | string[],
-    navigationExtras?: NavigationExtras,
-    data: Record<string, unknown> = {},
-    withLocale?: string,
-  ) {
-    this.routingData = data;
-    return this.router.navigate(this.getRoute(input, withLocale), navigationExtras);
+  navigate(input: string | string[], config: NavConfig = {}) {
+    const {extras, title, data, enableBackward, withLocale} = config;
+    // set values
+    this.routeTitle = title;
+    this.routeData = data;
+    this.backwardEnabled = !!enableBackward;
+    // do navigate
+    return this.router.navigate(this.getRoute(input, withLocale), extras);
   }
 
   scrollToTop() {

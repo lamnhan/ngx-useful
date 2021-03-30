@@ -4,6 +4,10 @@ import { NavigationExtras } from '@angular/router';
 
 import { NavService } from '../../services/nav/nav.service';
 
+interface ActiveOptions {
+  exact: boolean;
+}
+
 // NOTE: see implementation
 // https://github.com/angular/angular/blob/master/packages/router/src/directives/router_link.ts
 
@@ -12,13 +16,19 @@ import { NavService } from '../../services/nav/nav.service';
 })
 export class RouterLinkDirective implements OnChanges, OnDestroy {
   private input: string | string[] = [];
+  private title?: string;
   private data?: Record<string, unknown>;
   private locale?: string;
   private extras?: NavigationExtras;
   private activeClasses?: string[] = [];
+  private activeOptions?: ActiveOptions;
 
   @Input() set routerLink(input: undefined | null | string | string[]) {
     this.input = input || [];
+  }
+
+  @Input() set routeTitle(title: undefined | string) {
+    this.title = title;
   }
 
   @Input() set routeData(data: undefined | Record<string, unknown>) {
@@ -41,12 +51,21 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
       : classes;
   }
 
+  @Input() set routerLinkActiveOptions(options: undefined | ActiveOptions) {
+    this.activeOptions = options;
+  }
+
   @HostBinding() href!: string;
 
   @HostBinding() class!: string | string[];
 
   @HostListener('click') onClick() {
-    this.navService.navigate(this.input, this.extras, this.data, this.locale);
+    this.navService.navigate(this.input, {
+      extras: this.extras,
+      title: this.title,
+      data: this.data,
+      withLocale: this.locale,
+    });
     return false;
   }
 
@@ -69,7 +88,7 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
   private updateTargetAttributes() {
     this.href = this.navService.getRouteUrl(this.input, this.locale);
     this.class =
-      (this.activeClasses && this.navService.isActive(this.href))
+      (this.activeClasses && this.navService.isActive(this.href, !!this.activeOptions?.exact))
         ? this.activeClasses
         : [];
   }
