@@ -34,10 +34,6 @@ export interface MenuItem extends NavItem {
   subItems?: MenuItem[];
 }
 
-// export type NavMetaModifier =
-//   | string
-//   | { (input: Record<string, unknown>): string };
-
 export interface NavHistoryItem {
   url: string;
   title?: string;
@@ -111,15 +107,15 @@ export class NavService {
   private options: NavOptions = {};
   private integrations: NavIntegrations = {};
 
-  private routeTitle?: string;
-  private routeData?: Record<string, unknown>;
-  // private routingMetaRecords: Record<string, AppCustomMetas> = {};
-
   // general
   private loading = false;
   private loadingIndicatorTimer?: any;
   private isMenuVisible = false; // secondary/mobile menu
   private backwardEnabled = false;
+
+  // current props
+  private routeTitle?: string;
+  private routeData?: Record<string, unknown>;
 
   // history
   private previousRoutes: NavHistoryItem[] = [];
@@ -127,8 +123,6 @@ export class NavService {
   // i18n
   private i18nRouting?: I18nRouting;
   private i18nOrigins: Record<string, string> = {};
-
-  // router link
   public readonly onRefreshRouterLink = new ReplaySubject<void>(1);
 
   constructor(private readonly router: Router) {}
@@ -215,21 +209,25 @@ export class NavService {
         // refresh router link
         this.onRefreshRouterLink.next();
         // record urls for backward navigation
-        const url = event.urlAfterRedirects;
-        const backwardRoute = this.previousRoutes[this.previousRoutes.length - 2];
-        if (!backwardRoute?.url || (backwardRoute?.url && url !== backwardRoute?.url)) {
-          this.previousRoutes.push({
-            url,
-            title: this.routeTitle,
-            data: this.routeData,
-          });
-        } else {
-          this.previousRoutes.pop();
+        if (this.backwardEnabled) {
+          const url = event.urlAfterRedirects;
+          const backwardRoute = this.previousRoutes[this.previousRoutes.length - 2];
+          if (
+            !backwardRoute?.url
+            || (
+              backwardRoute?.url
+              && url !== backwardRoute?.url
+            )
+          ) {
+            this.previousRoutes.push({
+              url,
+              title: this.routeTitle,
+              data: this.routeData,
+            });
+          } else {
+            this.previousRoutes.pop();
+          }
         }
-        // set title & meta
-        // this.metaService.changePageMetas(
-        //   this.routingMetaRecords[(this.router as Router).url] || {}
-        // );
       }
       // run hook
       const hook = hooks[eventName] || ((e: Event) => e);
@@ -307,17 +305,6 @@ export class NavService {
     }
   }
 
-  // setMeta(
-  //   input: Record<string, unknown>,
-  //   modifiers: Record<string, NavMetaModifier> = {}
-  // ) {
-  //   const customMetas = this.extractCustomMetas(input, modifiers);
-  //   if (this.router && !this.routingMetaRecords[this.router.url]) {
-  //     this.routingMetaRecords[this.router.url] = customMetas;
-  //   }
-  //   return this as NavService;
-  // }
-
   showLoadingIndicator() {
     this.loading = true;
   }
@@ -359,11 +346,15 @@ export class NavService {
   }
 
   navigate(input: string | string[], config: NavConfig = {}) {
-    const {extras, title, data, enableBackward, withLocale} = config;
+    const {title, data, enableBackward, withLocale, extras} = config;
     // set values
     this.routeTitle = title;
     this.routeData = data;
     this.backwardEnabled = !!enableBackward;
+    // reset history
+    if (!this.backwardEnabled) {
+      this.previousRoutes = [];
+    }
     // do navigate
     return this.router.navigate(this.getRoute(input, withLocale), extras);
   }
@@ -378,37 +369,4 @@ export class NavService {
       : input;
     return elm?.scrollIntoView({ behavior: 'smooth' });
   }
-
-  // private extractCustomMetas(
-  //   input: Record<string, unknown>,
-  //   modifiers: Record<string, NavMetaModifier> = {}
-  // ) {
-  //   const getMetaValue = (fieldName: string) => {
-  //     const modifier = modifiers[fieldName];
-  //     return modifier && modifier instanceof Function
-  //       ? modifier(input)
-  //       : input[modifier || fieldName] as string;
-  //   };
-  //   const title = getMetaValue('title');
-  //   const description = getMetaValue('description');
-  //   const image = getMetaValue('image');
-  //   let url = getMetaValue('url') || window.document.URL;
-  //   url = url.substr(-1) === '/' ? url : (url + '/');
-  //   const author = getMetaValue('author');
-  //   const twitterCard = getMetaValue('twitterCard');
-  //   const twitterCreator = getMetaValue('twitterCreator');
-  //   const ogType = getMetaValue('ogType');
-  //   const ogLocale = getMetaValue('ogLocale');
-  //   return {
-  //     title,
-  //     description,
-  //     image,
-  //     url,
-  //     author,
-  //     twitterCard,
-  //     twitterCreator,
-  //     ogType,
-  //     ogLocale
-  //   } as AppCustomMetas;
-  // }
 }

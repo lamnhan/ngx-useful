@@ -1,5 +1,4 @@
 import { Directive, HostBinding, HostListener, Input, OnChanges, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { NavigationExtras } from '@angular/router';
 
 import { NavService } from '../../services/nav/nav.service';
@@ -16,10 +15,13 @@ interface ActiveOptions {
 })
 export class RouterLinkDirective implements OnChanges, OnDestroy {
   private input: string | string[] = [];
+
   private title?: string;
   private data?: Record<string, unknown>;
+  private backward?: boolean;
   private locale?: string;
   private extras?: NavigationExtras;
+
   private activeClasses?: string[] = [];
   private activeOptions?: ActiveOptions;
 
@@ -35,6 +37,10 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
     this.data = data;
   }
 
+  @Input() set routeBackward(backward: undefined | boolean) {
+    this.backward = backward;
+  }
+
   @Input() set routeLocale(locale: undefined | string) {
     this.locale = locale;
   }
@@ -47,8 +53,8 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
     this.activeClasses = !classes
       ? []
       : typeof classes === 'string'
-      ? classes.split(' ').filter(value => !!value)
-      : classes;
+        ? classes.split(' ').filter(value => !!value)
+        : classes;
   }
 
   @Input() set routerLinkActiveOptions(options: undefined | ActiveOptions) {
@@ -61,28 +67,27 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
 
   @HostListener('click') onClick() {
     this.navService.navigate(this.input, {
-      extras: this.extras,
       title: this.title,
       data: this.data,
+      enableBackward: this.backward,
       withLocale: this.locale,
+      extras: this.extras,
     });
     return false;
   }
 
-  private subscription: Subscription;
+  private refreshSubscription = this.navService
+    .onRefreshRouterLink
+    .subscribe(() => this.updateTargetAttributes());
 
-  constructor(private navService: NavService) {
-    this.subscription = navService
-      .onRefreshRouterLink
-      .subscribe(() => this.updateTargetAttributes());
-  }
+  constructor(private navService: NavService) {}
 
   ngOnChanges() {
     this.updateTargetAttributes();
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.refreshSubscription.unsubscribe();
   }
 
   private updateTargetAttributes() {
