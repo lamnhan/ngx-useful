@@ -58,7 +58,7 @@ export class ErrorService {
     }
     const payload = {
       serviceContext: {
-        service: service || 'web',
+        service: service || 'app',
         ...(version ? { version } : undefined)
       },
       context: {
@@ -68,7 +68,7 @@ export class ErrorService {
           url: window.location.href,
         },
       },
-      message: (error as Error).message,
+      message: (error as Error).stack,
     } as Record<string, unknown>;
     // dev
     if (this.options.disabled) {
