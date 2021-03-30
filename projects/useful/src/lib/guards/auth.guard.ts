@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import {
   Route,
   RouterStateSnapshot,
@@ -15,6 +15,7 @@ import { AuthService } from '../services/auth/auth.service';
 })
 export class AuthGuard implements CanActivate, CanLoad {
   constructor(
+    private readonly ngZone: NgZone,
     private navService: NavService,
     private authService: AuthService
   ) {}
@@ -33,7 +34,7 @@ export class AuthGuard implements CanActivate, CanLoad {
     }
     // Store the attempted URL for redirecting
     this.authService.setRedirectUrl(url);
-    this.navService.navigate(['login']);
+    this.ngZone.run(() => this.navService.navigate(['login']));
     return false;
   }
 }

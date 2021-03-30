@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import {
   Router,
   Route,
@@ -40,12 +40,12 @@ export interface NavHistoryItem {
   data?: Record<string, unknown>;
 }
 
-export interface NavConfig {
-  extras?: NavigationExtras;
+export interface NavAdvanced {
   title?: string;
   data?: Record<string, unknown>;
-  withLocale?: string;
-  enableBackward?: boolean;
+  locale?: string;
+  backwardable?: boolean;
+  extras?: NavigationExtras;
 }
 
 export interface NavOptions {
@@ -125,7 +125,10 @@ export class NavService {
   private i18nOrigins: Record<string, string> = {};
   public readonly onRefreshRouterLink = new ReplaySubject<void>(1);
 
-  constructor(private readonly router: Router) {}
+  constructor(
+    private readonly ngZone: NgZone,
+    private readonly router: Router,
+  ) {}
 
   init(
     options: NavOptions = {},
@@ -179,10 +182,10 @@ export class NavService {
           // refresh router link
           this.onRefreshRouterLink.next();
           // redirect i18n route
-          const url = this.router.url;
-          const pathInit = url.substr(1).split('/').shift() as string;
+          const currentUrl = this.router.url;
+          const pathInit = currentUrl.substr(1).split('/').shift() as string;
           if (pathInit !== '' && this.i18nOrigins[pathInit] !== locale) {
-            this.navigate(url, { withLocale: locale });
+            this.ngZone.run(() => this.navigate(currentUrl, { locale }));
           }
         });
       }
@@ -210,19 +213,19 @@ export class NavService {
         this.onRefreshRouterLink.next();
         // record urls for backward navigation
         if (this.backwardEnabled) {
-          const url = event.urlAfterRedirects;
+          const activeUrl = event.urlAfterRedirects;
           const backwardRoute = this.previousRoutes[this.previousRoutes.length - 2];
           if (
             !backwardRoute?.url
             || (
               backwardRoute?.url
-              && url !== backwardRoute?.url
+              && activeUrl !== backwardRoute?.url
             )
           ) {
             this.previousRoutes.push({
-              url,
+              url: activeUrl,
               title: this.routeTitle,
-              data: this.routeData,
+              data: this.routeData ? {...this.routeData} : undefined,
             });
           } else {
             this.previousRoutes.pop();
@@ -235,6 +238,10 @@ export class NavService {
     });
     // done
     return this as NavService;
+  }
+
+  get URL() {
+    return this.router.url;
   }
 
   get TITLE() {
@@ -328,7 +335,11 @@ export class NavService {
   }
 
   back() {
-    const { url = '/', title, data } = this.previousRoutes[this.previousRoutes.length - 2] || {};
+    const {
+      url = '/',
+      title,
+      data,
+    } = this.previousRoutes[this.previousRoutes.length - 2] || {};
     // const [ path, ... queryStringArr ] = (url || '/').split('?');
     // // query params
     // const queryParams = {} as Record<string, unknown>;
@@ -345,18 +356,27 @@ export class NavService {
     return this.navigate(url, {title, data});
   }
 
-  navigate(input: string | string[], config: NavConfig = {}) {
-    const {title, data, enableBackward, withLocale, extras} = config;
+  navigate(input: string | string[], advanced: NavAdvanced = {}) {
+    const {title, data, locale, backwardable, extras} = advanced;
+    // handle backward navigation
+    if (backwardable !== undefined) {
+      this.backwardEnabled = backwardable;
+    }
+    if (!this.backwardEnabled) {
+      this.previousRoutes = []; // reset history
+    } else if (!this.previousRoutes.length) {
+      // initial history (add current route as the first item)
+      this.previousRoutes.push({
+        url: this.router.url,
+        title: this.routeTitle,
+        data: this.routeData ? {...this.routeData} : undefined,
+      });
+    }
     // set values
     this.routeTitle = title;
     this.routeData = data;
-    this.backwardEnabled = !!enableBackward;
-    // reset history
-    if (!this.backwardEnabled) {
-      this.previousRoutes = [];
-    }
     // do navigate
-    return this.router.navigate(this.getRoute(input, withLocale), extras);
+    return this.router.navigate(this.getRoute(input, locale), extras);
   }
 
   scrollToTop() {

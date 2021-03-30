@@ -15,19 +15,15 @@ interface ActiveOptions {
 })
 export class RouterLinkDirective implements OnChanges, OnDestroy {
   private input: string | string[] = [];
+  private backwardable?: boolean;
+  private extras?: NavigationExtras;
 
   private title?: string;
   private data?: Record<string, unknown>;
-  private backward?: boolean;
   private locale?: string;
-  private extras?: NavigationExtras;
 
   private activeClasses?: string[] = [];
   private activeOptions?: ActiveOptions;
-
-  @Input() set routerLink(input: undefined | null | string | string[]) {
-    this.input = input || [];
-  }
 
   @Input() set routeTitle(title: undefined | string) {
     this.title = title;
@@ -37,12 +33,16 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
     this.data = data;
   }
 
-  @Input() set routeBackward(backward: undefined | boolean) {
-    this.backward = backward;
-  }
-
   @Input() set routeLocale(locale: undefined | string) {
     this.locale = locale;
+  }
+
+  @Input() set routerLink(input: undefined | null | string | string[]) {
+    this.input = input || [];
+  }
+
+  @Input() set routerBackwardable(backwardable: undefined | boolean) {
+    this.backwardable = backwardable;
   }
 
   @Input() set routerExtras(extras: undefined | NavigationExtras) {
@@ -57,8 +57,8 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
         : classes;
   }
 
-  @Input() set routerLinkActiveOptions(options: undefined | ActiveOptions) {
-    this.activeOptions = options;
+  @Input() set routerLinkActiveOptions(activeOptions: undefined | ActiveOptions) {
+    this.activeOptions = activeOptions;
   }
 
   @HostBinding() href!: string;
@@ -69,18 +69,18 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
     this.navService.navigate(this.input, {
       title: this.title,
       data: this.data,
-      enableBackward: this.backward,
-      withLocale: this.locale,
+      locale: this.locale,
+      backwardable: this.backwardable,
       extras: this.extras,
     });
     return false;
   }
 
-  private refreshSubscription = this.navService
+  private readonly refreshSubscription = this.navService
     .onRefreshRouterLink
     .subscribe(() => this.updateTargetAttributes());
 
-  constructor(private navService: NavService) {}
+  constructor(private readonly navService: NavService) {}
 
   ngOnChanges() {
     this.updateTargetAttributes();
@@ -93,7 +93,10 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
   private updateTargetAttributes() {
     this.href = this.navService.getRouteUrl(this.input, this.locale);
     this.class =
-      (this.activeClasses && this.navService.isActive(this.href, !!this.activeOptions?.exact))
+      (
+        this.activeClasses
+        && this.navService.isActive(this.href, !!this.activeOptions?.exact)
+      )
         ? this.activeClasses
         : [];
   }
