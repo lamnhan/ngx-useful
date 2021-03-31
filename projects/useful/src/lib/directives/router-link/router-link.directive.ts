@@ -16,13 +16,13 @@ interface ActiveOptions {
 export class RouterLinkDirective implements OnChanges, OnDestroy {
   private input: string | string[] = [];
   private backwardable?: boolean;
+  private locale?: string;
   
   private activeClasses?: string[] = [];
   private activeOptions?: ActiveOptions;
 
   private title?: string;
   private data?: Record<string, unknown>;
-  private locale?: string;
   private extras?: NavigationExtras;
 
   @Input() set usefulRouteTitle(title: undefined | string) {
@@ -31,10 +31,6 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
 
   @Input() set usefulRouteData(data: undefined | Record<string, unknown>) {
     this.data = data;
-  }
-
-  @Input() set usefulRouteLocale(locale: undefined | string) {
-    this.locale = locale;
   }
 
   @Input() set usefulRouteExtras(extras: undefined | NavigationExtras) {
@@ -49,7 +45,12 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
     this.backwardable = backwardable;
   }
 
-  @Input() set usefulRouterLinkActive(classes: undefined | string | string[]) {
+  @Input() set usefulRouterLocale(locale: undefined | string) {
+    this.locale = locale;
+  }
+
+  @Input()
+  set usefulRouterLinkActive(classes: undefined | string | string[]) {
     this.activeClasses = !classes
       ? []
       : typeof classes === 'string'
@@ -57,7 +58,8 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
         : classes;
   }
 
-  @Input() set usefulRouterLinkActiveOptions(activeOptions: undefined | ActiveOptions) {
+  @Input()
+  set usefulRouterLinkActiveOptions(activeOptions: undefined | ActiveOptions) {
     this.activeOptions = activeOptions;
   }
 
@@ -69,9 +71,9 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
     this.navService.navigate(this.input, {
       title: this.title,
       data: this.data,
-      locale: this.locale,
       extras: this.extras,
       backwardable: this.backwardable,
+      locale: this.locale,
     });
     return false;
   }

@@ -34,18 +34,20 @@ export interface MenuItem extends NavItem {
   subItems?: MenuItem[];
 }
 
-export interface NavHistoryItem {
-  url: string;
+
+export interface NavRouteProps {
   title?: string;
   data?: Record<string, unknown>;
+  extras?: NavigationExtras;
 }
 
-export interface NavAdvanced {
-  title?: string;
-  data?: Record<string, unknown>;
+export interface NavHistoryItem extends NavRouteProps {
+  url: string;
+}
+
+export interface NavAdvanced extends NavRouteProps {
   locale?: string;
   backwardable?: boolean;
-  extras?: NavigationExtras;
 }
 
 export interface NavOptions {
@@ -116,6 +118,7 @@ export class NavService {
   // current props
   private routeTitle?: string;
   private routeData?: Record<string, unknown>;
+  private routeExtras?: NavigationExtras;
 
   // history
   private previousRoutes: NavHistoryItem[] = [];
@@ -226,6 +229,7 @@ export class NavService {
               url: activeUrl,
               title: this.routeTitle,
               data: this.routeData ? {...this.routeData} : undefined,
+              extras: this.routeExtras ? {...this.routeExtras} : undefined,
             });
           } else {
             this.previousRoutes.pop();
@@ -335,29 +339,13 @@ export class NavService {
   }
 
   back() {
-    const {
-      url = '/',
-      title,
-      data,
-    } = this.previousRoutes[this.previousRoutes.length - 2] || {};
-    // const [ path, ... queryStringArr ] = (url || '/').split('?');
-    // // query params
-    // const queryParams = {} as Record<string, unknown>;
-    // if (queryStringArr.length) {
-    //   const queryItems = queryStringArr.join('?').split('&');
-    //   for (const queryItem of queryItems) {
-    //     const [ key, value ] = queryItem.split('=');
-    //     if (key && value) {
-    //       queryParams[key] = value;
-    //     }
-    //   }
-    // }
-    // navigate
-    return this.navigate(url, {title, data});
+    const { url, title, data, extras } =
+      this.previousRoutes[this.previousRoutes.length - 2] || {};
+    return this.navigate(url, {title, data, extras});
   }
 
   navigate(input: string | string[], advanced: NavAdvanced = {}) {
-    const {title, data, locale, backwardable, extras} = advanced;
+    const {title, data, extras, backwardable, locale } = advanced;
     // handle backward navigation
     if (backwardable !== undefined) {
       this.backwardEnabled = backwardable;
@@ -370,11 +358,13 @@ export class NavService {
         url: this.router.url,
         title: this.routeTitle,
         data: this.routeData ? {...this.routeData} : undefined,
+        extras: this.routeExtras ? {...this.routeExtras} : undefined,
       });
     }
     // set values
     this.routeTitle = title;
     this.routeData = data;
+    this.routeExtras = extras;
     // do navigate
     return this.router.navigate(this.getRoute(input, locale), extras);
   }
