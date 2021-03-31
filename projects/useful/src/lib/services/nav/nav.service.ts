@@ -185,7 +185,7 @@ export class NavService {
           const currentUrl = this.router.url;
           const pathInit = currentUrl.substr(1).split('/').shift() as string;
           if (pathInit !== '' && this.i18nOrigins[pathInit] !== locale) {
-            this.ngZone.run(() => this.navigate(currentUrl, { locale }));
+            this.ngZone.run(() => this.navigate(currentUrl, {locale, backwardable: false}));
           }
         });
       }
