@@ -146,49 +146,46 @@ export class NavService {
     this.integrations = integrations;
     // handle i18n
     if (i18nRegistry) {
-      // has i18n
-      this.i18nRouting = {};
-      // process routes / translations
       const { routes, routeTranslations } = i18nRegistry;
+      // process routes / translations
+      this.i18nRouting = {};
       routes.forEach(route => {
         const path = route.path as string;
         const pathMap = path.split('/').filter(value => !!value);
         const translation = routeTranslations[path];
-        // proccess translations
         const routingItem: I18nRoutingItem = {};
+        // proccess translations
         if (translation) {
           Object.keys(translation).forEach(locale => {
             const localizedPath = translation[locale];
             if (localizedPath === true) {
-              // routing item
               routingItem[locale] = pathMap;
-              // save origins
               this.i18nOrigins[pathMap[0]] = locale;
             } else {
-              // routing item
               const localizedPathMap = localizedPath.split('/').filter(value => !!value);
               routingItem[locale] = localizedPathMap;
-              // save origins
               this.i18nOrigins[localizedPathMap[0]] = locale;
             }
           });
         }
         // save original/localized routing
         Object.keys(routingItem).forEach(locale => {
-          const localizedPathMap = routingItem[locale];
-          (this.i18nRouting as I18nRouting)[localizedPathMap[0]] = routingItem;
+          const init = routingItem[locale][0];
+          if (!this.i18nRouting?.[init]) {
+            (this.i18nRouting as I18nRouting)[init] = routingItem;
+          }
         });
       });
       // watch for locale
-      if (this.integrations.settingService && this.options.i18nRedirect) {
+      if (this.options.i18nRedirect && this.integrations.settingService) {
         this.integrations.settingService.onLocaleChanged.subscribe(locale => {
           // refresh router link
           this.onRefreshRouterLink.next();
           // redirect i18n route
-          const currentUrl = this.router.url;
-          const pathInit = currentUrl.substr(1).split('/').shift() as string;
+          const {url, extras} = this.parseRouterUrl(this.router.url);
+          const pathInit = url.substr(1).split('/').shift() as string;
           if (pathInit !== '' && this.i18nOrigins[pathInit] !== locale) {
-            this.ngZone.run(() => this.navigate(currentUrl, {locale, backwardable: false}));
+            this.ngZone.run(() => this.navigate(url, {extras, locale, backwardable: false}));
           }
         });
       }
@@ -301,9 +298,7 @@ export class NavService {
     }
     // get i18n
     else {
-      const locale = withLocale
-        || this.integrations?.settingService?.LOCALE
-        || 'en-US';
+      const locale = withLocale || this.integrations.settingService?.LOCALE || 'en-US';
       const inputMap = (typeof input === 'string'
         ? input.split('/')
         : input.map(value => value.startsWith('/') ? value.substr(1) : value)
@@ -378,5 +373,15 @@ export class NavService {
       ? document.getElementById(input)
       : input;
     return elm?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  private parseRouterUrl(routerUrl: string) {
+    const urlData = new URL(`https://lamnhan.com${routerUrl}`);
+    const url = urlData.pathname;
+    const fragment = urlData.hash ? urlData.hash.replace('#', '') : undefined;
+    const queryParams = {} as Record<string, string>;
+    urlData.searchParams.forEach((value, key) => queryParams[key] = value);
+    const extras = { fragment, queryParams };
+    return { url, extras };
   }
 }
