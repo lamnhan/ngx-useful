@@ -58,7 +58,7 @@ export class ErrorService {
     }
     const payload = {
       serviceContext: {
-        service: service || 'app',
+        service: service || 'Web',
         ...(version ? { version } : undefined)
       },
       context: {
