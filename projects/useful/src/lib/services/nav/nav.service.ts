@@ -305,7 +305,8 @@ export class NavService {
       ).filter(value => !!value);
       const pathMap = (this.i18nRouting[inputMap[0]] || {})[locale];
       const route = pathMap
-        ? inputMap.map((inputValue, i) => pathMap[i].startsWith(':') ? inputValue : pathMap[i])
+        ? inputMap.map((inputValue, i) =>
+          (pathMap[i] || ':').startsWith(':') ? inputValue : pathMap[i])
         : inputMap;
       return route;
     }
