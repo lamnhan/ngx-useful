@@ -231,6 +231,11 @@ export class NavService {
           } else {
             this.previousRoutes.pop();
           }
+          // reset backwardable
+          if (this.previousRoutes.length <= 1) {
+            this.previousRoutes = [];
+            this.backwardEnabled = false;
+          }
         }
       }
       // run hook
@@ -335,8 +340,11 @@ export class NavService {
   }
 
   back() {
-    const { url, title, data, extras } =
-      this.previousRoutes[this.previousRoutes.length - 2] || {};
+    const backwardRoute = this.previousRoutes[this.previousRoutes.length - 2];
+    if (!backwardRoute) {
+      return;
+    }
+    const { url, title, data, extras } = backwardRoute;
     return this.navigate(url, {title, data, extras});
   }
 
