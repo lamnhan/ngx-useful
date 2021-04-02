@@ -41,10 +41,11 @@ export class MetaService {
   private options: MetaOptions = {};
   private integrations: MetaIntegrations = {};
 
+  appMetas: AppMetas = {};
+
   constructor(
     private title: Title,
     private meta: Meta,
-    // private settingService: SettingService,
   ) {}
 
   init(
@@ -57,38 +58,18 @@ export class MetaService {
     this.metaTranslations = metaTranslations;
     this.options = options;
     this.integrations = integrations;
+    this.appMetas = this.defaultMetas;
     // watch for locale changed
     if (this.integrations.settingService) {
       this.integrations.settingService
         .onLocaleChanged
-        .subscribe(locale => this.changePageMetas({}, locale));
+        .subscribe(locale => {
+          this.appMetas = this.getAppMetas(locale);
+          this.changePageMetas({}, locale);
+        });
     }
     // done
     return this as MetaService;
-  }
-
-  get TITLE() {
-    return this.getAppMetas().title;
-  }
-
-  get DESCRIPTION() {
-    return this.getAppMetas().description;
-  }
-
-  get URL() {
-    return this.getAppMetas().url;
-  }
-
-  get IMAGE() {
-    return this.getAppMetas().image;
-  }
-
-  get AUTHOR() {
-    return this.getAppMetas().author;
-  }
-
-  get LANG() {
-    return this.getAppMetas().lang;
   }
 
   changePageTitle(title: string) {
@@ -111,7 +92,7 @@ export class MetaService {
 
   private getAppMetas(withLocale?: string) {
     const locale = withLocale
-      || this.integrations?.settingService?.LOCALE
+      || this.integrations?.settingService?.locale
       || 'en-US';
     return this.metaTranslations[locale] || this.defaultMetas;
   }

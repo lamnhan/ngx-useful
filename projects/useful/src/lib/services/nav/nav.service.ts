@@ -110,15 +110,16 @@ export class NavService {
   private integrations: NavIntegrations = {};
 
   // general
-  private loading = false;
+  loading = false;
+  menuVisible = false; // secondary/mobile menu
   private loadingIndicatorTimer?: any;
-  private isMenuVisible = false; // secondary/mobile menu
   private backwardEnabled = false;
 
   // current props
-  private routeTitle?: string;
-  private routeData?: Record<string, unknown>;
-  private routeExtras?: NavigationExtras;
+  routeUrl = '/';
+  routeTitle?: string;
+  routeData?: Record<string, unknown>;
+  routeExtras?: NavigationExtras;
 
   // history
   private previousRoutes: NavHistoryItem[] = [];
@@ -209,6 +210,8 @@ export class NavService {
         }
       } else if (event instanceof NavigationEnd) {
         eventName = 'NavigationEnd';
+        // set route url
+        this.routeUrl = this.router.url;
         // refresh router link
         this.onRefreshRouterLink.next();
         // record urls for backward navigation
@@ -246,43 +249,27 @@ export class NavService {
     return this as NavService;
   }
 
-  get URL() {
-    return this.router.url;
+  isActive(url: string, exact = false) {
+    return this.router.isActive(url, exact);
   }
 
-  get TITLE() {
-    return this.routeTitle;
-  }
-
-  get DATA() {
-    return this.routeData;
-  }
-
-  get IS_LOADING() {
-    return this.loading;
-  }
-
-  get IS_BACKWARDABLE() {
+  isBackwardable() {
     return this.backwardEnabled
       && this.previousRoutes.length > 1
       && this.router.url !== ''
       && this.router.url !== '/';
   }
-  
-  get IS_MENU_VISIBLE() {
-    return this.isMenuVisible;
-  }
-
-  get MENU_ICON() {
-    return this.getMenuIcon();
-  }
 
   getMenuIcon(menuClass = 'icon-menu', backClass = 'icon-back') {
-    return this.IS_BACKWARDABLE ? backClass : menuClass;
+    return this.isBackwardable() ? backClass : menuClass;
   }
 
-  getRouteUrl(input: string | string[], withLocale?: string) {
-    return this.getRoute(input, withLocale).join('/');
+  showLoadingIndicator() {
+    this.loading = true;
+  }
+
+  hideLoadingIndicator() {
+    this.loading = false;
   }
 
   getRoute(input: string | string[], withLocale?: string) {
@@ -303,7 +290,7 @@ export class NavService {
     }
     // get i18n
     else {
-      const locale = withLocale || this.integrations.settingService?.LOCALE || 'en-US';
+      const locale = withLocale || this.integrations.settingService?.locale || 'en-US';
       const inputMap = (typeof input === 'string'
         ? input.split('/')
         : input.map(value => value.startsWith('/') ? value.substr(1) : value)
@@ -317,26 +304,16 @@ export class NavService {
     }
   }
 
-  showLoadingIndicator() {
-    this.loading = true;
-  }
-
-  hideLoadingIndicator() {
-    this.loading = false;
+  getRouteUrl(input: string | string[], withLocale?: string) {
+    return this.getRoute(input, withLocale).join('/');
   }
 
   menuAction() {
-    return this.IS_BACKWARDABLE
-      ? this.back()
-      : this.toggleMenu();
+    return this.isBackwardable() ? this.back() : this.toggleMenu();
   }
 
   toggleMenu() {
-    this.isMenuVisible = !this.isMenuVisible;
-  }
-
-  isActive(url: string, exact = false) {
-    return this.router.isActive(url, exact);
+    this.menuVisible = !this.menuVisible;
   }
 
   back() {

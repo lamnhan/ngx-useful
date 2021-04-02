@@ -59,14 +59,14 @@ export class PwaReminderComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  get I18N_MESSAGE_CODE() {
+  getI18nMessageCode() {
     return 'USEFUL_PWA_REMINDER.MESSAGE.'
-      + (this.pwa.RUNTIME || 'desktop-any').replace(/-/g, '_').toUpperCase();
+      + (this.pwa.runtime || 'desktop-any').replace(/-/g, '_').toUpperCase();
   }
 
   getMessage() {
     let msg: string | string[] = '';
-    switch (this.pwa.RUNTIME) {
+    switch (this.pwa.runtime) {
       case 'ios-safari':
         msg = this.iosSafariMessage;
         break;

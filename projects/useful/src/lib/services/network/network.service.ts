@@ -9,14 +9,10 @@ export class NetworkService {
 
   constructor() {}
 
-  get IS_ONLINE() {
-    return navigator.onLine;
-  }
-
   init() {
     window.addEventListener('online', () => this.onChanged.next(true));
     window.addEventListener('offline', () => this.onChanged.next(false));
-    this.onChanged.next(this.IS_ONLINE);
+    this.onChanged.next(navigator.onLine);
     return this as NetworkService;
   }
 }

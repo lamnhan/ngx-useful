@@ -60,21 +60,17 @@ export class PersonaService {
     return this as PersonaService;
   }
 
-  get MENU_REGISTRY() {
-    return this.menuRegistry;
-  }
-
-  get MENU() {
+  getMenu() {
     return this.get('menu') as MenuItem[];
   }
 
-  get TABS() {
+  getTabs() {
     return this.get('tabs') as MenuItem[];
   }
 
   get(key: string, withPersona?: string) {
     const persona = withPersona
-      || this.integrations?.settingService?.PERSONA
+      || this.integrations?.settingService?.persona
       || 'default';
     return (this.data[persona] || {})[key] || (this.data['default'] || {})[key];
   }

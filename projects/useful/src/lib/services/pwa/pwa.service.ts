@@ -21,12 +21,12 @@ export class PwaService {
 
   private options: PWAOptions = {};
 
-  private runtime = 'desktop-any';
-  private installed = true;
+  runtime = 'desktop-any';
+  installed = true;
 
-  private reminderCount = 0;
-  private reminderTimestamp = 0;
-  private reminderShowed = false;
+  reminderCount = 0;
+  reminderTimestamp = 0;
+  reminderShowed = false;
 
   constructor(
     private readonly localstorageService: LocalstorageService
@@ -53,23 +53,7 @@ export class PwaService {
     return this as PwaService;
   }
 
-  get RUNTIME() {
-    return this.runtime;
-  }
-
-  get IS_INSTALLED() {
-    return this.installed;
-  }
-
-  get IS_REMINDER_COUNT() {
-    return this.reminderCount;
-  }
-
-  get IS_REMINDER_SHOWED() {
-    return this.reminderShowed;
-  }
-
-  get IS_REMINDER_ANNOYED() {
+  isReminderAnnoyed() {
     return this.reminderCount >= (this.options.reminderAnnoying || 3);
   }
 

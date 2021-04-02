@@ -1,7 +1,7 @@
 <div
   class="useful-nav-indicator"
   *ngIf="nav"
-  [class.show]="nav.IS_LOADING"
+  [class.show]="nav.loading"
 >
   <div class="body" (click)="nav.hideLoadingIndicator()">
     <img [src]="icon">

@@ -31,6 +31,8 @@ export class DatabaseService {
   private options: DatabaseOptions = {};
   private integrations: DatabaseIntegrations = {};
 
+  driver = 'firebase';
+
   constructor(private readonly helperService: HelperService) {}
 
   init(
@@ -41,16 +43,11 @@ export class DatabaseService {
     this.service = service;
     this.options = options;
     this.integrations = integrations;
+    if (options.driver) {
+      this.driver = options.driver;
+    }
     // done
     return this as DatabaseService;
-  }
-
-  get SERVICE() {
-    return this.service;
-  }
-
-  get DRIVER() {
-    return this.options.driver || 'firebase';
   }
 
   exists(path: string, queryFn?: QueryFn) {
@@ -60,11 +57,11 @@ export class DatabaseService {
   }
 
   doc<Type>(path: string) {
-    return this.SERVICE.doc(path) as DatabaseItem<Type>;
+    return this.service.doc(path) as DatabaseItem<Type>;
   }
 
   collection<Type>(path: string, queryFn?: QueryFn) {
-    return this.SERVICE.collection(path, queryFn) as DatabaseCollection<Type>;
+    return this.service.collection(path, queryFn) as DatabaseCollection<Type>;
   }
 
   set<Type>(path: string, item: Type) {

@@ -1,9 +1,9 @@
 <div
   class="useful-pwa-reminder"
-  *ngIf="pwa && !pwa.IS_INSTALLED"
-  [class]="pwa.RUNTIME"
-  [class.show]="pwa.IS_REMINDER_SHOWED"
-  [class.annoyed]="pwa.IS_REMINDER_ANNOYED"
+  *ngIf="pwa && !pwa.installed"
+  [class]="pwa.runtime"
+  [class.show]="pwa.reminderShowed"
+  [class.annoyed]="pwa.isReminderAnnoyed()"
 >
 
   <div class="head">
@@ -17,8 +17,8 @@
 
   <div class="body">
     <div
-      [class]="pwa.RUNTIME + '-message'"
-      [innerHtml]="!i18n ? getMessage() : (I18N_MESSAGE_CODE | translate)"
+      [class]="pwa.runtime + '-message'"
+      [innerHtml]="!i18n ? getMessage() : (getI18nMessageCode() | translate)"
     ></div>
   </div>
 

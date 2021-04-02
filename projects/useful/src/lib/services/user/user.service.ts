@@ -36,9 +36,9 @@ export class UserService {
   private options: UserOptions = {};
   private integrations: UserIntegrations = {};
 
-  private nativeUser?: NativeUser;
-  private data?: User;
-  private publicData?: Profile;
+  nativeUser?: NativeUser;
+  data?: User;
+  publicData?: Profile;
 
   public readonly onUserChanged = new ReplaySubject<undefined | User>(1);
 
@@ -91,24 +91,12 @@ export class UserService {
     return this as UserService;
   }
 
-  get IS_USER() {
+  isUser() {
     return !!(this.nativeUser && this.data && (!this.integrations.profileDataService || this.publicData));
   }
-
-  get NATIVE_USER() {
-    return this.nativeUser;
-  }
-
-  get DATA() {
-    return this.data;
-  }
-
-  get PUBLIC_DATA() {
-    return this.publicData;
-  }
   
-  get ROLE() {
-    const { sadmin, admin, editor, author, contributor } = this.DATA?.claims || {};
+  getRole() {
+    const { sadmin, admin, editor, author, contributor } = this.data?.claims || {};
     return sadmin ? 'sadmin'
       : admin ? 'admin'
       : editor ? 'editor'
@@ -117,8 +105,8 @@ export class UserService {
       : 'subscriber';
   }
 
-  get LEVEL() {
-    const { sadmin, admin, editor, author, contributor } = this.DATA?.claims || {};
+  getLevel() {
+    const { sadmin, admin, editor, author, contributor } = this.data?.claims || {};
     return sadmin ? 6
       : admin ? 5
       : editor ? 4
@@ -127,36 +115,36 @@ export class UserService {
       : 1;
   }
 
-  get IS_SUPER_ADMIN() {
-    return this.IS_USER && this.isRole('sadmin');
+  isSuperAdmin() {
+    return this.isUser() && this.isRole('sadmin');
   }
 
-  get IS_ADMIN() {
-    return this.IS_USER && this.isRole('admin');
+  isAdmin() {
+    return this.isUser() && this.isRole('admin');
   }
 
-  get IS_EDITOR() {
-    return this.IS_USER && this.isRole('editor');
+  isEditor() {
+    return this.isUser() && this.isRole('editor');
   }
 
-  get IS_AUTHOR() {
-    return this.IS_USER && this.isRole('author');
+  isAuthor() {
+    return this.isUser() && this.isRole('author');
   }
 
-  get IS_CONTRIBUTOR() {
-    return this.IS_USER && this.isRole('contributor');
+  isContributor() {
+    return this.isUser() && this.isRole('contributor');
   }
 
-  get IS_SUBSCRIBER() {
+  isSubscriber() {
     return true;
   }
 
   isRole(role: string) {
-    return this.DATA?.claims?.[role] === true;
+    return this.data?.claims?.[role] === true;
   }
 
   allowedLevel(level: number) {
-    return this.LEVEL >= level;
+    return this.getLevel() >= level;
   }
 
   checkUsernameExists(username: string) {
@@ -429,7 +417,7 @@ export class UserService {
     }
     // with /profiles
     else {
-      const nativeUsername = this.authService.CREDENTIAL?.additionalUserInfo?.username;
+      const nativeUsername = this.authService.credential?.additionalUserInfo?.username;
       const defaultUsername = nativeUsername
         ? nativeUsername
         : nativeUser.email
@@ -524,7 +512,7 @@ export class UserService {
 
   private proccessUserData(nativeUser: NativeUser, userDoc: User) {
     return from(nativeUser.getIdTokenResult()).pipe(map(idTokenResult => {
-      const isNew = this.authService?.CREDENTIAL?.additionalUserInfo?.isNewUser;
+      const isNew = this.authService.credential?.additionalUserInfo?.isNewUser;
       const data = {
         ...userDoc,
         isAnonymous: nativeUser.isAnonymous ?? undefined,

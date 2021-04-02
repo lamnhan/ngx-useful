@@ -41,9 +41,9 @@ export class SettingService {
   private integrations: SettingIntegrations = {};
 
   // UI intensive settings
-  private theme?: string;
-  private persona?: string;
-  private locale?: string;
+  theme = 'light';
+  persona = 'default';
+  locale = 'en-US';
 
   // other settings
   // ...
@@ -87,18 +87,6 @@ export class SettingService {
     return this as SettingService;
   }
 
-  get THEME() {
-    return this.theme || 'light';
-  }
-
-  get PERSONA() {
-    return this.persona || 'default';
-  }
-
-  get LOCALE() {
-    return this.locale || 'en-US';
-  }
-
   changeTheme(name: string) {
     if (!this.theme || this.theme !== name) {
       // affect
@@ -109,8 +97,8 @@ export class SettingService {
         this.integrations.localstorageService.set(this.LSK_THEME, name);
       }
       if (
-        this.integrations.userService?.IS_USER
-        && this.integrations.userService.DATA?.settings?.theme !== name
+        this.integrations.userService?.isUser()
+        && this.integrations.userService.data?.settings?.theme !== name
       ) {
         this.integrations.userService.updateSettings({ theme: name });
       }
@@ -131,8 +119,8 @@ export class SettingService {
         this.integrations.localstorageService.set(this.LSK_PERSONA, name);
       }
       if (
-        this.integrations.userService?.IS_USER
-        && this.integrations.userService.DATA?.settings?.persona !== name
+        this.integrations.userService?.isUser()
+        && this.integrations.userService.data?.settings?.persona !== name
       ) {
         this.integrations.userService.updateSettings({ persona: name });
       }
@@ -153,8 +141,8 @@ export class SettingService {
         this.integrations.localstorageService.set(this.LSK_LOCALE, value);
       }
       if (
-        this.integrations.userService?.IS_USER
-        && this.integrations.userService.DATA?.settings?.locale !== value
+        this.integrations.userService?.isUser()
+        && this.integrations.userService.data?.settings?.locale !== value
       ) {
         this.integrations.userService.updateSettings({ locale: value });
       }

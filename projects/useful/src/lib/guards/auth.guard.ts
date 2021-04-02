@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate, CanLoad {
   }
 
   private handler(url: null | string) {
-    if (this.authService.IS_AUTH) {
+    if (this.authService.authenticated) {
       return true;
     }
     // Store the attempted URL for redirecting

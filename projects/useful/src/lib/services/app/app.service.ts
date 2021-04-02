@@ -23,17 +23,17 @@ export class AppService {
   private options: AppOptions = {};
   
   // builtin data
-  private themes: BuiltinDataItem[] = [{text: 'Light', value: 'light'}];
-  private personas: BuiltinDataItem[] = [{text: 'Default', value: 'default'}];
-  private locales: BuiltinDataItem[] = [{text: 'English', value: 'en-US'}];
+  themes: BuiltinDataItem[] = [{text: 'Light', value: 'light'}];
+  personas: BuiltinDataItem[] = [{text: 'Default', value: 'default'}];
+  locales: BuiltinDataItem[] = [{text: 'English', value: 'en-US'}];
 
   // custom data
-  private customData: Record<string, unknown> = {};
+  customData: Record<string, unknown> = {};
 
   // auto data
-  private host = '';
-  private viewWidth = 0;
-  private viewHeight = 0;
+  host = '';
+  viewWidth = 0;
+  viewHeight = 0;
 
   constructor() {}
 
@@ -71,34 +71,6 @@ export class AppService {
     this.setViewport();
     // done
     return this as AppService;
-  }
-
-  get HOST() {
-    return this.host;
-  }
-
-  get VIEW_WIDTH() {
-    return this.viewWidth;
-  }
-
-  get VIEW_HEIGHT() {
-    return this.viewHeight;
-  }
-
-  get THEMES() {
-    return this.themes;
-  }
-
-  get PERSONAS() {
-    return this.personas;
-  }
-
-  get LOCALES() {
-    return this.locales;
-  }
-
-  get CUSTOM_DATA() {
-    return this.customData;
   }
 
   getData<Value>(key: string) {

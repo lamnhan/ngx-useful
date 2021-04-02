@@ -16,12 +16,13 @@ export interface AuthOptions {
   providedIn: 'root'
 })
 export class AuthService {
-  private options: AuthOptions = {};
   private service!: VendorAuthService;
+  private options: AuthOptions = {};
 
-  private redirectUrl?: null | string;
-  private isAuth?: boolean;
-  private credential?: NativeUserCredential;
+  driver = 'firebase';
+  redirectUrl?: null | string;
+  authenticated?: boolean;
+  credential?: NativeUserCredential;
 
   private methodLock = false;
   private allowedMethods: Record<string, boolean> = {};
@@ -31,53 +32,20 @@ export class AuthService {
   constructor() {}
 
   init(service: VendorAuthService, options: AuthOptions = {}) {
-    this.options = options;
     this.service = service;
+    this.options = options;
+    if (options.driver) {
+      this.driver = options.driver;
+    }
     // watch for changed
     this.service.onAuthStateChanged(user => {
-      this.isAuth = !!user; // change status
+      this.authenticated = !!user; // change status
       this.onAuthStateChanged.next(user); // emit
     });
     // done
     return this as AuthService;
   }
-
-  get SERVICE() {
-    return this.service;
-  }
-
-  get DRIVER() {
-    return this.options.driver || 'firebase';
-  }
-
-  get REDIRECT_URL() {
-    return this.redirectUrl;
-  }
-
-  get IS_AUTH() {
-    return this.isAuth;
-  }
-
-  get CREDENTIAL() {
-    return this.credential;
-  }
-
-  get IS_METHOD_ALLOWED_FOR_EMAIL_PASWWORD() {
-    return this.isMethodAllowed('email/password');
-  }
-
-  get IS_METHOD_ALLOWED_FOR_GOOGLE() {
-    return this.isMethodAllowed('google.com');
-  }
-
-  get IS_METHOD_ALLOWED_FOR_FACEBOOK() {
-    return this.isMethodAllowed('facebook.com');
-  }
-
-  get IS_METHOD_ALLOWED_FOR_GITHUB() {
-    return this.isMethodAllowed('github.com');
-  }
-
+  
   setRedirectUrl(url: null | string) {
     this.redirectUrl = url;
   }
@@ -86,8 +54,24 @@ export class AuthService {
     return !this.methodLock || this.allowedMethods[method];
   }
 
+  isMethodAllowedForEmailPassword() {
+    return this.isMethodAllowed('email/password');
+  }
+
+  isMethodAllowedForGoogle() {
+    return this.isMethodAllowed('google.com');
+  }
+
+  isMethodAllowedForFacebook() {
+    return this.isMethodAllowed('facebook.com');
+  }
+
+  isMethodAllowedForGithub() {
+    return this.isMethodAllowed('github.com');
+  }
+
   handleAccountExistsWithDifferentCredential(email: string) {
-    return from(this.SERVICE.fetchSignInMethodsForEmail(email)).pipe(
+    return from(this.service.fetchSignInMethodsForEmail(email)).pipe(
       tap(methods => {
         this.methodLock = true;
         methods.forEach(method => this.allowedMethods[method] = true);
@@ -96,38 +80,38 @@ export class AuthService {
   }
 
   createUserWithEmailAndPassword(email: string, password: string) {
-    return from(this.SERVICE.createUserWithEmailAndPassword(email, password))
+    return from(this.service.createUserWithEmailAndPassword(email, password))
       .pipe(tap(credential => this.credential = credential));
   }
 
   signInWithEmailAndPassword(email: string, password: string) {
-    return from(this.SERVICE.signInWithEmailAndPassword(email, password))
+    return from(this.service.signInWithEmailAndPassword(email, password))
       .pipe(tap(credential => this.credential = credential));
   }
 
   sendPasswordResetEmail(email: string) {
-    return from(this.SERVICE.sendPasswordResetEmail(email));
+    return from(this.service.sendPasswordResetEmail(email));
   }
   
   signInWithPopupForGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
-    return from(this.SERVICE.signInWithPopup(provider))
+    return from(this.service.signInWithPopup(provider))
       .pipe(tap(credential => this.credential = credential));
   }
 
   signInWithPopupForFacebook() {
     const provider = new firebase.auth.FacebookAuthProvider();
-    return from(this.SERVICE.signInWithPopup(provider))
+    return from(this.service.signInWithPopup(provider))
       .pipe(tap(credential => this.credential = credential));
   }
 
   signInWithPopupForGithub() {
     const provider = new firebase.auth.GithubAuthProvider();
-    return from(this.SERVICE.signInWithPopup(provider))
+    return from(this.service.signInWithPopup(provider))
       .pipe(tap(credential => this.credential = credential));
   }
 
   signOut() {
-    return from(this.SERVICE.signOut());
+    return from(this.service.signOut());
   }
 }
