@@ -23,7 +23,7 @@
     "@angular/platform-browser": "^11.0.9",
     "@angular/router": "^11.0.9",
     "@angular/fire": "^6.1.4",
-    "@ngx-translate/core": "^13.0.0",
+    "@ngneat/transloco": "^2.20.1",
     "@lamnhan/schemata": "0.0.4",
     "firebase": "^8.2.9",
     "rxjs": "~6.6.0"

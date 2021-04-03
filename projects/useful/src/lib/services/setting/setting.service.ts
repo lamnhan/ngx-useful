@@ -1,7 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 import { of, combineLatest, ReplaySubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslocoService } from '@ngneat/transloco';
 
 import { LocalstorageService } from '../localstorage/localstorage.service';
 import { UserService } from '../user/user.service';
@@ -25,7 +25,7 @@ export interface SettingOptions {
 
 export interface SettingIntegrations {
   localstorageService?: LocalstorageService;
-  translateService?: TranslateService;
+  translateService?: TranslocoService;
   userService?: UserService;
 }
 
@@ -132,7 +132,7 @@ export class SettingService {
     if (!this.locale || this.locale !== value) {
       // affect
       if (this.integrations.translateService) {
-        this.integrations.translateService.use(value);
+        this.integrations.translateService.setActiveLang(value);
       }
       // set value
       this.locale = value;
