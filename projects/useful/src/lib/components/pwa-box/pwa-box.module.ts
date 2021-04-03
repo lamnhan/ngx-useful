@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslocoModule } from '@ngneat/transloco';
 
 import {PwaBoxComponent} from './pwa-box.component';
 
@@ -10,7 +10,7 @@ import {PwaBoxComponent} from './pwa-box.component';
   ],
   imports: [
     CommonModule,
-    TranslateModule,
+    TranslocoModule,
   ],
   exports: [
     PwaBoxComponent,
