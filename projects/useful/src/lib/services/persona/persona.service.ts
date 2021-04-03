@@ -24,10 +24,16 @@ export interface PersonaIntegrations {
   providedIn: 'root'
 })
 export class PersonaService {
-  private data: PersonaData = {};
   private menuRegistry?: Record<string, MenuItem>;
   private options: PersonaOptions = {};
   private integrations: PersonaIntegrations = {};
+  
+  data: PersonaData = {};
+
+  name = 'default';
+  properties: PersonaProperties = {};
+  menu: MenuItem[] = [];
+  tabs: MenuItem[] = [];
 
   constructor() {}
 
@@ -41,6 +47,7 @@ export class PersonaService {
     this.integrations = integrations;
     // proccess menu & secondary menu
     if (menuRegistry) {
+      this.menuRegistry = menuRegistry;
       Object.keys(data).forEach(persona => {
         const {menu, tabs} = data[persona];
         if (menu) {
@@ -54,24 +61,24 @@ export class PersonaService {
       });
     }
     // save data
-    this.menuRegistry = menuRegistry;
     this.data = data;
+    // calculate values
+    this.setData('default');
+    if (this.integrations.settingService) {
+      this.integrations.settingService.onPersonaChanged.subscribe(persona => this.setData(persona));
+    }
     // done
     return this as PersonaService;
   }
 
-  getMenu() {
-    return this.get('menu') as MenuItem[];
-  }
-
-  getTabs() {
-    return this.get('tabs') as MenuItem[];
-  }
-
   get(key: string, withPersona?: string) {
-    const persona = withPersona
-      || this.integrations?.settingService?.persona
-      || 'default';
-    return (this.data[persona] || {})[key] || (this.data['default'] || {})[key];
+    return (this.data[withPersona || this.name] || {})[key] || (this.data['default'] || {})[key];
+  }
+
+  private setData(persona: string) {
+    this.name = persona;
+    this.properties = this.data[this.name] || this.data['default'] || {};
+    this.menu = (this.get('menu') || []) as MenuItem[];
+    this.tabs = (this.get('tabs') || []) as MenuItem[];
   }
 }

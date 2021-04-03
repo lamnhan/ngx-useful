@@ -3,7 +3,7 @@
   *ngIf="pwa && !pwa.installed"
   [class]="pwa.runtime"
   [class.show]="pwa.reminderShowed"
-  [class.annoyed]="pwa.isReminderAnnoyed()"
+  [class.annoyed]="pwa.reminderCount >= pwa.reminderAnnoying"
 >
 
   <div class="head">

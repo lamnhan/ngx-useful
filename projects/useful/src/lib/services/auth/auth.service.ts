@@ -24,8 +24,10 @@ export class AuthService {
   authenticated?: boolean;
   credential?: NativeUserCredential;
 
-  private methodLock = false;
-  private allowedMethods: Record<string, boolean> = {};
+  methodAllowedForEmailPassword = true;
+  methodAllowedForGoogle = true;
+  methodAllowedForFacebook = true;
+  methodAllowedForGithub = true;
 
   public readonly onAuthStateChanged = new ReplaySubject<null | NativeUser>(1);
 
@@ -50,32 +52,14 @@ export class AuthService {
     this.redirectUrl = url;
   }
 
-  isMethodAllowed(method: string) {
-    return !this.methodLock || this.allowedMethods[method];
-  }
-
-  isMethodAllowedForEmailPassword() {
-    return this.isMethodAllowed('email/password');
-  }
-
-  isMethodAllowedForGoogle() {
-    return this.isMethodAllowed('google.com');
-  }
-
-  isMethodAllowedForFacebook() {
-    return this.isMethodAllowed('facebook.com');
-  }
-
-  isMethodAllowedForGithub() {
-    return this.isMethodAllowed('github.com');
-  }
-
   handleAccountExistsWithDifferentCredential(email: string) {
     return from(this.service.fetchSignInMethodsForEmail(email)).pipe(
-      tap(methods => {
-        this.methodLock = true;
-        methods.forEach(method => this.allowedMethods[method] = true);
-      })
+      tap(methods => methods.forEach(method => {
+        this.methodAllowedForEmailPassword = method === 'email/password';
+        this.methodAllowedForGoogle = method === 'google.com';
+        this.methodAllowedForFacebook = method === 'facebook.com';
+        this.methodAllowedForGithub = method === 'github.com';
+      }))
     );
   }
 

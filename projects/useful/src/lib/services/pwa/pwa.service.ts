@@ -18,15 +18,14 @@ export class PwaService {
   private readonly LSK_INSTALLED = 'pwa_installed';
   private readonly LSK_REMINDER_TIMESTAMP = 'pwa_reminder_timestamp';
   private readonly LSK_REMINDER_COUNT = 'pwa_reminder_count';
-
   private options: PWAOptions = {};
 
   runtime = 'desktop-any';
   installed = true;
-
   reminderCount = 0;
   reminderTimestamp = 0;
   reminderShowed = false;
+  reminderAnnoying = 3;
 
   constructor(
     private readonly localstorageService: LocalstorageService
@@ -34,6 +33,9 @@ export class PwaService {
 
   init(options: PWAOptions = {}) {
     this.options = options;
+    if (this.options.reminderAnnoying) {
+      this.reminderAnnoying = this.options.reminderAnnoying;
+    }
     this.setRuntime();
     this.loadLocalMetrics()
     .subscribe(({ installed, reminderCount, reminderTimestamp, reminderShowed }) => {
@@ -51,10 +53,6 @@ export class PwaService {
     });
     // done
     return this as PwaService;
-  }
-
-  isReminderAnnoyed() {
-    return this.reminderCount >= (this.options.reminderAnnoying || 3);
   }
 
   showReminder(manualShowed?: boolean) {

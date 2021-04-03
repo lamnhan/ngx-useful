@@ -36,9 +36,11 @@ export class UserService {
   private options: UserOptions = {};
   private integrations: UserIntegrations = {};
 
-  nativeUser?: NativeUser;
+  currentUser?: NativeUser;
   data?: User;
   publicData?: Profile;
+  role = 'subscriber';
+  level = 1;
 
   public readonly onUserChanged = new ReplaySubject<undefined | User>(1);
 
@@ -81,9 +83,11 @@ export class UserService {
       )
       .subscribe(({nativeUser, data, publicData}) => {
         // set data
-        this.nativeUser = nativeUser;
+        this.currentUser = nativeUser;
         this.data = data;
         this.publicData = publicData;
+        this.role = this.getRole(this.data?.claims);
+        this.level = this.getLevel(this.data?.claims);
         // user changed
         this.onUserChanged.next(this.data);
       });
@@ -91,60 +95,8 @@ export class UserService {
     return this as UserService;
   }
 
-  isUser() {
-    return !!(this.nativeUser && this.data && (!this.integrations.profileDataService || this.publicData));
-  }
-  
-  getRole() {
-    const { sadmin, admin, editor, author, contributor } = this.data?.claims || {};
-    return sadmin ? 'sadmin'
-      : admin ? 'admin'
-      : editor ? 'editor'
-      : author ? 'author'
-      : contributor ? 'contributor'
-      : 'subscriber';
-  }
-
-  getLevel() {
-    const { sadmin, admin, editor, author, contributor } = this.data?.claims || {};
-    return sadmin ? 6
-      : admin ? 5
-      : editor ? 4
-      : author ? 3
-      : contributor ? 2
-      : 1;
-  }
-
-  isSuperAdmin() {
-    return this.isUser() && this.isRole('sadmin');
-  }
-
-  isAdmin() {
-    return this.isUser() && this.isRole('admin');
-  }
-
-  isEditor() {
-    return this.isUser() && this.isRole('editor');
-  }
-
-  isAuthor() {
-    return this.isUser() && this.isRole('author');
-  }
-
-  isContributor() {
-    return this.isUser() && this.isRole('contributor');
-  }
-
-  isSubscriber() {
-    return true;
-  }
-
-  isRole(role: string) {
-    return this.data?.claims?.[role] === true;
-  }
-
-  allowedLevel(level: number) {
-    return this.getLevel() >= level;
+  allowedLevel(atLeast: number) {
+    return this.level >= atLeast;
   }
 
   checkUsernameExists(username: string) {
@@ -169,10 +121,10 @@ export class UserService {
         if (exists) {
           return throwError('User exists with the username: ' + username);
         }
-        if (!this.nativeUser || !this.data || !this.publicData || !this.integrations.profileDataService) {
+        if (!this.currentUser || !this.data || !this.publicData || !this.integrations.profileDataService) {
           return throwError('Can not change username.');
         }
-        const uid = this.nativeUser.uid;
+        const uid = this.currentUser.uid;
         const currentUsername = this.data.username as string;
         // in service
         this.data.username = username;
@@ -185,7 +137,7 @@ export class UserService {
           ),
           // add new doc to /profiles
           switchMap(() =>
-            this.profileInitializer(this.nativeUser as NativeUser, this.data as User)
+            this.profileInitializer(this.currentUser as NativeUser, this.data as User)
           ),
         );
       }),
@@ -193,7 +145,7 @@ export class UserService {
   }
 
   changePublicity(toPublic = false) {
-    if (!this.nativeUser || !this.data || !this.publicData || !this.integrations.profileDataService) {
+    if (!this.currentUser || !this.data || !this.publicData || !this.integrations.profileDataService) {
       return throwError('No user.');
     }
     // TODO
@@ -201,10 +153,10 @@ export class UserService {
   }
 
   updateSettings(settings: UserSettings) {
-    if (!this.nativeUser || !this.data) {
+    if (!this.currentUser || !this.data) {
       return throwError('No user.');
     }
-    const uid = this.nativeUser.uid;
+    const uid = this.currentUser.uid;
     // in service
     this.data.settings = { ...this.data?.settings, ...settings };
     // remotely
@@ -212,10 +164,10 @@ export class UserService {
   }
 
   updateAddresses(addresses: string | Record<string, string | UserAddress>) {
-    if (!this.nativeUser || !this.data) {
+    if (!this.currentUser || !this.data) {
       return throwError('No user.');
     }
-    const uid = this.nativeUser?.uid as string;
+    const uid = this.currentUser?.uid as string;
     // in service
     if (!this.data?.addresses || typeof this.data.addresses === 'string') {
       this.data.addresses = addresses;
@@ -234,10 +186,10 @@ export class UserService {
   }
 
   updatePublicly(publicly: UserPublicly) {
-    if (!this.nativeUser || !this.data) {
+    if (!this.currentUser || !this.data) {
       return throwError('No user.');
     }
-    const uid = this.nativeUser.uid;
+    const uid = this.currentUser.uid;
     const username = this.data.username as string;
     // in service
     let profileDoc: Partial<Profile> | NullableOptional<Partial<Profile>>;
@@ -305,10 +257,10 @@ export class UserService {
     data: Record<string, unknown>,
     publicly?: Record<string, boolean>
   ) {
-    if (!this.nativeUser || !this.data) {
+    if (!this.currentUser || !this.data) {
       return throwError('No user.');
     }
-    const uid = this.nativeUser.uid;
+    const uid = this.currentUser.uid;
     // in service
     this.data.additionalData = {...this.data.additionalData, ...data};
     // remotely
@@ -322,10 +274,10 @@ export class UserService {
   }
 
   updateProfile(data: UserEditableProfile) {
-    if (!this.nativeUser || !this.data) {
+    if (!this.currentUser || !this.data) {
       return throwError('No user.');
     }
-    const uid = this.nativeUser.uid;
+    const uid = this.currentUser.uid;
     const username = this.data.username as string;
     // extract data
     const { displayName, photoURL, coverPhoto, intro, detail, url } = data;
@@ -364,8 +316,8 @@ export class UserService {
     // remotely
     return combineLatest([
       // update native profile
-      nativeProfile && this.nativeUser
-        ? from(this.nativeUser.updateProfile(nativeProfile))
+      nativeProfile && this.currentUser
+        ? from(this.currentUser.updateProfile(nativeProfile))
         : of(undefined),
       // update user doc
       userDoc
@@ -530,5 +482,25 @@ export class UserService {
       } as User;
       return { nativeUser, data, publicData: undefined };
     }));
+  }
+
+  private getRole(claims: Record<string, unknown> = {}) {
+    const { sadmin, admin, editor, author, contributor } = claims;
+    return sadmin ? 'sadmin'
+      : admin ? 'admin'
+      : editor ? 'editor'
+      : author ? 'author'
+      : contributor ? 'contributor'
+      : 'subscriber';
+  }
+
+  private getLevel(claims: Record<string, unknown> = {}) {
+    const { sadmin, admin, editor, author, contributor } = claims;
+    return sadmin ? 6
+      : admin ? 5
+      : editor ? 4
+      : author ? 3
+      : contributor ? 2
+      : 1;
   }
 }

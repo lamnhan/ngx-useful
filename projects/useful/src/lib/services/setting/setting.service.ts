@@ -36,7 +36,6 @@ export class SettingService {
   private readonly LSK_THEME = 'setting_theme';
   private readonly LSK_PERSONA = 'setting_persona';
   private readonly LSK_LOCALE = 'setting_locale';
-
   private options: SettingOptions = {};
   private integrations: SettingIntegrations = {};
 
@@ -97,7 +96,7 @@ export class SettingService {
         this.integrations.localstorageService.set(this.LSK_THEME, name);
       }
       if (
-        this.integrations.userService?.isUser()
+        this.integrations.userService?.currentUser
         && this.integrations.userService.data?.settings?.theme !== name
       ) {
         this.integrations.userService.updateSettings({ theme: name });
@@ -119,7 +118,7 @@ export class SettingService {
         this.integrations.localstorageService.set(this.LSK_PERSONA, name);
       }
       if (
-        this.integrations.userService?.isUser()
+        this.integrations.userService?.currentUser
         && this.integrations.userService.data?.settings?.persona !== name
       ) {
         this.integrations.userService.updateSettings({ persona: name });
@@ -141,7 +140,7 @@ export class SettingService {
         this.integrations.localstorageService.set(this.LSK_LOCALE, value);
       }
       if (
-        this.integrations.userService?.isUser()
+        this.integrations.userService?.currentUser
         && this.integrations.userService.data?.settings?.locale !== value
       ) {
         this.integrations.userService.updateSettings({ locale: value });
