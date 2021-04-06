@@ -20,6 +20,7 @@ export interface NavItem {
   shortText?: string;
   html?: string;
   icon?: string;
+  iconActive?: string;
   classes?: string | string[];
   level?: number;
   separator?: true;
@@ -251,6 +252,11 @@ export class NavService {
 
   isActive(url: string, exact = false) {
     return this.router.isActive(url, exact);
+  }
+
+  isRouteActive(input: string | string[], exact = false, withLocale?: string) {
+    const url = this.getRouteUrl(input, withLocale);
+    return this.isActive(url, exact);
   }
 
   isBackwardable() {

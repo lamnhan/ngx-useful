@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 
+import { UsefulRouterModule } from './useful-router.module';
+
 import { OauthPopupComponentModule } from './components/oauth-popup/oauth-popup.module';
 import { NavIndicatorComponentModule } from './components/nav-indicator/nav-indicator.module';
 import { PwaReminderComponentModule } from './components/pwa-reminder/pwa-reminder.module';
@@ -12,8 +14,6 @@ import { CurrencyxPipeModule } from './pipes/currencyx/currencyx.module';
 import { DatexPipeModule } from './pipes/datex/datex.module';
 import { AgoPipeModule } from './pipes/ago/ago.module';
 import { ListPipeModule } from './pipes/list/list.module';
-
-import { RouterLinkDirectiveModule } from './directives/router-link/router-link.module';
 
 import {HelperService} from './services/helper/helper.service';
 import {ErrorService} from './services/error/error.service';
@@ -47,6 +47,7 @@ import {UserDataService} from './schematas/user/user.service';
 @NgModule({
   declarations: [],
   imports: [
+    UsefulRouterModule,
     OauthPopupComponentModule,
     NavIndicatorComponentModule,
     PwaReminderComponentModule,
@@ -58,7 +59,6 @@ import {UserDataService} from './schematas/user/user.service';
     DatexPipeModule,
     AgoPipeModule,
     ListPipeModule,
-    RouterLinkDirectiveModule,
   ],
   providers: [
     // normal services
@@ -92,6 +92,7 @@ import {UserDataService} from './schematas/user/user.service';
     UserDataService,
   ],
   exports: [
+    UsefulRouterModule,
     OauthPopupComponentModule,
     NavIndicatorComponentModule,
     PwaReminderComponentModule,
@@ -103,7 +104,6 @@ import {UserDataService} from './schematas/user/user.service';
     DatexPipeModule,
     AgoPipeModule,
     ListPipeModule,
-    RouterLinkDirectiveModule,
   ]
 })
-export class UsefulModule { }
+export class UsefulModule {}
