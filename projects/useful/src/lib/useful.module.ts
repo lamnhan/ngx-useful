@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 
-import { UsefulRouterModule } from './useful-router.module';
-
 import { OauthPopupComponentModule } from './components/oauth-popup/oauth-popup.module';
 import { NavIndicatorComponentModule } from './components/nav-indicator/nav-indicator.module';
 import { PwaReminderComponentModule } from './components/pwa-reminder/pwa-reminder.module';
 import { PwaBoxComponentModule } from './components/pwa-box/pwa-box.module';
+
+import { RouterLinkDirectiveModule } from './directives/router-link/router-link.module';
+import { RouterExternalActiveDirectiveModule } from './directives/router-external-active/router-external-active.module';
 
 import { O2aPipeModule } from './pipes/o2a/o2a.module';
 import { FilterPipeModule } from './pipes/filter/filter.module';
@@ -47,7 +48,8 @@ import {UserDataService} from './schematas/user/user.service';
 @NgModule({
   declarations: [],
   imports: [
-    UsefulRouterModule,
+    RouterLinkDirectiveModule,
+    RouterExternalActiveDirectiveModule,
     OauthPopupComponentModule,
     NavIndicatorComponentModule,
     PwaReminderComponentModule,
@@ -92,7 +94,8 @@ import {UserDataService} from './schematas/user/user.service';
     UserDataService,
   ],
   exports: [
-    UsefulRouterModule,
+    RouterLinkDirectiveModule,
+    RouterExternalActiveDirectiveModule,
     OauthPopupComponentModule,
     NavIndicatorComponentModule,
     PwaReminderComponentModule,

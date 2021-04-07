@@ -3,7 +3,6 @@
  */
 
 export {UsefulModule} from './lib/useful.module';
-export {UsefulRouterModule} from './lib/useful-router.module';
 
 export * from './lib/components/oauth-popup/oauth-popup.component';
 export {OauthPopupComponentModule} from './lib/components/oauth-popup/oauth-popup.module';
@@ -31,6 +30,8 @@ export {ListPipeModule} from './lib/pipes/list/list.module';
 
 export * from './lib/directives/router-link/router-link.directive';
 export {RouterLinkDirectiveModule} from './lib/directives/router-link/router-link.module';
+export * from './lib/directives/router-external-active/router-external-active.directive';
+export {RouterExternalActiveDirectiveModule} from './lib/directives/router-external-active/router-external-active.module';
 
 export * from './lib/services/helper/helper.service';
 export * from './lib/services/error/error.service';
