@@ -39,6 +39,8 @@ export class UserService {
   currentUser?: NativeUser;
   data?: User;
   publicData?: Profile;
+  uid?: string;
+  username?: string;
   role = 'subscriber';
   level = 1;
 
@@ -86,6 +88,8 @@ export class UserService {
         this.currentUser = nativeUser;
         this.data = data;
         this.publicData = publicData;
+        this.uid = this.currentUser?.uid;
+        this.username = this.data?.username;
         this.role = this.getRole(this.data?.claims);
         this.level = this.getLevel(this.data?.claims);
         // user changed
@@ -129,6 +133,7 @@ export class UserService {
         // in service
         this.data.username = username;
         this.publicData.id = username;
+        this.username = username;
         // remotely
         return this.userDataService.update(uid, {username}).pipe(
           // remove current doc from /profiles
