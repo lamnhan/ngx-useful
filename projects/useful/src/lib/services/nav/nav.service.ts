@@ -9,26 +9,29 @@ import {
   NavigationEnd,
   NavigationExtras
 } from '@angular/router';
-import { ReplaySubject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 
 import { SettingService } from '../setting/setting.service';
 
 export type NavRouterEventHooks = 'RouteConfigLoadStart' | 'RouteConfigLoadEnd' | 'NavigationEnd';
 
 export interface NavItem {
+  name?: string;
   text?: string;
   shortText?: string;
   html?: string;
-  icon?: string;
-  iconActive?: string;
   classes?: string | string[];
+  icon?: string;
   level?: number;
   separator?: true;
   segment?: string; // inner link
   href?: string; // normal link
   target?: string;
-  routerLink?: string | string[]; // router link
   handler?: (...args: unknown[]) => void; // click
+  routerLink?: string | string[] | Observable<string | string[]>; // router link
+  activeClasses?: string | string[];
+  activeIcon?: string;
+  activeAlso?: string[];
 }
 
 export interface MenuItem extends NavItem {

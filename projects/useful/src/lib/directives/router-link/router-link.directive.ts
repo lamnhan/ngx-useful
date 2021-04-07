@@ -1,10 +1,12 @@
-import { Directive, HostBinding, HostListener, Input, OnChanges, OnDestroy } from '@angular/core';
+import { Directive, HostBinding, HostListener, Input, OnInit, OnChanges, OnDestroy } from '@angular/core';
 import { NavigationExtras } from '@angular/router';
+import { Observable, Subscription } from 'rxjs';
 
 import { NavService } from '../../services/nav/nav.service';
 
 interface ActiveOptions {
-  exact: boolean;
+  exact?: boolean;
+  also?: string[];
 }
 
 // NOTE: see implementation
@@ -13,13 +15,14 @@ interface ActiveOptions {
 @Directive({
   selector: 'a[usefulRouterLink]'
 })
-export class RouterLinkDirective implements OnChanges, OnDestroy {
+export class RouterLinkDirective implements OnInit, OnChanges, OnDestroy {
+  private inputBuilder?: Observable<string | string[]>;
   private input: string | string[] = [];
   private backwardable?: boolean;
   private locale?: string;
   
-  private activeClasses?: string[] = [];
-  private activeOptions?: ActiveOptions;
+  private activeClasses: string[] = [];
+  private activeOptions: ActiveOptions = {};
 
   private title?: string;
   private data?: Record<string, unknown>;
@@ -37,8 +40,12 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
     this.extras = extras;
   }
 
-  @Input() set usefulRouterLink(input: undefined | null | string | string[]) {
-    this.input = input || [];
+  @Input() set usefulRouterLink(input: undefined | string | string[] | Observable<string | string[]>) {
+    if (input && (input as any).subscribe) {
+      this.inputBuilder = input as Observable<string | string[]>;
+    } else {
+      this.input = input as string | string[] || [];
+    }
   }
 
   @Input() set usefulRouterBackwardable(backwardable: undefined | boolean) {
@@ -59,8 +66,8 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
   }
 
   @Input()
-  set usefulRouterLinkActiveOptions(activeOptions: undefined | ActiveOptions) {
-    this.activeOptions = activeOptions;
+  set usefulRouterLinkActiveOptions(options: undefined | ActiveOptions) {
+    this.activeOptions = options || {};
   }
 
   @HostBinding() href!: string;
@@ -78,11 +85,21 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
     return false;
   }
 
-  private readonly refreshSubscription = this.navService
-    .onRefreshRouterLink
-    .subscribe(() => this.updateTargetAttributes());
+  private refreshSubscription!: Subscription;
+  private builderSubscription?: Subscription;
 
   constructor(private readonly navService: NavService) {}
+
+  ngOnInit() {
+    this.refreshSubscription = this.navService.onRefreshRouterLink
+      .subscribe(() => this.updateTargetAttributes());
+    if (this.inputBuilder) {
+      this.builderSubscription = this.inputBuilder.subscribe(input => {
+        this.input = input;
+        this.updateTargetAttributes();
+      });
+    }
+  }
 
   ngOnChanges() {
     this.updateTargetAttributes();
@@ -90,16 +107,25 @@ export class RouterLinkDirective implements OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.refreshSubscription.unsubscribe();
+    if (this.builderSubscription) {
+      this.builderSubscription.unsubscribe();
+    }
   }
 
   private updateTargetAttributes() {
+    // href
     this.href = this.navService.getRouteUrl(this.input, this.locale);
-    this.class =
-      (
-        this.activeClasses
-        && this.navService.isActive(this.href, !!this.activeOptions?.exact)
-      )
-        ? this.activeClasses
-        : [];
+    // active
+    const {exact, also} = this.activeOptions;
+    let isActive = this.navService.isActive(this.href, !!exact);
+    if (also) {
+      also.forEach(item => {
+        if (this.navService.isRouteActive(item, !!exact, this.locale)) {
+          isActive = true;
+          return;
+        }
+      });
+    }
+    this.class = isActive ? this.activeClasses : '';
   }
 }
