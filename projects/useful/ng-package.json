@@ -14,7 +14,7 @@
       "localforage": "localforage",
       "howler": "howler",
       "firebase/app": "firebase",
-      "@ngx-translate/core": "ng.translate"
+      "@ngneat/transloco": "ng.transloco"
     }
   },
   "whitelistedNonPeerDependencies": [

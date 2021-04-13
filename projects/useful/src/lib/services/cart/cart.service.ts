@@ -58,7 +58,7 @@ export class CartService {
   };
 
   private items: Record<string, OrderItem> = {};
-  private customer: UserProfile = {};
+  private customer?: UserProfile;
   private discountData: Record<string, OrderDiscount> = {};
   private note = '';
 
@@ -126,16 +126,19 @@ export class CartService {
     // set customer data based on the user
     if (this.authUser) {
       const {
+        uid,
         email = '',
         phoneNumber = '',
         addresses = {}
-      } = this.customer;
+      } = this.customer || {};
       const {
+        uid: userUid,
         email: userEmail = '',
         phoneNumber: userPhoneNumber = '',
         addresses: userAddresses = {}
       } = this.authUser;
       this.customer = {
+        uid: uid || userUid,
         email: email || userEmail,
         phoneNumber: phoneNumber || userPhoneNumber,
         addresses: addresses || userAddresses,

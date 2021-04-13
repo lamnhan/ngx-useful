@@ -42,14 +42,14 @@ export class NotifyService {
   getUnreadNotifications() {
     return this.notifications
       .filter(
-        notification => notification.$key && !this.isNotificationRead(notification.$key)
+        notification => notification.id && !this.isNotificationRead(notification.id)
       );
   }
 
   getReadNotifications() {
     return this.notifications
       .filter(
-        notification => notification.$key && this.isNotificationRead(notification.$key)
+        notification => notification.id && this.isNotificationRead(notification.id)
       );
   }
 

@@ -37,7 +37,7 @@ export class PlayerService {
       id: '__',
       title: 'Welcome!',
       authors: '--' as any,
-      srcs: blankAudio,
+      src: blankAudio,
     });
   }
 

@@ -168,7 +168,7 @@ export class UserService {
     return this.userDataService.update(uid, { settings: this.data.settings });
   }
 
-  updateAddresses(addresses: string | Record<string, string | UserAddress>) {
+  updateAddresses(addresses: Record<string, UserAddress>) {
     if (!this.currentUser || !this.data) {
       return throwError('No user.');
     }

@@ -59,6 +59,7 @@ export * from './lib/schematas/category/category.service';
 export * from './lib/schematas/page/page.service';
 export * from './lib/schematas/post/post.service';
 export * from './lib/schematas/option/option.service';
+export * from './lib/schematas/meta/meta.service';
 export * from './lib/schematas/profile/profile.service';
 export * from './lib/schematas/user/user.service';
 
