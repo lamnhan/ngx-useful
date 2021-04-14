@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { from, Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
+import firebase from 'firebase/app';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
 
 import { HelperService } from '../helper/helper.service';
@@ -70,6 +71,13 @@ export class DatabaseService {
 
   update<Type>(path: string, item: Type) {
     return from(this.doc(path).update(item));
+  }
+
+  increment(path: string, data: Record<string, number>) {
+    const item = {} as Record<string, unknown>;
+    Object.keys(data).forEach(field =>
+      item[field] = firebase.firestore.FieldValue.increment(data[field]));
+    return this.update(path, item);
   }
 
   delete(path: string) {
@@ -265,6 +273,10 @@ export class DatabaseData<Type> {
   update(id: string, item: Partial<Type> | NullableOptional<Partial<Type>>) {
     const updatedAt = new Date().toISOString();
     return this.databaseService.update(`${this.name}/${id}`, {...item, updatedAt});
+  }
+
+  increment(id: string, data: Record<string, number>) {
+    return this.databaseService.increment(`${this.name}/${id}`, data);
   }
 
   trash(id: string) {
