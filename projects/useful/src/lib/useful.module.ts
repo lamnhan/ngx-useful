@@ -9,6 +9,7 @@ import { RouterLinkDirectiveModule } from './directives/router-link/router-link.
 import { RouterExternalActiveDirectiveModule } from './directives/router-external-active/router-external-active.module';
 
 import { O2aPipeModule } from './pipes/o2a/o2a.module';
+import { O1iPipeModule } from './pipes/o1i/o1i.module';
 import { FilterPipeModule } from './pipes/filter/filter.module';
 import { SafePipeModule } from './pipes/safe/safe.module';
 import { CurrencyxPipeModule } from './pipes/currencyx/currencyx.module';
@@ -56,6 +57,7 @@ import {UserDataService} from './schematas/user/user.service';
     PwaReminderComponentModule,
     PwaBoxComponentModule,
     O2aPipeModule,
+    O1iPipeModule,
     FilterPipeModule,
     SafePipeModule,
     CurrencyxPipeModule,
@@ -103,6 +105,7 @@ import {UserDataService} from './schematas/user/user.service';
     PwaReminderComponentModule,
     PwaBoxComponentModule,
     O2aPipeModule,
+    O1iPipeModule,
     FilterPipeModule,
     SafePipeModule,
     CurrencyxPipeModule,

@@ -15,6 +15,8 @@ export {PwaBoxComponentModule} from './lib/components/pwa-box/pwa-box.module';
 
 export * from './lib/pipes/o2a/o2a.pipe';
 export {O2aPipeModule} from './lib/pipes/o2a/o2a.module';
+export * from './lib/pipes/o1i/o1i.pipe';
+export {O1iPipeModule} from './lib/pipes/o1i/o1i.module';
 export * from './lib/pipes/filter/filter.pipe';
 export {FilterPipeModule} from './lib/pipes/filter/filter.module';
 export * from './lib/pipes/safe/safe.pipe';

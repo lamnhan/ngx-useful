@@ -57,40 +57,44 @@ export class HelperService {
     });
   }
 
-  o2a(
-    object: {[$key: string]: any},
+  o1i<Type extends Record<string, unknown>>(
+    object: {[$key: string]: Type},
+    clone = false,
+    includeKey = true
+  ) {
+    const firstKey = Object.keys(object).shift();
+    if (!firstKey) {
+      return null;
+    }
+    const firstItem = object[firstKey];
+    const item = clone ? {...firstItem} : firstItem;
+    if (includeKey) {
+      (item as Record<string, unknown>).$key = firstKey;
+    }
+    return item;
+  }
+
+  o2a<Type extends Record<string, unknown>>(
+    object: {[$key: string]: Type},
     clone = false,
     includeKey = true,
     limit?: number,
-    nullResult = false
   ) {
-    let result: null | unknown[] = [];
+    let result: null | Type[] = [];
     // clone object
     if (clone) {
       object = Object.assign({}, object || {});
     }
     // turn {} => []
     for (const key of Object.keys(object)) {
-      if (typeof object[key] === 'object') {
-        object[key]['$key'] = key;
-      } else {
-        object[key] = {
-          $key: key,
-          value: object[key]
-        };
-      }
-      if (!includeKey) {
-        delete object[key]['$key'];
+      if (includeKey) {
+        (object[key] as Record<string, unknown>).$key = key;
       }
       result.push(object[key]);
     }
     // limit
     if (limit) {
       result.splice(limit, result.length);
-    }
-    // null result
-    if (nullResult && result.length < 1) {
-      result = null;
     }
     // result
     return result;
