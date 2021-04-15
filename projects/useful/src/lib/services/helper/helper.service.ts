@@ -58,9 +58,8 @@ export class HelperService {
   }
 
   o1i<Type extends Record<string, unknown>>(
-    object: {[$key: string]: Type},
+    object: {[id: string]: Type},
     clone = false,
-    includeKey = true
   ) {
     const firstKey = Object.keys(object).shift();
     if (!firstKey) {
@@ -68,16 +67,13 @@ export class HelperService {
     }
     const firstItem = object[firstKey];
     const item = clone ? {...firstItem} : firstItem;
-    if (includeKey) {
-      (item as Record<string, unknown>).$key = firstKey;
-    }
+    (item as Record<string, unknown>).id = firstKey;
     return item;
   }
 
   o2a<Type extends Record<string, unknown>>(
-    object: {[$key: string]: Type},
+    object: {[id: string]: Type},
     clone = false,
-    includeKey = true,
     limit?: number,
   ) {
     let result: null | Type[] = [];
@@ -87,9 +83,7 @@ export class HelperService {
     }
     // turn {} => []
     for (const key of Object.keys(object)) {
-      if (includeKey) {
-        (object[key] as Record<string, unknown>).$key = key;
-      }
+      (object[key] as Record<string, unknown>).id = key;
       result.push(object[key]);
     }
     // limit

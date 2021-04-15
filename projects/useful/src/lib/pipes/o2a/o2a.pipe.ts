@@ -6,11 +6,8 @@ import { HelperService } from '../../services/helper/helper.service';
   name: 'o2a'
 })
 export class O2aPipe implements PipeTransform {
-
   constructor(private helperService: HelperService) {}
-
-  transform(value: {[$key: string]: any}, ... args: any[]) {
-    return this.helperService.o2a(value, ...args);
+  transform(value: undefined | null | {[id: string]: any}, ... args: any[]) {
+    return !value ? null : this.helperService.o2a(value, ...args);
   }
-
 }
