@@ -6,6 +6,17 @@ import { TranslocoService } from '@ngneat/transloco';
 import { LocalstorageService } from '../localstorage/localstorage.service';
 import { UserService } from '../user/user.service';
 
+export interface BuiltinDataItem {
+  value: string;
+  text: string;
+}
+
+export interface BuiltinData {
+  themes?: BuiltinDataItem[];
+  personas?: BuiltinDataItem[];
+  locales?: BuiltinDataItem[];
+}
+
 export interface BuiltinUISettings {
   theme?: string;
   persona?: string;
@@ -39,6 +50,12 @@ export class SettingService {
   private options: SettingOptions = {};
   private integrations: SettingIntegrations = {};
 
+
+  // builtin data
+  themes: BuiltinDataItem[] = [{text: 'Light', value: 'light'}];
+  personas: BuiltinDataItem[] = [{text: 'Default', value: 'default'}];
+  locales: BuiltinDataItem[] = [{text: 'English', value: 'en-US'}];
+
   // UI intensive settings
   theme = 'light';
   persona = 'default';
@@ -56,10 +73,27 @@ export class SettingService {
 
   init(
     options: SettingOptions = {},
+    settingData: BuiltinData = {},
     integrations: SettingIntegrations = {},
   ) {
     this.options = options;
+    // data
+    const {themes, personas, locales} = settingData;
+    if (themes) {
+      this.themes = themes;
+    }
+    if (personas) {
+      this.personas = personas;
+    }
+    if (locales) {
+      this.locales = locales;
+    }
+    // integrations
     this.integrations = integrations;
+    // emit default values
+    this.onThemeChanged.next(this.theme);
+    this.onPersonaChanged.next(this.persona);
+    this.onLocaleChanged.next(this.locale);
     // handle UI intensive settings
     this.remoteLoader()
     .pipe(
@@ -87,7 +121,7 @@ export class SettingService {
   }
 
   changeTheme(name: string) {
-    if (!this.theme || this.theme !== name) {
+    if (this.theme !== name) {
       // affect
       document.body.setAttribute('data-theme', name);
       // set value
@@ -111,7 +145,7 @@ export class SettingService {
       ? true
       : this.options.personaValidator(name, this.integrations.userService);
     name = isValid ? name : 'default';
-    if (!this.persona || this.persona !== name) {
+    if (this.persona !== name) {
       // set value
       this.persona = name;
       if (this.integrations.localstorageService) {
@@ -129,7 +163,7 @@ export class SettingService {
   }
 
   changeLocale(value: string) {
-    if (!this.locale || this.locale !== value) {
+    if (this.locale !== value) {
       // affect
       if (this.integrations.translateService) {
         this.integrations.translateService.setActiveLang(value);
