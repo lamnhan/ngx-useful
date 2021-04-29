@@ -63,10 +63,7 @@ export class MetaService {
     if (this.integrations.settingService) {
       this.integrations.settingService
         .onLocaleChanged
-        .subscribe(locale => {
-          this.appMetas = this.getAppMetas(locale);
-          this.changePageMetas({}, locale);
-        });
+        .subscribe(locale => this.appMetas = this.getAppMetas(locale));
     }
     // done
     return this as MetaService;
@@ -103,7 +100,7 @@ export class MetaService {
     const title = customMetas['title'] || appMetas['title'];
     const description = customMetas['description'] || appMetas['description'];
     const image = customMetas['image'] || appMetas['image'];
-    const url = customMetas['url'];
+    const url = customMetas['url'] || location.href;
     const author = customMetas['author'] || appMetas['author'];
     const lang = customMetas['lang'] || appMetas['lang'];
     const twitterCard = customMetas['twitterCard'] || appMetas['twitterCard'];

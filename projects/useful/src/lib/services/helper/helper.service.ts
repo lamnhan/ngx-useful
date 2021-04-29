@@ -66,9 +66,7 @@ export class HelperService {
       return null;
     }
     const firstItem = object[firstKey];
-    const item = clone ? {...firstItem} : firstItem;
-    (item as Record<string, unknown>).id = firstKey;
-    return item;
+    return clone ? {...firstItem} : firstItem;
   }
 
   o2a<Type extends Record<string, unknown>>(
@@ -83,7 +81,6 @@ export class HelperService {
     }
     // turn {} => []
     for (const key of Object.keys(object)) {
-      (object[key] as Record<string, unknown>).id = key;
       result.push(object[key]);
     }
     // limit
