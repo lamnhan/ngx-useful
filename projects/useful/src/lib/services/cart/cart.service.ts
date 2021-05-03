@@ -42,6 +42,9 @@ export interface CartOptions {
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * (DON'T USE YET) Shopping cart related actions
+ */
 export class CartService {
   private APP_LOCAL_CART_STORAGE_KEY = 'app_local_cart';
 

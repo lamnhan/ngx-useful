@@ -20,6 +20,9 @@ export interface DateConfigs {
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * (DON'T USE YET) Date service
+ */
 export class DateService {
   private configs: DateConfigs = {};
   private datePipe: DatePipe = new DatePipe('en-US');

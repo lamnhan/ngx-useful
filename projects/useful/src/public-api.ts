@@ -3,6 +3,7 @@
  */
 
 export {UsefulModule} from './lib/useful.module';
+export {SchemataModule} from './schemata/schemata.module';
 
 export * from './lib/components/oauth-popup/oauth-popup.component';
 export {OauthPopupComponentModule} from './lib/components/oauth-popup/oauth-popup.module';
@@ -35,6 +36,8 @@ export {RouterLinkDirectiveModule} from './lib/directives/router-link/router-lin
 export * from './lib/directives/router-external-active/router-external-active.directive';
 export {RouterExternalActiveDirectiveModule} from './lib/directives/router-external-active/router-external-active.module';
 
+export * from './lib/guards/auth.guard';
+
 export * from './lib/services/helper/helper.service';
 export * from './lib/services/error/error.service';
 export * from './lib/services/network/network.service';
@@ -56,13 +59,18 @@ export * from './lib/services/auth/auth.service';
 export * from './lib/services/user/user.service';
 export * from './lib/services/database/database.service';
 
-export * from './lib/schematas/tag/tag.service';
-export * from './lib/schematas/category/category.service';
-export * from './lib/schematas/page/page.service';
-export * from './lib/schematas/post/post.service';
-export * from './lib/schematas/option/option.service';
-export * from './lib/schematas/meta/meta.service';
-export * from './lib/schematas/profile/profile.service';
-export * from './lib/schematas/user/user.service';
 
-export * from './lib/guards/auth.guard';
+
+export * from './schemata/pipes/tag/tag.pipe';
+export {TagDataPipeModule} from './schemata/pipes/tag/tag.module';
+export * from './schemata/pipes/category/category.pipe';
+export {CategoryDataPipeModule} from './schemata/pipes/category/category.module';
+
+export * from './schemata/services/tag/tag.service';
+export * from './schemata/services/category/category.service';
+export * from './schemata/services/page/page.service';
+export * from './schemata/services/post/post.service';
+export * from './schemata/services/option/option.service';
+export * from './schemata/services/meta/meta.service';
+export * from './schemata/services/profile/profile.service';
+export * from './schemata/services/user/user.service';

@@ -38,15 +38,6 @@ import {AuthService} from './services/auth/auth.service';
 import {UserService} from './services/user/user.service';
 import {DatabaseService} from './services/database/database.service';
 
-import {TagDataService} from './schematas/tag/tag.service';
-import {CategoryDataService} from './schematas/category/category.service';
-import {PageDataService} from './schematas/page/page.service';
-import {PostDataService} from './schematas/post/post.service';
-import {OptionDataService} from './schematas/option/option.service';
-import {MetaDataService} from './schematas/meta/meta.service';
-import {ProfileDataService} from './schematas/profile/profile.service';
-import {UserDataService} from './schematas/user/user.service';
-
 @NgModule({
   declarations: [],
   imports: [
@@ -87,15 +78,6 @@ import {UserDataService} from './schematas/user/user.service';
     AuthService,
     UserService,
     DatabaseService,
-    // data services
-    TagDataService,
-    CategoryDataService,
-    PageDataService,
-    PostDataService,
-    OptionDataService,
-    MetaDataService,
-    ProfileDataService,
-    UserDataService,
   ],
   exports: [
     RouterLinkDirectiveModule,

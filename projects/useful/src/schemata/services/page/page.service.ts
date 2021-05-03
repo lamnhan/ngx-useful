@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Page } from '@lamnhan/schemata';
 
-import { DatabaseService, DatabaseData } from '../../services/database/database.service';
+import { DatabaseService, DatabaseData } from '../../../lib/services/database/database.service';
 
 @Injectable({
   providedIn: 'root'

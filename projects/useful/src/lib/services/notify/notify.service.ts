@@ -6,6 +6,9 @@ import { LocalstorageService } from '../localstorage/localstorage.service';
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * (DON'T USE YET) Notify service
+ */
 export class NotifyService {
   private APP_LOCAL_NOTIFICATION_READ_IDS = 'app_local_notification_read_ids';
   private readNotificationIds: Record<string, true> = {};

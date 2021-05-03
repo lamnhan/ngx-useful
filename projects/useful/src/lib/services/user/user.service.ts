@@ -14,8 +14,8 @@ import {
 import { HelperService } from '../helper/helper.service';
 import { NullableOptional } from '../database/database.service';
 import { AuthService } from '../auth/auth.service';
-import { UserDataService } from '../../schematas/user/user.service';
-import { ProfileDataService } from '../../schematas/profile/profile.service';
+import { UserDataService } from '../../../schemata/services/user/user.service';
+import { ProfileDataService } from '../../../schemata/services/profile/profile.service';
 
 export type NativeUser = firebase.User;
 export type NativeUserCredential = firebase.auth.UserCredential;
