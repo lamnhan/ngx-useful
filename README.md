@@ -12,7 +12,7 @@
 - [Components](#components)
 - [Services](#services)
 - [Pipes](#pipes)
-- [Detail API reference](https://lamnhan.github.io/ngx-useful)
+- [Detail API reference](https://ngx-useful.lamnhan.com)
 
 
 </section>
@@ -22,11 +22,12 @@
 <h2><a name="modules"><p>Modules</p>
 </a></h2>
 
-| Class                                                                                                                        | Description |
-| ---------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| [RouterExternalActiveDirectiveModule](https://lamnhan.github.io/ngx-useful/classes/routerexternalactivedirectivemodule.html) |             |
-| [RouterLinkDirectiveModule](https://lamnhan.github.io/ngx-useful/classes/routerlinkdirectivemodule.html)                     |             |
-| [UsefulModule](https://lamnhan.github.io/ngx-useful/classes/usefulmodule.html)                                               |             |
+| Class                                                                                                                  | Description |
+| ---------------------------------------------------------------------------------------------------------------------- | ----------- |
+| [RouterExternalActiveDirectiveModule](https://ngx-useful.lamnhan.com/classes/routerexternalactivedirectivemodule.html) |             |
+| [RouterLinkDirectiveModule](https://ngx-useful.lamnhan.com/classes/routerlinkdirectivemodule.html)                     |             |
+| [SchemataModule](https://ngx-useful.lamnhan.com/classes/schematamodule.html)                                           |             |
+| [UsefulModule](https://ngx-useful.lamnhan.com/classes/usefulmodule.html)                                               |             |
 
 </section>
 
@@ -35,12 +36,12 @@
 <h2><a name="components"><p>Components</p>
 </a></h2>
 
-| Class                                                                                            | Description |
-| ------------------------------------------------------------------------------------------------ | ----------- |
-| [NavIndicatorComponent](https://lamnhan.github.io/ngx-useful/classes/navindicatorcomponent.html) |             |
-| [OauthPopupComponent](https://lamnhan.github.io/ngx-useful/classes/oauthpopupcomponent.html)     |             |
-| [PwaBoxComponent](https://lamnhan.github.io/ngx-useful/classes/pwaboxcomponent.html)             |             |
-| [PwaReminderComponent](https://lamnhan.github.io/ngx-useful/classes/pwaremindercomponent.html)   |             |
+| Class                                                                                      | Description |
+| ------------------------------------------------------------------------------------------ | ----------- |
+| [NavIndicatorComponent](https://ngx-useful.lamnhan.com/classes/navindicatorcomponent.html) |             |
+| [OauthPopupComponent](https://ngx-useful.lamnhan.com/classes/oauthpopupcomponent.html)     |             |
+| [PwaBoxComponent](https://ngx-useful.lamnhan.com/classes/pwaboxcomponent.html)             |             |
+| [PwaReminderComponent](https://ngx-useful.lamnhan.com/classes/pwaremindercomponent.html)   |             |
 
 </section>
 
@@ -49,36 +50,37 @@
 <h2><a name="services"><p>Services</p>
 </a></h2>
 
-| Class                                                                                        | Description |
-| -------------------------------------------------------------------------------------------- | ----------- |
-| [AppService](https://lamnhan.github.io/ngx-useful/classes/appservice.html)                   |             |
-| [AuthService](https://lamnhan.github.io/ngx-useful/classes/authservice.html)                 |             |
-| [CacheService](https://lamnhan.github.io/ngx-useful/classes/cacheservice.html)               |             |
-| [CartService](https://lamnhan.github.io/ngx-useful/classes/cartservice.html)                 |             |
-| [CategoryDataService](https://lamnhan.github.io/ngx-useful/classes/categorydataservice.html) |             |
-| [CurrencyService](https://lamnhan.github.io/ngx-useful/classes/currencyservice.html)         |             |
-| [DatabaseService](https://lamnhan.github.io/ngx-useful/classes/databaseservice.html)         |             |
-| [DateService](https://lamnhan.github.io/ngx-useful/classes/dateservice.html)                 |             |
-| [ErrorService](https://lamnhan.github.io/ngx-useful/classes/errorservice.html)               |             |
-| [FetchService](https://lamnhan.github.io/ngx-useful/classes/fetchservice.html)               |             |
-| [HelperService](https://lamnhan.github.io/ngx-useful/classes/helperservice.html)             |             |
-| [LocalstorageService](https://lamnhan.github.io/ngx-useful/classes/localstorageservice.html) |             |
-| [MetaDataService](https://lamnhan.github.io/ngx-useful/classes/metadataservice.html)         |             |
-| [MetaService](https://lamnhan.github.io/ngx-useful/classes/metaservice.html)                 |             |
-| [NavService](https://lamnhan.github.io/ngx-useful/classes/navservice.html)                   |             |
-| [NetworkService](https://lamnhan.github.io/ngx-useful/classes/networkservice.html)           |             |
-| [NotifyService](https://lamnhan.github.io/ngx-useful/classes/notifyservice.html)             |             |
-| [OptionDataService](https://lamnhan.github.io/ngx-useful/classes/optiondataservice.html)     |             |
-| [PageDataService](https://lamnhan.github.io/ngx-useful/classes/pagedataservice.html)         |             |
-| [PersonaService](https://lamnhan.github.io/ngx-useful/classes/personaservice.html)           |             |
-| [PlayerService](https://lamnhan.github.io/ngx-useful/classes/playerservice.html)             |             |
-| [PostDataService](https://lamnhan.github.io/ngx-useful/classes/postdataservice.html)         |             |
-| [ProfileDataService](https://lamnhan.github.io/ngx-useful/classes/profiledataservice.html)   |             |
-| [PwaService](https://lamnhan.github.io/ngx-useful/classes/pwaservice.html)                   |             |
-| [SettingService](https://lamnhan.github.io/ngx-useful/classes/settingservice.html)           |             |
-| [TagDataService](https://lamnhan.github.io/ngx-useful/classes/tagdataservice.html)           |             |
-| [UserDataService](https://lamnhan.github.io/ngx-useful/classes/userdataservice.html)         |             |
-| [UserService](https://lamnhan.github.io/ngx-useful/classes/userservice.html)                 |             |
+| Class                                                                                  | Description |
+| -------------------------------------------------------------------------------------- | ----------- |
+| [AppService](https://ngx-useful.lamnhan.com/classes/appservice.html)                   |             |
+| [AuthService](https://ngx-useful.lamnhan.com/classes/authservice.html)                 |             |
+| [AuthorDataService](https://ngx-useful.lamnhan.com/classes/authordataservice.html)     |             |
+| [CacheService](https://ngx-useful.lamnhan.com/classes/cacheservice.html)               |             |
+| [CartService](https://ngx-useful.lamnhan.com/classes/cartservice.html)                 |             |
+| [CategoryDataService](https://ngx-useful.lamnhan.com/classes/categorydataservice.html) |             |
+| [CurrencyService](https://ngx-useful.lamnhan.com/classes/currencyservice.html)         |             |
+| [DatabaseService](https://ngx-useful.lamnhan.com/classes/databaseservice.html)         |             |
+| [DateService](https://ngx-useful.lamnhan.com/classes/dateservice.html)                 |             |
+| [ErrorService](https://ngx-useful.lamnhan.com/classes/errorservice.html)               |             |
+| [FetchService](https://ngx-useful.lamnhan.com/classes/fetchservice.html)               |             |
+| [HelperService](https://ngx-useful.lamnhan.com/classes/helperservice.html)             |             |
+| [LocalstorageService](https://ngx-useful.lamnhan.com/classes/localstorageservice.html) |             |
+| [MetaDataService](https://ngx-useful.lamnhan.com/classes/metadataservice.html)         |             |
+| [MetaService](https://ngx-useful.lamnhan.com/classes/metaservice.html)                 |             |
+| [NavService](https://ngx-useful.lamnhan.com/classes/navservice.html)                   |             |
+| [NetworkService](https://ngx-useful.lamnhan.com/classes/networkservice.html)           |             |
+| [NotifyService](https://ngx-useful.lamnhan.com/classes/notifyservice.html)             |             |
+| [OptionDataService](https://ngx-useful.lamnhan.com/classes/optiondataservice.html)     |             |
+| [PageDataService](https://ngx-useful.lamnhan.com/classes/pagedataservice.html)         |             |
+| [PersonaService](https://ngx-useful.lamnhan.com/classes/personaservice.html)           |             |
+| [PlayerService](https://ngx-useful.lamnhan.com/classes/playerservice.html)             |             |
+| [PostDataService](https://ngx-useful.lamnhan.com/classes/postdataservice.html)         |             |
+| [ProfileDataService](https://ngx-useful.lamnhan.com/classes/profiledataservice.html)   |             |
+| [PwaService](https://ngx-useful.lamnhan.com/classes/pwaservice.html)                   |             |
+| [SettingService](https://ngx-useful.lamnhan.com/classes/settingservice.html)           |             |
+| [TagDataService](https://ngx-useful.lamnhan.com/classes/tagdataservice.html)           |             |
+| [UserDataService](https://ngx-useful.lamnhan.com/classes/userdataservice.html)         |             |
+| [UserService](https://ngx-useful.lamnhan.com/classes/userservice.html)                 |             |
 
 </section>
 
@@ -87,16 +89,22 @@
 <h2><a name="pipes"><p>Pipes</p>
 </a></h2>
 
-| Class                                                                            | Description |
-| -------------------------------------------------------------------------------- | ----------- |
-| [AgoPipe](https://lamnhan.github.io/ngx-useful/classes/agopipe.html)             |             |
-| [CurrencyxPipe](https://lamnhan.github.io/ngx-useful/classes/currencyxpipe.html) |             |
-| [DatexPipe](https://lamnhan.github.io/ngx-useful/classes/datexpipe.html)         |             |
-| [FilterPipe](https://lamnhan.github.io/ngx-useful/classes/filterpipe.html)       |             |
-| [ListPipe](https://lamnhan.github.io/ngx-useful/classes/listpipe.html)           |             |
-| [O1iPipe](https://lamnhan.github.io/ngx-useful/classes/o1ipipe.html)             |             |
-| [O2aPipe](https://lamnhan.github.io/ngx-useful/classes/o2apipe.html)             |             |
-| [SafePipe](https://lamnhan.github.io/ngx-useful/classes/safepipe.html)           |             |
+| Class                                                                      | Description |
+| -------------------------------------------------------------------------- | ----------- |
+| [AgoPipe](https://ngx-useful.lamnhan.com/classes/agopipe.html)             |             |
+| [AuthorPipe](https://ngx-useful.lamnhan.com/classes/authorpipe.html)       |             |
+| [CategoryPipe](https://ngx-useful.lamnhan.com/classes/categorypipe.html)   |             |
+| [CurrencyxPipe](https://ngx-useful.lamnhan.com/classes/currencyxpipe.html) |             |
+| [DatexPipe](https://ngx-useful.lamnhan.com/classes/datexpipe.html)         |             |
+| [FilterPipe](https://ngx-useful.lamnhan.com/classes/filterpipe.html)       |             |
+| [ListPipe](https://ngx-useful.lamnhan.com/classes/listpipe.html)           |             |
+| [O1iPipe](https://ngx-useful.lamnhan.com/classes/o1ipipe.html)             |             |
+| [O2aPipe](https://ngx-useful.lamnhan.com/classes/o2apipe.html)             |             |
+| [PagePipe](https://ngx-useful.lamnhan.com/classes/pagepipe.html)           |             |
+| [PostPipe](https://ngx-useful.lamnhan.com/classes/postpipe.html)           |             |
+| [ProfilePipe](https://ngx-useful.lamnhan.com/classes/profilepipe.html)     |             |
+| [SafePipe](https://ngx-useful.lamnhan.com/classes/safepipe.html)           |             |
+| [TagPipe](https://ngx-useful.lamnhan.com/classes/tagpipe.html)             |             |
 
 </section>
 
