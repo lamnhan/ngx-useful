@@ -17,7 +17,7 @@
       "@ngneat/transloco": "ng.transloco"
     }
   },
-  "whitelistedNonPeerDependencies": [
+  "allowedNonPeerDependencies": [
     "howler",
     "localforage"
   ]
