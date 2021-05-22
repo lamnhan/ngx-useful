@@ -18,6 +18,10 @@
     }
   },
   "allowedNonPeerDependencies": [
+    "@angular/fire",
+    "@lamnhan/schemata",
+    "@ngneat/transloco",
+    "firebase",
     "howler",
     "localforage"
   ]
