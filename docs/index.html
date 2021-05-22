@@ -1,9 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Blank</title>
-  <meta http-equiv="refresh" content="0; URL='reference/index.html'" />
-</head>
+<!DOCTYPE html><html lang="en"><head>
+
+  <!-- Github Pages hack to allow SPA refresh without receiving 404. -->
+  <script>
+    (function () {
+      var redirect = sessionStorage.redirect;
+      delete sessionStorage.redirect;
+      if (redirect && redirect != location.href) {
+        history.replaceState(null, null, redirect);
+      }
+    })();
+  </script>
+
+  <meta charset="utf-8">
+  <title>Ngx Useful</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="styles.31d6cfe0d16ae931b73c.css"></head>
 <body>
-</body>
-</html>
+  <app-root></app-root>
+<script src="runtime.24a441ff5e0f8fd20b45.js" defer></script><script src="polyfills.8094120a2e9f322b2591.js" defer></script><script src="main.18576f2cbff428881350.js" defer></script>
+
+</body></html>
