@@ -1,0 +1,21 @@
+@import '../../../unistylus/projects/unistylus/src/scss/mixins';
+
+// light theme
+$light_theme_icons: (
+  github: 'https://img.icons8.com/material-sharp/32/000000/github.svg',
+  right: 'https://img.icons8.com/ios-glyphs/32/000000/chevron-right.png'
+);
+
+// dark theme
+$dark_theme_icons: (
+  github: 'https://img.icons8.com/material-sharp/32/ffffff/github.svg',
+  right: 'https://img.icons8.com/ios-glyphs/32/ffffff/chevron-right.png'
+);
+
+@include register_app_icons(
+  (
+    default: $light_theme_icons,
+    light: $light_theme_icons,
+    dark: $dark_theme_icons,
+  )
+);

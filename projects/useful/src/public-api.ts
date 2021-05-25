@@ -13,6 +13,8 @@ export * from './lib/components/pwa-reminder/pwa-reminder.component';
 export {PwaReminderComponentModule} from './lib/components/pwa-reminder/pwa-reminder.module';
 export * from './lib/components/pwa-box/pwa-box.component';
 export {PwaBoxComponentModule} from './lib/components/pwa-box/pwa-box.module';
+export * from './lib/components/content/content.component';
+export {ContentComponentModule} from './lib/components/content/content.module';
 
 export * from './lib/pipes/o2a/o2a.pipe';
 export {O2aPipeModule} from './lib/pipes/o2a/o2a.module';

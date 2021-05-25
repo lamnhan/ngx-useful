@@ -1,0 +1,32 @@
+<div class="menu">
+  <div class="head">
+    <div class="title">
+      <span class="truncate" (click)="mobileMenuExpanded=!mobileMenuExpanded">Documentation</span>
+    </div>
+    <div class="toggler">
+      <button
+        [class.expanded]="mobileMenuExpanded"
+        (click)="mobileMenuExpanded=!mobileMenuExpanded"
+      >
+        <i class="icon icon-right"></i>
+      </button>
+    </div>
+  </div>
+  <div class="body" [class.expanded]="mobileMenuExpanded">        
+    <ul class="menu-items">
+      <li *ngFor="let menuItem of menuItems">
+        <a
+          *ngIf="menuItem.level!==0;else noLinkElse"
+          [href]="menuItem.href"
+          [usefulRouterLink]="menuItem.routerLink"
+          usefulRouterLinkActive="active"
+          (click)="mobileMenuExpanded=false;nav.scrollToTop()"
+          [innerHtml]="menuItem.text"
+        ></a>
+        <ng-template #noLinkElse>
+          <strong class="margin-top-2x">{{menuItem.text}}</strong>
+        </ng-template>
+      </li>
+    </ul>
+  </div>
+</div>

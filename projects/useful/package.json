@@ -1,6 +1,6 @@
 {
   "name": "@lamnhan/ngx-useful",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A collection of helpful Angular services, pipes, ....",
   "author": "Lam Nhan",
   "homepage": "https://lamnhan.com",
@@ -30,6 +30,7 @@
     "firebase": "^8.6.2",
     "howler": "^2.2.1",
     "localforage": "^1.9.0",
+    "ngx-markdown": "^11.1.3",
     "tslib": "^2.1.0"
   }
 }

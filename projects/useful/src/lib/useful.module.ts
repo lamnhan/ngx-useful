@@ -4,6 +4,7 @@ import { OauthPopupComponentModule } from './components/oauth-popup/oauth-popup.
 import { NavIndicatorComponentModule } from './components/nav-indicator/nav-indicator.module';
 import { PwaReminderComponentModule } from './components/pwa-reminder/pwa-reminder.module';
 import { PwaBoxComponentModule } from './components/pwa-box/pwa-box.module';
+import { ContentComponentModule } from './components/content/content.module';
 
 import { RouterLinkDirectiveModule } from './directives/router-link/router-link.module';
 import { RouterExternalActiveDirectiveModule } from './directives/router-external-active/router-external-active.module';
@@ -47,6 +48,7 @@ import {DatabaseService} from './services/database/database.service';
     NavIndicatorComponentModule,
     PwaReminderComponentModule,
     PwaBoxComponentModule,
+    ContentComponentModule,
     O2aPipeModule,
     O1iPipeModule,
     FilterPipeModule,

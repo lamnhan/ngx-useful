@@ -1,0 +1,32 @@
+.app {
+  margin-top: 65px;
+
+  .sidebar {
+    width: 100%;
+  }
+  
+  .page-container {
+    width: 100%;
+    max-width: 992px;
+    margin: auto;
+    min-height: calc(100vh - 65px - 49px - 97px); // header - aside - footer
+  }
+}
+
+
+@media only screen and (min-width: 992px) {
+
+  .app {
+    display: flex;
+    flex-wrap: nowrap;
+
+    .sidebar {
+      width: 250px;
+    }
+    
+    .page-container {
+      flex: 1;
+      margin: 0 0 0 2rem;
+    }
+  }
+}

@@ -23,6 +23,7 @@
     "@ngneat/transloco",
     "firebase",
     "howler",
-    "localforage"
+    "localforage",
+    "ngx-markdown"
   ]
 }

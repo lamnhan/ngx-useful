@@ -1,0 +1,6 @@
+<article class="useful-content">
+  <markdown *ngIf="contentSrc; else directContent" [src]="contentSrc"></markdown>
+  <ng-template #directContent>
+    <markdown [data]="content"></markdown>
+  </ng-template>
+</article>
