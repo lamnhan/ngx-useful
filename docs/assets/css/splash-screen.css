@@ -1,0 +1,47 @@
+#app-splash-screen {
+  z-index: 999999999;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  color: #000;
+  transition: opacity 0.5s ease;
+}
+
+#app-splash-screen.hidden {
+  opacity: 0;
+}
+
+#app-splash-screen img {
+  width: 120px;
+  height: 120px;
+  animation: heartbeat 1s infinite;
+}
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(0.75);
+  }
+  20% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(0.75);
+  }
+  60% {
+    transform: scale(1);
+  }
+  80% {
+    transform: scale(0.75);
+  }
+  100% {
+    transform: scale(0.75);
+  }
+}
+  
