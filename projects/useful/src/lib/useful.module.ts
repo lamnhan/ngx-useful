@@ -1,11 +1,5 @@
 import { NgModule } from '@angular/core';
 
-import { OauthPopupComponentModule } from './components/oauth-popup/oauth-popup.module';
-import { NavIndicatorComponentModule } from './components/nav-indicator/nav-indicator.module';
-import { PwaReminderComponentModule } from './components/pwa-reminder/pwa-reminder.module';
-import { PwaBoxComponentModule } from './components/pwa-box/pwa-box.module';
-import { ContentComponentModule } from './components/content/content.module';
-
 import { RouterLinkDirectiveModule } from './directives/router-link/router-link.module';
 import { RouterExternalActiveDirectiveModule } from './directives/router-external-active/router-external-active.module';
 
@@ -44,11 +38,6 @@ import {DatabaseService} from './services/database/database.service';
   imports: [
     RouterLinkDirectiveModule,
     RouterExternalActiveDirectiveModule,
-    OauthPopupComponentModule,
-    NavIndicatorComponentModule,
-    PwaReminderComponentModule,
-    PwaBoxComponentModule,
-    ContentComponentModule,
     O2aPipeModule,
     O1iPipeModule,
     FilterPipeModule,
@@ -84,10 +73,6 @@ import {DatabaseService} from './services/database/database.service';
   exports: [
     RouterLinkDirectiveModule,
     RouterExternalActiveDirectiveModule,
-    OauthPopupComponentModule,
-    NavIndicatorComponentModule,
-    PwaReminderComponentModule,
-    PwaBoxComponentModule,
     O2aPipeModule,
     O1iPipeModule,
     FilterPipeModule,
