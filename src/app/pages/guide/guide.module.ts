@@ -14,4 +14,4 @@ import { GuideComponent } from './guide.component';
     GuideRoutingModule
   ]
 })
-export class GuideModule { }
+export class GuidePageModule {}

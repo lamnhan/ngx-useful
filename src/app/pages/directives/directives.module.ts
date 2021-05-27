@@ -14,4 +14,4 @@ import { DirectivesComponent } from './directives.component';
     DirectivesRoutingModule
   ]
 })
-export class DirectivesModule { }
+export class DirectivesPageModule {}

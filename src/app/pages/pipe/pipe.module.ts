@@ -14,4 +14,4 @@ import { PipeComponent } from './pipe.component';
     PipeRoutingModule
   ]
 })
-export class PipeModule { }
+export class PipePageModule {}

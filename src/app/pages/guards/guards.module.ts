@@ -14,4 +14,4 @@ import { GuardsComponent } from './guards.component';
     GuardsRoutingModule
   ]
 })
-export class GuardsModule { }
+export class GuardsPageModule {}

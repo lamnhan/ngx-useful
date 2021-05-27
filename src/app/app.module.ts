@@ -6,32 +6,23 @@ import {
   MetaService,
   NavService,
   SettingService,
-  RouterLinkDirectiveModule
 } from '@lamnhan/ngx-useful';
 
 import { AppRoutingModule } from './app-routing.module';
-
 import { AppComponent } from './app.component';
-import { HomeComponent } from './pages/home/home.component';
-import { OopsComponent } from './pages/oops/oops.component';
 
-import { HeaderComponent } from './components/header/header.component';
-import { FooterComponent } from './components/footer/footer.component';
-import { MenuComponent } from './components/menu/menu.component';
+import { HeaderComponentModule } from './components/header/header.module';
+import { Header2ndComponentModule } from './components/header2nd/header2nd.module';
+import { FooterComponentModule } from './components/footer/footer.module';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent, 
-    OopsComponent,
-    HeaderComponent,
-    FooterComponent,
-    MenuComponent,
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    RouterLinkDirectiveModule,
+    HeaderComponentModule,
+    Header2ndComponentModule,
+    FooterComponentModule,
   ],
   providers: [
     LocalstorageService,

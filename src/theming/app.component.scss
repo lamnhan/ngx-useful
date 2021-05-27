@@ -1,5 +1,9 @@
 @import '../../../unistylus/projects/unistylus/src/scss/mixins';
 
+$shared_icons: (
+  github-light: 'https://img.icons8.com/material-sharp/32/ffffff/github.svg'
+);
+
 // light theme
 $light_theme_icons: (
   github: 'https://img.icons8.com/material-sharp/32/000000/github.svg',
@@ -14,7 +18,7 @@ $dark_theme_icons: (
 
 @include register_app_icons(
   (
-    default: $light_theme_icons,
+    default: map-merge($shared_icons, $light_theme_icons),
     light: $light_theme_icons,
     dark: $dark_theme_icons,
   )

@@ -1,5 +1,6 @@
-footer {
+.app-footer {
   width: 100%;
+  padding: 1rem;
   background: var(--app-color-background);
   border-top: var(--app-size-border) solid var(--app-color-background-shade);
 
@@ -25,7 +26,7 @@ footer {
 
 @media only screen and (min-width: 768px) {
 
-  footer {
+  .app-footer {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;

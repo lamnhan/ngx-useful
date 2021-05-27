@@ -14,4 +14,4 @@ import { ServiceComponent } from './service.component';
     ServiceRoutingModule
   ]
 })
-export class ServiceModule { }
+export class ServicePageModule {}
