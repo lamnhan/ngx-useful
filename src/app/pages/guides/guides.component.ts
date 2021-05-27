@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { DataService } from '../../services/data.service';
+
 @Component({
   selector: 'app-guides',
   templateUrl: './guides.component.html',
@@ -7,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GuidesComponent implements OnInit {
 
-  constructor() { }
+  constructor(public readonly data: DataService) { }
 
   ngOnInit(): void {
   }

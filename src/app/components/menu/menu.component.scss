@@ -4,7 +4,7 @@
     display: flex;
     align-items: center;
     border-bottom: var(--app-size-border) solid var(--app-color-background-shade);
-    padding: .5rem .25rem .5rem 1rem;
+    padding: .5rem 1rem;
 
     .title {
       flex: 1;
@@ -31,14 +31,6 @@
 
         &:hover, &:focus {
           opacity: 1;
-        }
-
-        &.expanded {
-          transform: rotate(90deg);
-        }
-
-        i {
-          width: 100%;
         }
       }
     }
@@ -74,18 +66,14 @@
 
       a {
         display: block;
+        text-decoration: none;
         color: var(--app-color-foreground);
-        padding: .25rem 1rem 0;
+        padding: .5rem 1rem;
         opacity: .7;
-
-        &.active {
-          text-decoration: underline;
-          font-weight: 700;
-          opacity: 1;
-        }
         
-        &:hover, &:focus {
+        &:hover, &:focus, &:active, &.active {
           opacity: 1;
+          background: var(--app-color-background-shade);
         }
       }
     }
@@ -100,16 +88,9 @@
     .head {
       flex-wrap: wrap;
       border-bottom: none;
-      padding-top: 2rem;
 
       .title {
         width: 100%;
-      }
-
-      #themer {
-        width: 100%;
-        margin-left: 0;
-        margin-top: 1rem;
       }
 
       .toggler {

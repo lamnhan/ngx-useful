@@ -1,0 +1,37 @@
+<div class="app-content">
+
+  <aside class="menu">
+    <app-menu [name]="menuName" [items]="menuItems"></app-menu>
+  </aside>
+
+  <div class="body">
+
+    <article class="content" *ngIf="contentSrc || content; else listingElse">
+      <markdown *ngIf="contentSrc; else directContent" [src]="contentSrc"></markdown>
+      <ng-template #directContent>
+        <markdown [data]="content"></markdown>
+      </ng-template>
+    </article>
+  
+    <ng-template #listingElse>
+
+      <div class="listing">
+        <h3 class="title">Services</h3>
+        <ul class="menu-items">
+          <li *ngFor="let item of menuItems">
+            <a
+              *ngIf="item.level!==0"
+              [usefulRouterLink]="item.routerLink" 
+              usefulRouterLinkActive="active"
+              [innerHtml]="item.text"
+            ></a>
+          </li>
+        </ul>
+      </div>
+
+    </ng-template>
+
+  </div>
+
+</div>
+

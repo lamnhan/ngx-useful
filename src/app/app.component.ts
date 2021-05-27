@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { LocalstorageService, AppService, MetaService, NavService, NavItem, SettingService } from '@lamnhan/ngx-useful';
+import { LocalstorageService, AppService, MetaService, NavService, SettingService } from '@lamnhan/ngx-useful';
 
 @Component({
   selector: 'app-root',
@@ -7,35 +7,6 @@ import { LocalstorageService, AppService, MetaService, NavService, NavItem, Sett
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  menuItems: NavItem[] = [
-    {
-      text: 'Getting started',
-      level: 0,
-    },
-      {
-        text: 'Install',
-        level: 1,
-        routerLink: ['']
-      },
-    {
-      text: 'Components',
-      level: 0,
-    },
-      {
-        text: 'Content',
-        level: 1,
-        routerLink: ['']
-      },
-    {
-      text: 'Services',
-      level: 0,
-    },
-      {
-        text: 'App',
-        level: 1,
-        routerLink: ['']
-      },
-  ];
 
   constructor(
     private localstorageService: LocalstorageService,
@@ -67,7 +38,7 @@ export class AppComponent {
     this.metaService.init(
       {
         title: 'Angular Useful',
-        description: 'A collection of useful Angular components, services, ...',
+        description: 'A collection of useful Angular services, pipes, ...',
         image: 'https://ngx-useful.lamnhan.com/assets/images/featured.jpg',
         url: 'https://ngx-useful.lamnhan.com/',
         lang: 'en',

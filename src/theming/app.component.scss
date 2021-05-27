@@ -1,19 +1,19 @@
 @import '../../../unistylus/projects/unistylus/src/scss/mixins';
 
 $shared_icons: (
-  github-light: 'https://img.icons8.com/material-sharp/32/ffffff/github.svg'
+  github-light: '/assets/theme-icons/dark/github.svg'
 );
 
 // light theme
 $light_theme_icons: (
-  github: 'https://img.icons8.com/material-sharp/32/000000/github.svg',
-  right: 'https://img.icons8.com/ios-glyphs/32/000000/chevron-right.png'
+  github: '/assets/theme-icons/light/github.svg',
+  menu: '/assets/theme-icons/light/menu.svg'
 );
 
 // dark theme
 $dark_theme_icons: (
-  github: 'https://img.icons8.com/material-sharp/32/ffffff/github.svg',
-  right: 'https://img.icons8.com/ios-glyphs/32/ffffff/chevron-right.png'
+  github: '/assets/theme-icons/dark/github.svg',
+  menu: '/assets/theme-icons/dark/menu.svg'
 );
 
 @include register_app_icons(

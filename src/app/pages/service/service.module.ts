@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { ContentComponentModule } from '../../components/content/content.module';
+
 import { ServiceRoutingModule } from './service-routing.module';
 import { ServiceComponent } from './service.component';
-
 
 @NgModule({
   declarations: [
@@ -11,6 +12,7 @@ import { ServiceComponent } from './service.component';
   ],
   imports: [
     CommonModule,
+    ContentComponentModule,
     ServiceRoutingModule
   ]
 })

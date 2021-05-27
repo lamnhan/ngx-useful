@@ -1,30 +1,27 @@
 <div class="app-menu">
   <div class="head">
     <div class="title">
-      <span class="truncate" (click)="mobileMenuExpanded=!mobileMenuExpanded">Documentation</span>
+      <span class="truncate" (click)="mobileMenuExpanded=!mobileMenuExpanded">{{name}}</span>
     </div>
     <div class="toggler">
-      <button
-        [class.expanded]="mobileMenuExpanded"
-        (click)="mobileMenuExpanded=!mobileMenuExpanded"
-      >
-        <i class="icon icon-right"></i>
+      <button (click)="mobileMenuExpanded=!mobileMenuExpanded">
+        <i class="icon icon-menu"></i>
       </button>
     </div>
   </div>
   <div class="body" [class.expanded]="mobileMenuExpanded">        
     <ul class="menu-items">
-      <li *ngFor="let menuItem of menuItems">
+      <li *ngFor="let item of items">
         <a
-          *ngIf="menuItem.level!==0;else noLinkElse"
-          [href]="menuItem.href"
-          [usefulRouterLink]="menuItem.routerLink"
+          *ngIf="item.level!==0; else noLinkElse"
+          [href]="item.href"
+          [usefulRouterLink]="item.routerLink"
           usefulRouterLinkActive="active"
-          (click)="mobileMenuExpanded=false;nav.scrollToTop()"
-          [innerHtml]="menuItem.text"
+          (click)="mobileMenuExpanded=false; nav.scrollToTop()"
+          [innerHtml]="item.text"
         ></a>
         <ng-template #noLinkElse>
-          <strong class="margin-top-2x">{{menuItem.text}}</strong>
+          <strong class="margin-top-2x">{{item.text}}</strong>
         </ng-template>
       </li>
     </ul>

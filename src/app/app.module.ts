@@ -15,6 +15,8 @@ import { HeaderComponentModule } from './components/header/header.module';
 import { Header2ndComponentModule } from './components/header2nd/header2nd.module';
 import { FooterComponentModule } from './components/footer/footer.module';
 
+import { DataService } from './services/data.service';
+
 @NgModule({
   declarations: [AppComponent],
   imports: [
@@ -25,6 +27,7 @@ import { FooterComponentModule } from './components/footer/footer.module';
     FooterComponentModule,
   ],
   providers: [
+    DataService,
     LocalstorageService,
     AppService,
     MetaService,

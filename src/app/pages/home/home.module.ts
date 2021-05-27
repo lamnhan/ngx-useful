@@ -5,8 +5,6 @@ import { RouterLinkDirectiveModule } from '@lamnhan/ngx-useful';
 import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.component';
 
-import { MenuComponentModule } from '../../components/menu/menu.module';
-
 @NgModule({
   declarations: [
     HomeComponent
@@ -14,7 +12,6 @@ import { MenuComponentModule } from '../../components/menu/menu.module';
   imports: [
     CommonModule,
     RouterLinkDirectiveModule,
-    MenuComponentModule,
     HomeRoutingModule
   ]
 })
