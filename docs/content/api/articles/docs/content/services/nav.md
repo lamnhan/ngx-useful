@@ -1,9 +1,9 @@
-<section id="nav" data-note="AUTO-GENERATED CONTENT, DO NOT EDIT DIRECTLY!">
+<section id="main" data-note="AUTO-GENERATED CONTENT, DO NOT EDIT DIRECTLY!">
 
 <h2><a name="navservice" href="https://ngx-useful.lamnhan.com/classes/navservice.html"><p>The <code>NavService</code> class</p>
 </a></h2>
 
-**The `NavService` class.**
+**Advanced navigation**
 
 <h3><a name="navservice-properties"><p>NavService properties</p>
 </a></h3>

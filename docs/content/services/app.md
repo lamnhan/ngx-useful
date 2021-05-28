@@ -1,9 +1,9 @@
-<section id="app" data-note="AUTO-GENERATED CONTENT, DO NOT EDIT DIRECTLY!">
+<section id="main" data-note="AUTO-GENERATED CONTENT, DO NOT EDIT DIRECTLY!">
 
 <h2><a name="appservice" href="https://ngx-useful.lamnhan.com/classes/appservice.html"><p>The <code>AppService</code> class</p>
 </a></h2>
 
-**The `AppService` class.**
+**General app related methods**
 
 <h3><a name="appservice-properties"><p>AppService properties</p>
 </a></h3>

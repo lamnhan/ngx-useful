@@ -12,6 +12,9 @@ interface ActiveOptions {
 // NOTE: see implementation
 // https://github.com/angular/angular/blob/master/packages/router/src/directives/router_link.ts
 
+/**
+ * Router link with more features
+ */
 @Directive({
   selector: 'a[usefulRouterLink]'
 })

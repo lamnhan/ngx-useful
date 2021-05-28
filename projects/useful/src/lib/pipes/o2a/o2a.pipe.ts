@@ -2,6 +2,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 import { HelperService } from '../../services/helper/helper.service';
 
+/**
+ * Turn an object of items into an array
+ */
 @Pipe({
   name: 'o2a'
 })

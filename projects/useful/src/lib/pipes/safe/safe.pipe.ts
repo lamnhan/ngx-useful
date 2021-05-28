@@ -1,6 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
 
+/**
+ * Mark an url or a HTML content as safe from XSS
+ */
 @Pipe({
   name: 'safe'
 })

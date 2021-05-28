@@ -106,6 +106,9 @@ export function i18nRoutes(
   return allRoutes;
 }
 
+/**
+ * Advanced navigation
+ */
 @Injectable({
   providedIn: 'root'
 })

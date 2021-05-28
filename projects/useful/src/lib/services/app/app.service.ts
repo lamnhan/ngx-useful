@@ -5,6 +5,9 @@ export interface AppOptions {
   splashScreen?: boolean | string;
 }
 
+/**
+ * General app related methods
+ */
 @Injectable({
   providedIn: 'root'
 })

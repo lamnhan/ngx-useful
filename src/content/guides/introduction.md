@@ -1,0 +1,3 @@
+## Introduction
+
+A collection of useful Angular services, pipes, ...

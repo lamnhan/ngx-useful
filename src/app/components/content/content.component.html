@@ -6,33 +6,37 @@
 
   <div class="body">
 
-    <div class="error" *ngIf="errorMessage">
+    <div class="error" *ngIf="errorMessage; else noError">
       <h2>Error</h2>
-      <span class="alert-danger">{{errorMessage}}</span>
+      <span class="margin-bottom-2x alert-danger">{{errorMessage}}</span>
     </div>
 
-    <article class="content" *ngIf="contentSrc || content; else listingElse">
-      <markdown *ngIf="contentSrc; else directContent" [src]="contentSrc" (error)="onError($event)"></markdown>
-      <ng-template #directContent>
-        <markdown [data]="content"></markdown>
-      </ng-template>
-    </article>
-  
-    <ng-template #listingElse>
+    <ng-template #noError>
 
-      <div class="listing">
-        <h3 class="title">{{menuName}}</h3>
-        <ul class="menu-items">
-          <li *ngFor="let item of menuItems">
-            <a
-              *ngIf="item.level!==0"
-              [usefulRouterLink]="item.routerLink" 
-              usefulRouterLinkActive="active"
-              [innerHtml]="item.text"
-            ></a>
-          </li>
-        </ul>
-      </div>
+      <article class="content" *ngIf="contentSrc || content; else listingElse">
+        <markdown *ngIf="contentSrc; else directContent" [src]="contentSrc" (error)="onError($event)"></markdown>
+        <ng-template #directContent>
+          <markdown [data]="content"></markdown>
+        </ng-template>
+      </article>
+    
+      <ng-template #listingElse>
+  
+        <div class="listing">
+          <h3 class="title">{{menuName}}</h3>
+          <ul class="menu-items">
+            <li *ngFor="let item of menuItems">
+              <a
+                *ngIf="item.level!==0"
+                [usefulRouterLink]="item.routerLink" 
+                usefulRouterLinkActive="active"
+                [innerHtml]="item.text"
+              ></a>
+            </li>
+          </ul>
+        </div>
+  
+      </ng-template>
 
     </ng-template>
 

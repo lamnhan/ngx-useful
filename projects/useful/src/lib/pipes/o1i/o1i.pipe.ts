@@ -2,6 +2,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 import { HelperService } from '../../services/helper/helper.service';
 
+/**
+ * Select the 1st item in an object
+ */
 @Pipe({
   name: 'o1i'
 })

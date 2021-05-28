@@ -10,6 +10,9 @@ import {
 import { NavService } from '../services/nav/nav.service';
 import { AuthService } from '../services/auth/auth.service';
 
+/**
+ * Only allow authenticated user
+ */
 @Injectable({
   providedIn: 'root',
 })

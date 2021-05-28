@@ -1,4 +1,4 @@
-<section id="meta" data-note="AUTO-GENERATED CONTENT, DO NOT EDIT DIRECTLY!">
+<section id="main" data-note="AUTO-GENERATED CONTENT, DO NOT EDIT DIRECTLY!">
 
 <h2><a name="metaservice" href="https://ngx-useful.lamnhan.com/classes/metaservice.html"><p>The <code>MetaService</code> class</p>
 </a></h2>

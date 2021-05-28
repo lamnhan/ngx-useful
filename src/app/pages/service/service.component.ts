@@ -10,7 +10,6 @@ import { DataService } from '../../services/data.service';
   styleUrls: ['./service.component.scss']
 })
 export class ServiceComponent implements OnInit {
-
   public readonly contentSrc$ = this.activatedRoute.params.pipe(
     map(params => `https://ngx-useful.lamnhan.com/content/services/${params.id}.md`),
   );
