@@ -12,12 +12,12 @@ export interface CurrencyConfigs {
   estimatedExchangeRate?: number;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
 /**
  * (DON'T USE YET) Currency service
  */
+@Injectable({
+  providedIn: 'root'
+})
 export class CurrencyService {
   private configs: CurrencyConfigs = {};
   private currencyPipe: CurrencyPipe = new CurrencyPipe('en-US');

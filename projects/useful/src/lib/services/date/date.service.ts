@@ -17,12 +17,12 @@ export interface DateConfigs {
   translator?: RelativeTimeTranslator;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
 /**
  * (DON'T USE YET) Date service
  */
+@Injectable({
+  providedIn: 'root'
+})
 export class DateService {
   private configs: DateConfigs = {};
   private datePipe: DatePipe = new DatePipe('en-US');

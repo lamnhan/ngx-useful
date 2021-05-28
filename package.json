@@ -8,10 +8,10 @@
   "private": true,
   "scripts": {
     "build:lib": "ng build useful && cpy README.md LICENSE dist/useful",
-    "build:app": "ng build",
+    "build:app": "ng build && ayedocs generate",
     "build": "npm run build:app && npm run build:lib",
     "deploy:lib": "cd ./dist/useful && npm publish && cd ../../",
-    "deploy:app": "git push",
+    "deploy:app": "git add . && git commit -m '...' && git push",
     "deploy": "npm run deploy:app && npm run deploy:lib",
     "lint": "ng lint useful",
     "test": "ng test useful",
