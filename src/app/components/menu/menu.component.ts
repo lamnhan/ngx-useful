@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { NavService, NavItem } from '@lamnhan/ngx-useful';
 
 @Component({
@@ -9,6 +9,8 @@ import { NavService, NavItem } from '@lamnhan/ngx-useful';
 export class MenuComponent implements OnInit {
   @Input() name = 'Menu';
   @Input() items?: NavItem[];
+
+  @Output() select: EventEmitter<NavItem> = new EventEmitter(); 
 
   mobileMenuExpanded = false;
 

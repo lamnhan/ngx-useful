@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { map, tap } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 import { DataService } from '../../services/data.service';
 
@@ -9,7 +11,14 @@ import { DataService } from '../../services/data.service';
 })
 export class ServiceComponent implements OnInit {
 
-  constructor(public readonly data: DataService) { }
+  public readonly contentSrc$ = this.activatedRoute.params.pipe(
+    map(params => `https://ngx-useful.lamnhan.com/content/services/${params.id}.md`),
+  );
+
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    public readonly data: DataService
+  ) {}
 
   ngOnInit(): void {
   }

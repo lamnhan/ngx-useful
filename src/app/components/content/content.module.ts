@@ -1,5 +1,6 @@
 import { NgModule, SecurityContext } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { MarkdownModule, MarkdownService, SECURITY_CONTEXT } from 'ngx-markdown';
 import { RouterLinkDirectiveModule } from '@lamnhan/ngx-useful';
 
@@ -23,6 +24,7 @@ import { ContentComponent } from './content.component';
   declarations: [ContentComponent],
   imports: [
     CommonModule,
+    HttpClientModule,
     MarkdownModule,
     MenuComponentModule,
     RouterLinkDirectiveModule,

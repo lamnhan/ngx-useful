@@ -12,9 +12,14 @@ export class ContentComponent implements OnInit {
   @Input() content = '';
   @Input() contentSrc?: string;
 
+  errorMessage = '';
+
   constructor() { }
 
-  ngOnInit(): void {
+  ngOnInit(): void {}
+
+  onError(e: any) {
+    this.errorMessage = e.message;
   }
 
 }

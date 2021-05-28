@@ -9,6 +9,10 @@
     .title {
       flex: 1;
       font-weight: bold;
+
+      span {
+        cursor: pointer;
+      }
     }
 
     .toggler {

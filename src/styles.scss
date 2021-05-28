@@ -19,6 +19,16 @@
 // use light and dark theme
 @import '../../unistylus/projects/unistylus/src/scss/unistylus-light-dark';
 
+:root,
+[data-theme=default],
+[data-theme=light],
+[data-theme=dark]
+{
+  --app-font-head: 'Poppins', sans-serif;
+  --app-font-body: 'Roboto', sans-serif;
+  --app-font-code: 'Roboto Mono', monospace;
+}
+
 // register app styles
 @import './theming/app.module';
 
@@ -27,3 +37,107 @@
  * Global styles 
  * ====================================================
  */
+
+app-content markdown {
+
+  h1 {
+    display: none;
+  }
+
+  h2 {
+
+    &, strong, a, code, a:hover {
+      font-family: var(--app-font-head);
+      font-weight: 700;
+      font-size: 1.7rem;
+      color: var(--app-color-foreground);
+      background: none;
+      text-decoration: none;
+    }
+
+    p {
+      display: inline;
+    }
+  }
+  
+  h2 + p {
+
+    &, strong, a, code {
+      font-family: var(--app-font-body);
+      font-size: 1.3rem;
+      font-weight: normal;
+      color: var(--app-color-medium);
+      background: none;
+    }
+  }
+  
+  h3 {
+    margin: 3rem 0 1rem;
+
+    &, strong, a, code, a:hover {
+      font-size: 1.5rem;
+    }
+  
+    p {
+      display: inline;
+    }
+  }
+
+  h4 {
+    margin: 2rem 0 1rem;
+
+    &, strong, a, code, a:hover {
+      color: var(--app-color-primary);
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: none;
+    }
+
+    p {
+      display: inline;
+    }
+  }
+
+  h4 + p {
+
+    &, strong, a, code {
+      font-family: var(--app-font-body);
+      font-size: 1rem;
+      font-weight: normal;
+      color: var(--app-color-medium);
+      background: none;
+    }
+  }
+
+  code {
+
+    &, a {
+      display: inline-block;
+      padding: 0 .25rem;
+      background: var(--app-color-background-shade);
+      color: var(--app-color-foreground);
+      border-radius: 100rem;
+    }
+  }
+
+  table {
+    @extend .table;
+
+    thead tr th {
+      font-weight: normal;
+      color: var(--app-color-medium);
+    }
+  }
+
+  table + p {
+    margin-top: 1rem;
+  }
+
+  table + h4 {
+    margin-top: 3rem;
+  }
+
+  hr {
+    color: var(--app-color-background-shade);
+  }
+}

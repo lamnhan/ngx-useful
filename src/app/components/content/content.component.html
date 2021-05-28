@@ -1,13 +1,18 @@
 <div class="app-content">
 
   <aside class="menu">
-    <app-menu [name]="menuName" [items]="menuItems"></app-menu>
+    <app-menu [name]="menuName" [items]="menuItems" (select)="errorMessage=''"></app-menu>
   </aside>
 
   <div class="body">
 
+    <div class="error" *ngIf="errorMessage">
+      <h2>Error</h2>
+      <span class="alert-danger">{{errorMessage}}</span>
+    </div>
+
     <article class="content" *ngIf="contentSrc || content; else listingElse">
-      <markdown *ngIf="contentSrc; else directContent" [src]="contentSrc"></markdown>
+      <markdown *ngIf="contentSrc; else directContent" [src]="contentSrc" (error)="onError($event)"></markdown>
       <ng-template #directContent>
         <markdown [data]="content"></markdown>
       </ng-template>
@@ -16,7 +21,7 @@
     <ng-template #listingElse>
 
       <div class="listing">
-        <h3 class="title">Services</h3>
+        <h3 class="title">{{menuName}}</h3>
         <ul class="menu-items">
           <li *ngFor="let item of menuItems">
             <a

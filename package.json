@@ -11,7 +11,7 @@
     "build:app": "ng build && ayedocs generate",
     "build": "npm run build:app && npm run build:lib",
     "deploy:lib": "cd ./dist/useful && npm publish && cd ../../",
-    "deploy:app": "git add . && git commit -m '...' && git push",
+    "deploy:app": "git add . && git commit -m 'deploy:app' && git push",
     "deploy": "npm run deploy:app && npm run deploy:lib",
     "lint": "ng lint useful",
     "test": "ng test useful",
