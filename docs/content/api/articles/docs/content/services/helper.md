@@ -1,6 +1,6 @@
 <section id="main" data-note="AUTO-GENERATED CONTENT, DO NOT EDIT DIRECTLY!">
 
-<h2><a name="helperservice" href="https://ngx-useful.lamnhan.com/classes/helperservice.html"><p>The <code>HelperService</code> class</p>
+<h2><a name="helperservice" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html"><p>The <code>HelperService</code> class</p>
 </a></h2>
 
 **The `HelperService` class.**
@@ -23,7 +23,7 @@
 | [orderBy(collection, iteratees, orders, guard?)](#helperservice-orderby-0)                         | <code>any</code>                 |             |
 | [retryInterval(matched, interval?, timeout?)](#helperservice-retryinterval-0)                      | <code>Observable<unknown></code> |             |
 
-<h4><a name="helperservice-cleanupstr-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#cleanupstr"><p><code>cleanupStr(value)</code></p>
+<h4><a name="helperservice-cleanupstr-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#cleanupstr"><p><code>cleanupStr(value)</code></p>
 </a></h4>
 
 **The `cleanupStr` call signature.**
@@ -40,16 +40,16 @@
 
 ---
 
-<h4><a name="helperservice-createpopup-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#createpopup"><p><code>createPopup(config)</code></p>
+<h4><a name="helperservice-createpopup-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#createpopup"><p><code>createPopup(config)</code></p>
 </a></h4>
 
 **The `createPopup` call signature.**
 
 **Parameters**
 
-| Param      | Type                                                                                                                | Description |
-| ---------- | ------------------------------------------------------------------------------------------------------------------- | ----------- |
-| **config** | <code><a href="https://ngx-useful.lamnhan.com/interfaces/popupconfigs.html" target="_blank">PopupConfigs</a></code> |             |
+| Param      | Type                                                                                                                             | Description |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **config** | <code><a href="https://ngx-useful.lamnhan.com/docs/content/interfaces/popupconfigs.html" target="_blank">PopupConfigs</a></code> |             |
 
 **Returns**
 
@@ -57,7 +57,7 @@
 
 ---
 
-<h4><a name="helperservice-decodejwtpayloadwithoutverification-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#decodejwtpayloadwithoutverification"><p><code>decodeJWTPayloadWithoutVerification(token)</code></p>
+<h4><a name="helperservice-decodejwtpayloadwithoutverification-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#decodejwtpayloadwithoutverification"><p><code>decodeJWTPayloadWithoutVerification(token)</code></p>
 </a></h4>
 
 **The `decodeJWTPayloadWithoutVerification` call signature.**
@@ -74,7 +74,7 @@
 
 ---
 
-<h4><a name="helperservice-filter-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#filter"><p><code>filter(items, keyword, fields?)</code></p>
+<h4><a name="helperservice-filter-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#filter"><p><code>filter(items, keyword, fields?)</code></p>
 </a></h4>
 
 **The `filter` call signature.**
@@ -93,7 +93,7 @@
 
 ---
 
-<h4><a name="helperservice-gethost-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#gethost"><p><code>getHost()</code></p>
+<h4><a name="helperservice-gethost-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#gethost"><p><code>getHost()</code></p>
 </a></h4>
 
 **The `getHost` call signature.**
@@ -104,7 +104,7 @@
 
 ---
 
-<h4><a name="helperservice-isexpiredinseconds-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#isexpiredinseconds"><p><code>isExpiredInSeconds(expiredTime, costMore?)</code></p>
+<h4><a name="helperservice-isexpiredinseconds-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#isexpiredinseconds"><p><code>isExpiredInSeconds(expiredTime, costMore?)</code></p>
 </a></h4>
 
 **The `isExpiredInSeconds` call signature.**
@@ -122,7 +122,7 @@
 
 ---
 
-<h4><a name="helperservice-isexpiredjwtwithoutverification-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#isexpiredjwtwithoutverification"><p><code>isExpiredJWTWithoutVerification(token)</code></p>
+<h4><a name="helperservice-isexpiredjwtwithoutverification-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#isexpiredjwtwithoutverification"><p><code>isExpiredJWTWithoutVerification(token)</code></p>
 </a></h4>
 
 **The `isExpiredJWTWithoutVerification` call signature.**
@@ -139,7 +139,7 @@
 
 ---
 
-<h4><a name="helperservice-md5-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#md5"><p><code>md5(str, key?, raw?)</code></p>
+<h4><a name="helperservice-md5-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#md5"><p><code>md5(str, key?, raw?)</code></p>
 </a></h4>
 
 **The `md5` call signature.**
@@ -158,7 +158,7 @@
 
 ---
 
-<h4><a name="helperservice-o1i-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#o1i"><p><code>o1i(object, clone?)</code></p>
+<h4><a name="helperservice-o1i-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#o1i"><p><code>o1i(object, clone?)</code></p>
 </a></h4>
 
 **The `o1i` call signature.**
@@ -176,7 +176,7 @@
 
 ---
 
-<h4><a name="helperservice-o2a-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#o2a"><p><code>o2a(object, clone?, limit?)</code></p>
+<h4><a name="helperservice-o2a-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#o2a"><p><code>o2a(object, clone?, limit?)</code></p>
 </a></h4>
 
 **The `o2a` call signature.**
@@ -195,7 +195,7 @@
 
 ---
 
-<h4><a name="helperservice-orderby-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#orderby"><p><code>orderBy(collection, iteratees, orders, guard?)</code></p>
+<h4><a name="helperservice-orderby-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#orderby"><p><code>orderBy(collection, iteratees, orders, guard?)</code></p>
 </a></h4>
 
 **The `orderBy` call signature.**
@@ -215,7 +215,7 @@
 
 ---
 
-<h4><a name="helperservice-retryinterval-0" href="https://ngx-useful.lamnhan.com/classes/helperservice.html#retryinterval"><p><code>retryInterval(matched, interval?, timeout?)</code></p>
+<h4><a name="helperservice-retryinterval-0" href="https://ngx-useful.lamnhan.com/docs/content/classes/helperservice.html#retryinterval"><p><code>retryInterval(matched, interval?, timeout?)</code></p>
 </a></h4>
 
 **The `retryInterval` call signature.**

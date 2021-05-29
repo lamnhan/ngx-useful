@@ -16,8 +16,6 @@ import 'prismjs/components/prism-json.min.js';
 // import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js';
 // import 'emoji-toolkit/lib/js/joypixels.min.js';
 
-import { MenuComponentModule } from '../menu/menu.module';
-
 import { ContentComponent } from './content.component';
 
 @NgModule({
@@ -26,7 +24,6 @@ import { ContentComponent } from './content.component';
     CommonModule,
     HttpClientModule,
     MarkdownModule,
-    MenuComponentModule,
     RouterLinkDirectiveModule,
   ],
   providers: [

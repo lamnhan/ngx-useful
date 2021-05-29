@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ContentComponentModule } from '../../components/content/content.module';
+import { PageComponentModule } from '../../components/page/page.module';
 
 import { GuidesRoutingModule } from './guides-routing.module';
 import { GuidesComponent } from './guides.component';
@@ -13,7 +13,7 @@ import { GuidesComponent } from './guides.component';
   ],
   imports: [
     CommonModule,
-    ContentComponentModule,
+    PageComponentModule,
     GuidesRoutingModule
   ]
 })

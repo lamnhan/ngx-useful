@@ -1,9 +1,9 @@
 <div class="guide-page" *ngIf="contentSrc$ | async as contentSrc; else loading">
-  <app-content
+  <app-page
     menuName="Getting started"
     [menuItems]="data.guideMenu"
     [contentSrc]="contentSrc"
-  ></app-content>
+  ></app-page>
 </div>
 
 <ng-template #loading>

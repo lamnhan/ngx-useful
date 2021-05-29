@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLinkDirectiveModule } from '@lamnhan/ngx-useful';
 
-import { ContentComponentModule } from '../../components/content/content.module';
+import { PageComponentModule } from '../../components/page/page.module';
 
 import { ServicesRoutingModule } from './services-routing.module';
 import { ServicesComponent } from './services.component';
@@ -14,7 +14,7 @@ import { ServicesComponent } from './services.component';
   imports: [
     CommonModule,
     RouterLinkDirectiveModule,
-    ContentComponentModule,
+    PageComponentModule,
     ServicesRoutingModule
   ]
 })

@@ -1,9 +1,9 @@
 <div class="guard-page" *ngIf="contentSrc$ | async as contentSrc; else loading">
-  <app-content
+  <app-page
     menuName="List of guards"
     [menuItems]="data.guardMenu"
     [contentSrc]="contentSrc"
-  ></app-content>
+  ></app-page>
 </div>
 
 <ng-template #loading>

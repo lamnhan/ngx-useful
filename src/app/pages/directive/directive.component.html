@@ -1,9 +1,9 @@
 <div class="directive-page" *ngIf="contentSrc$ | async as contentSrc; else loading">
-  <app-content
+  <app-page
     menuName="List of directives"
     [menuItems]="data.directiveMenu"
     [contentSrc]="contentSrc"
-  ></app-content>
+  ></app-page>
 </div>
 
 <ng-template #loading>

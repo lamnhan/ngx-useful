@@ -1,5 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { NavItem } from '@lamnhan/ngx-useful';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-content',
@@ -7,19 +6,16 @@ import { NavItem } from '@lamnhan/ngx-useful';
   styleUrls: ['./content.component.scss']
 })
 export class ContentComponent implements OnInit {
-  @Input() menuName = '';
-  @Input() menuItems: NavItem[] = [];
   @Input() content = '';
   @Input() contentSrc?: string;
 
-  errorMessage = '';
+  @Output() ready: EventEmitter<void> = new EventEmitter();
+  @Output() load: EventEmitter<any> = new EventEmitter();
+  @Output() error: EventEmitter<any> = new EventEmitter();
 
   constructor() { }
 
-  ngOnInit(): void {}
-
-  onError(e: any) {
-    this.errorMessage = e.message;
+  ngOnInit(): void {
   }
 
 }

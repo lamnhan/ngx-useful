@@ -1,9 +1,9 @@
 <div class="service-page" *ngIf="contentSrc$ | async as contentSrc; else loading">
-  <app-content
+  <app-page
     menuName="List of services"
     [menuItems]="data.serviceMenu"
     [contentSrc]="contentSrc"
-  ></app-content>
+  ></app-page>
 </div>
 
 <ng-template #loading>

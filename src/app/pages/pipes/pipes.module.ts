@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ContentComponentModule } from '../../components/content/content.module';
+import { PageComponentModule } from '../../components/page/page.module';
 
 import { PipesRoutingModule } from './pipes-routing.module';
 import { PipesComponent } from './pipes.component';
@@ -13,7 +13,7 @@ import { PipesComponent } from './pipes.component';
   ],
   imports: [
     CommonModule,
-    ContentComponentModule,
+    PageComponentModule,
     PipesRoutingModule
   ]
 })

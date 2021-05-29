@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ContentComponentModule } from '../../components/content/content.module';
+import { PageComponentModule } from '../../components/page/page.module';
 
 import { ServiceRoutingModule } from './service-routing.module';
 import { ServiceComponent } from './service.component';
@@ -12,7 +12,7 @@ import { ServiceComponent } from './service.component';
   ],
   imports: [
     CommonModule,
-    ContentComponentModule,
+    PageComponentModule,
     ServiceRoutingModule
   ]
 })

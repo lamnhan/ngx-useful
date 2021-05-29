@@ -1,10 +1,15 @@
 module.exports = {
-  url: 'https://ngx-useful.lamnhan.com',
+  url: 'https://ngx-useful.lamnhan.com/docs/content',
   srcPath: './projects/useful/src',
+  cleanOutput: true,
   webRender: {
     out: 'docs/content',
   },
   fileRender: {
+    'README.md': {
+      cleanOutput: false,
+      template: 'angularx'
+    },
     // services
     'docs/content/services/app.md': {main: ['AppService', 'FULL']},
     'docs/content/services/auth.md': {main: ['AuthService', 'FULL']},
@@ -21,11 +26,11 @@ module.exports = {
     'docs/content/services/setting.md': {main: ['SettingService', 'FULL']},
     'docs/content/services/user.md': {main: ['UserService', 'FULL']},
     // pipes
-    'docs/content/pipes/o1i.md': {main: ['O1iPipe', 'SELF']},
-    'docs/content/pipes/o2a.md': {main: ['O2aPipe', 'SELF']},
-    'docs/content/pipes/safe.md': {main: ['SafePipe', 'SELF']},
+    'docs/content/pipes/o1i.md': {main: ['O1iPipe', 'FULL_METHODS']},
+    'docs/content/pipes/o2a.md': {main: ['O2aPipe', 'FULL_METHODS']},
+    'docs/content/pipes/safe.md': {main: ['SafePipe', 'FULL_METHODS']},
     // directives
-    'docs/content/directives/router-link.md': {main: ['RouterLinkDirective', 'SELF']},
+    'docs/content/directives/router-link.md': {main: ['RouterLinkDirective', 'FULL']},
     // guards
     'docs/content/guards/auth.md': {main: ['AuthGuard', 'SELF']},
   }
