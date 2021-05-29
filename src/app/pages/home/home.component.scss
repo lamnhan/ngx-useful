@@ -7,17 +7,27 @@
       font-size: 1.5rem;
       font-weight: 700;
       text-transform: uppercase;
-    }
+      padding-bottom: .5rem;
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
 
-    .content {
-      margin-top: 2rem;
+      &::before {
+        display: block;
+        content: '';
+        width: 7rem;
+        height: 1.7rem;
+        margin-right: 2rem;
+        background: var(--app-color-medium);
+      }
     }
   }
 
-  .head {
+  .heading {
     margin-bottom: 4rem;
     padding-bottom: 4rem;
     background: var(--app-color-background-shade);
+    border-bottom: .25rem solid var(--app-color-medium);
 
     .image {
 
@@ -65,11 +75,89 @@
 
   .features {
     padding: 1rem;
+
+    .title {
+
+      &::before {
+        background: var(--app-gradient-success);
+      }
+    }
+
+    ul.content {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      margin-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+
+      li {
+        width: 100%;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        padding: 1rem;
+
+        .thumbnail {
+          width: 5rem;
+          height: 5rem;
+          padding: 1rem;
+          border-radius: 100%;
+          background: var(--app-color-background-shade);
+
+          img {
+            width: 100%;
+          }
+        }
+
+        .text {
+          flex: 1;
+          max-width: calc(100% - 7rem);
+          margin-left: 2rem;
+
+          h3 {
+            font-size: 1.5rem;
+          }
+        }
+      }
+    }
   }
   
-  .install {
+  .getting-started {
     padding: 1rem;
     margin-top: 2rem;
+    
+    .title {
+
+      &::before {
+        background: var(--app-gradient-secondary);
+      }
+    }
+
+    ul.content {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      margin-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+
+      li {
+        width: 100%;
+        margin-bottom: 2rem;
+        border: 1px solid var(--app-color-foreground);
+
+        .head {
+          padding: .5rem 1rem;
+          background: var(--app-color-foreground);
+          color: var(--app-color-background);
+        }
+
+        .body {
+          padding: 1rem;
+        }
+      }
+    }
   }
 }
 
@@ -77,7 +165,7 @@
 
   .home-page {
 
-    .head {
+    .heading {
 
       .text h1 {
         font-size: 5rem;
@@ -100,7 +188,7 @@
 
   .home-page {
 
-    .head .text h1 {
+    .heading .text h1 {
       font-size: 6rem;
     }
   }
@@ -110,8 +198,20 @@
 
   .home-page {
 
-    .head .text h1 {
+    .heading .text h1 {
       font-size: 7rem;
+    }
+
+    .features {
+
+      ul.content {
+        margin-left: -1rem;
+        
+        li {
+          width: calc(50% - 2rem);
+          margin-left: 1rem;
+        }
+      }
     }
   }
 }
@@ -120,8 +220,20 @@
 
   .home-page {
 
-    .head .text h1 {
+    .heading .text h1 {
       font-size: 8rem;
+    }
+
+    .getting-started {
+
+      ul.content {
+        margin-left: -1rem;
+        
+        li {
+          width: calc(50% - 2rem);
+          margin-left: 1rem;
+        }
+      }
     }
   }
 }

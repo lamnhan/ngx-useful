@@ -77,6 +77,24 @@
 						<li><a href="https://ngx-useful.lamnhan.com/docs/content">Detail API reference</a></li>
 					</ul>
 				</section>
+				<section id="getting-started">
+					<a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
+						<h2>Getting started</h2>
+					</a>
+					<p>Install ngx-useful:</p>
+					<pre><code class="language-sh">npm install --save @lamnhan/ngx-useful@0.0.8</code></pre>
+					<p>You may also want to install <a href="https://unistylus.lamnhan.com">@lamnhan/unistylus</a>.</p>
+					<p>Basic usage, three steps to use a service:</p>
+					<pre><code class="language-ts"><span class="hljs-comment">// 1. provide services in ---&gt; app.module.ts</span>
+{ ..., <span class="hljs-attr">providers</span>: [AppService], ... }
+
+<span class="hljs-comment">// 2. init services in ---&gt; app.component.ts</span>
+<span class="hljs-built_in">this</span>.appService.init(...);
+
+<span class="hljs-comment">// 3. inject where needed</span>
+<span class="hljs-function"><span class="hljs-title">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> appService: AppService</span>)</span> {}</code></pre>
+					<p>See <a href="https://ngx-useful.lamnhan.com/guides">guides</a> for more articles. Also see the list of: <a href="https://ngx-useful.lamnhan.com/services">services</a>, <a href="https://ngx-useful.lamnhan.com/pipes">pipes</a>, <a href="https://ngx-useful.lamnhan.com/directives">directives</a>, <a href="https://ngx-useful.lamnhan.com/guards">guards</a>.</p>
+				</section>
 				<section id="modules" data-note="AUTO-GENERATED CONTENT, DO NOT EDIT DIRECTLY!">
 					<h2><a name="modules"><p>Modules</p>
 					</a></h2>

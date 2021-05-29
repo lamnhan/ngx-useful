@@ -1,5 +1,5 @@
 module.exports = {
-  url: 'https://ngx-useful.lamnhan.com/docs/content',
+  url: 'https://ngx-useful.lamnhan.com/content/reference',
   srcPath: './projects/useful/src',
   cleanOutput: true,
   webRender: {
@@ -26,12 +26,12 @@ module.exports = {
     'docs/content/services/setting.md': {main: ['SettingService', 'FULL']},
     'docs/content/services/user.md': {main: ['UserService', 'FULL']},
     // pipes
-    'docs/content/pipes/o1i.md': {main: ['O1iPipe', 'FULL_METHODS']},
-    'docs/content/pipes/o2a.md': {main: ['O2aPipe', 'FULL_METHODS']},
-    'docs/content/pipes/safe.md': {main: ['SafePipe', 'FULL_METHODS']},
+    'docs/content/pipes/o1i.md': {main: ['O1iPipe', 'FULL']},
+    'docs/content/pipes/o2a.md': {main: ['O2aPipe', 'FULL']},
+    'docs/content/pipes/safe.md': {main: ['SafePipe', 'FULL']},
     // directives
     'docs/content/directives/router-link.md': {main: ['RouterLinkDirective', 'FULL']},
     // guards
-    'docs/content/guards/auth.md': {main: ['AuthGuard', 'SELF']},
+    'docs/content/guards/auth.md': {main: ['AuthGuard', 'FULL']},
   }
 };

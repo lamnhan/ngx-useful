@@ -1,6 +1,6 @@
 <div class="home-page">
 
-  <section class="head">
+  <section class="heading">
 
     <div class="image">
       <img src="/assets/images/featured.jpg" alt="Angular Useful">
@@ -33,18 +33,79 @@
     <div class="title">Why?</div>
 
     <ul class="content">
-      <li>XXX</li>
+
+      <li class="simple">
+        <div class="thumbnail"><img src="https://img.icons8.com/fluent/96/000000/flower.png"/></div>
+        <div class="text">
+          <h3>Simple</h3>
+          <p class="truncate">Conventional project structure</p>
+        </div>
+      </li>
+
+      <li class="theming">
+        <div class="thumbnail"><img src="https://img.icons8.com/fluent/96/000000/color-palette.png"/></div>
+        <div class="text">
+          <h3>Theming</h3>
+          <p class="truncate">Multiple themes</p>
+        </div>
+      </li>
+
+      <li class="i18n">
+        <div class="thumbnail"><img src="https://img.icons8.com/fluent/96/000000/language.png"/></div>
+        <div class="text">
+          <h3>I18N</h3>
+          <p class="truncate">Template, URL and content localization.</p>
+        </div>
+      </li>
+
+      <li class="persona">
+        <div class="thumbnail"><img src="https://img.icons8.com/fluent/96/000000/themes.png"/></div>
+        <div class="text">
+          <h3>Persona</h3>
+          <p class="truncate">Monoapp with multiple personas.</p>
+        </div>
+      </li>
+
+      <li class="splashscreen">
+        <div class="thumbnail"><img src="https://img.icons8.com/fluent/96/000000/wallpaper.png"/></div>
+        <div class="text">
+          <h3>Splash screen</h3>
+          <p class="truncate">In-app loading screen.</p>
+        </div>
+      </li>
+
+      <li class="database">
+        <div class="thumbnail"><img src="https://img.icons8.com/fluent/96/000000/database.png"/></div>
+        <div class="text">
+          <h3>Database</h3>
+          <p class="truncate">Database and state management.</p>
+        </div>
+      </li>
+
     </ul>
     
   </section>
   
-  <section class="install">
+  <section class="getting-started">
 
     <div class="title">How?</div>
 
-    <div class="content">
-      <p>To install: <code>npm install --save @lamnhan/ngx-useful@0.0.8</code></p>
-    </div>
+    <ul class="content">
+      <li>
+        <div class="head">Installation</div>
+        <div class="body">
+          <app-content [content]="installContent"></app-content>
+          <p>You may also want to install <a href="https://unistylus.lamnhan.com" target="_blank">@lamnhan/unistylus</a></p>
+        </div>
+      </li>
+      <li>
+        <div class="head">Basic usage</div>
+        <div class="body">
+          <app-content [content]="usageContent"></app-content>
+          <p>See <a [usefulRouterLink]="['guides']">guides</a> for more articles. Also see the list of: <a [usefulRouterLink]="['services']">services</a>, <a [usefulRouterLink]="['pipes']">pipes</a>, <a [usefulRouterLink]="['directives']">directives</a>, <a [usefulRouterLink]="['guards']">guards</a>.</p>
+        </div>
+      </li>
+    </ul>
 
   </section>
 
