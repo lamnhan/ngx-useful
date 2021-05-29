@@ -1,38 +1,75 @@
 .home-page {
-  padding: 3rem 1rem;
 
-  .heading {
-    width: 100%;
+  section {
 
-    h1 {
-      font-size: 4rem;
+    .title {
+      font-family: var(--app-font-head);
+      font-size: 1.5rem;
       font-weight: 700;
+      text-transform: uppercase;
     }
 
-    p {
-      font-size: 2rem;
-      color: var(--app-color-medium);
+    .content {
+      margin-top: 2rem;
     }
   }
 
-  .cta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+  .head {
+    margin-bottom: 4rem;
+    padding-bottom: 4rem;
+    background: var(--app-color-background-shade);
 
-    a.source-code {
-      display: flex;
-      align-items: center;
-      margin-top: 1rem;
+    .image {
 
-      .icon {
-        opacity: .5;
-      }
-
-      span {
-        margin-left: 1rem;
+      &, img {
+        width: 100%;
       }
     }
+
+    .text {
+      margin-top: 2rem;
+      padding: 0 1rem;
+  
+      h1 {
+        font-size: 4rem;
+        font-weight: 700;
+      }
+  
+      p {
+        font-size: 2rem;
+        color: var(--app-color-medium);
+      }
+    }
+  
+    .cta {
+      padding: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+  
+      a.source-code {
+        display: flex;
+        align-items: center;
+        margin-top: 1rem;
+  
+        .icon {
+          opacity: .5;
+        }
+  
+        span {
+          margin-left: 1rem;
+        }
+      }
+    }
+  }
+
+  .features {
+    padding: 1rem;
+  }
+  
+  .install {
+    padding: 1rem;
+    margin-top: 2rem;
   }
 }
 
@@ -40,41 +77,50 @@
 
   .home-page {
 
-    .heading h1 {
-      font-size: 5rem;
-    }
+    .head {
 
-    .cta {
-      flex-wrap: nowrap;
-
-      a.source-code {
-        margin-top: 0;
-        margin-left: 1rem;
+      .text h1 {
+        font-size: 5rem;
+      }
+  
+      .cta {
+        flex-wrap: nowrap;
+  
+        a.source-code {
+          margin-top: 0;
+          margin-left: 1rem;
+        }
       }
     }
+
   }
 }
 
 @media only screen and (min-width: 576px) {
 
-  .home-page .heading h1 {
-    font-size: 6rem;
+  .home-page {
+
+    .head .text h1 {
+      font-size: 6rem;
+    }
   }
 }
 
 @media only screen and (min-width: 768px) {
 
-  .home-page .heading h1 {
-    font-size: 7rem;
+  .home-page {
+
+    .head .text h1 {
+      font-size: 7rem;
+    }
   }
 }
 
 @media only screen and (min-width: 992px) {
 
   .home-page {
-    padding-top: 1rem;
 
-    .heading h1 {
+    .head .text h1 {
       font-size: 8rem;
     }
   }
