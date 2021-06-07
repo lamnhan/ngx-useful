@@ -229,10 +229,6 @@ export class NavService {
           clearTimeout(this.loadingIndicatorTimer);
           setTimeout(() => this.hideLoadingIndicator(), 1000);
         }
-        // handle locale, persona, theme in params
-        const routeUrl = this.router.url;
-        const routeQuery = this.route.snapshot.queryParams;
-        console.log({routeUrl, routeQuery, locales: this.i18nLocales});
       } else if (event instanceof NavigationEnd) {
         eventName = 'NavigationEnd';
         // set route url
@@ -267,7 +263,39 @@ export class NavService {
           }
         }
         // scroll to position
-        this.scrollTo(this.routePosition, 0, false);        
+        this.scrollTo(this.routePosition, 0, false);
+        // handle locale, persona, theme in params
+        if (this.integrations.settingService) {
+          const routeUrl = this.router.url.split('?').shift() as string;
+          const routeQuery = this.route.snapshot.queryParams;
+          const routeFirstParam = routeUrl.split('/')[1];
+          // change locale
+          if (
+            routeQuery.l
+            || routeQuery.locale
+            || this.i18nLocales.indexOf(routeFirstParam) !== -1
+          ) {
+            this.integrations.settingService.changeLocale(
+              routeQuery.l
+              || routeQuery.locale
+              || routeFirstParam
+            );
+          }
+          // change persona
+          if (routeQuery.p || routeQuery.persona) {
+            this.integrations.settingService.changePersona(
+              routeQuery.p
+              || routeQuery.persona
+            );
+          }
+          // change theme
+          if (routeQuery.t || routeQuery.theme) {
+            this.integrations.settingService.changeTheme(
+              routeQuery.t
+              || routeQuery.theme
+            );
+          }
+        }
       }
       // run hook
       const hook = hooks[eventName] || ((e: Event) => e);
