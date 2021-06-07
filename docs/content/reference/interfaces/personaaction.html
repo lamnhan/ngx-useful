@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>DatabaseIntegrations | @lamnhan/ngx-useful</title>
+	<title>PersonaAction | @lamnhan/ngx-useful</title>
 	<meta name="description" content="Documentation for @lamnhan/ngx-useful">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="databaseintegrations.html">DatabaseIntegrations</a>
+					<a href="personaaction.html">PersonaAction</a>
 				</li>
 			</ul>
-			<h1>Interface DatabaseIntegrations</h1>
+			<h1>Interface PersonaAction</h1>
 		</div>
 	</div>
 </header>
@@ -68,7 +68,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">DatabaseIntegrations</span>
+						<span class="target">PersonaAction</span>
 					</li>
 				</ul>
 			</section>
@@ -79,7 +79,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="databaseintegrations.html#cacheservice" class="tsd-kind-icon">cache<wbr>Service</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="personaaction.html#redirect" class="tsd-kind-icon">redirect</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="personaaction.html#theme" class="tsd-kind-icon">theme</a></li>
 							</ul>
 						</section>
 					</div>
@@ -88,12 +89,22 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="cacheservice" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> cache<wbr>Service</h3>
-					<div class="tsd-signature tsd-kind-icon">cache<wbr>Service<span class="tsd-signature-symbol">:</span> <a href="../classes/cacheservice.html" class="tsd-signature-type">CacheService</a></div>
+					<a name="redirect" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> redirect</h3>
+					<div class="tsd-signature tsd-kind-icon">redirect<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in projects/useful/src/lib/services/database/database.service.ts:24</li>
+							<li>Defined in projects/useful/src/lib/services/persona/persona.service.ts:28</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="theme" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> theme</h3>
+					<div class="tsd-signature tsd-kind-icon">theme<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in projects/useful/src/lib/services/persona/persona.service.ts:27</li>
 						</ul>
 					</aside>
 				</section>
@@ -112,10 +123,13 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="databaseintegrations.html" class="tsd-kind-icon">Database<wbr>Integrations</a>
+						<a href="personaaction.html" class="tsd-kind-icon">Persona<wbr>Action</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="databaseintegrations.html#cacheservice" class="tsd-kind-icon">cache<wbr>Service</a>
+								<a href="personaaction.html#redirect" class="tsd-kind-icon">redirect</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="personaaction.html#theme" class="tsd-kind-icon">theme</a>
 							</li>
 						</ul>
 					</li>

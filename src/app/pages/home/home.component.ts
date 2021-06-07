@@ -8,9 +8,16 @@ import { Component, OnInit } from '@angular/core';
 export class HomeComponent implements OnInit {
 
   installContent =
-`\`\`\`sh
-npm install --save @lamnhan/ngx-useful@0.0.8
-\`\`\``;
+`Using NPM:
+\`\`\`sh
+npm install --save @lamnhan/ngx-useful@0.0.9
+\`\`\`
+
+You may also [@lamnhan/unistylus](https://unistylus.lamnhan.com) (for theming):
+\`\`\`sh
+npm install --save @lamnhan/unistylus@0.0.10
+\`\`\`
+`;
 
   usageContent =
 `Three steps to use a service:

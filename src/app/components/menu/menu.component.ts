@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { NavService, NavItem } from '@lamnhan/ngx-useful';
+import { NavItem } from '@lamnhan/ngx-useful';
 
 @Component({
   selector: 'app-menu',
@@ -14,7 +14,7 @@ export class MenuComponent implements OnInit {
 
   mobileMenuExpanded = false;
 
-  constructor(public readonly nav: NavService) {}
+  constructor() {}
 
   ngOnInit(): void {}
 }

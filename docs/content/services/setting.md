@@ -23,12 +23,13 @@
 <h3><a name="settingservice-methods"><p>SettingService methods</p>
 </a></h3>
 
-| Function                                                              | Returns type                                                                                                                           | Description |
-| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| [changeLocale(value)](#settingservice-changelocale-0)                 | <code>void</code>                                                                                                                      |             |
-| [changePersona(name)](#settingservice-changepersona-0)                | <code>void</code>                                                                                                                      |             |
-| [changeTheme(name)](#settingservice-changetheme-0)                    | <code>void</code>                                                                                                                      |             |
-| [init(options?, settingData?, integrations?)](#settingservice-init-0) | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/settingservice.html" target="_blank">SettingService</a></code> |             |
+| Function                                                                    | Returns type                                                                                                                           | Description |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| [changeLocale(value)](#settingservice-changelocale-0)                       | <code>void</code>                                                                                                                      |             |
+| [changePersona(name)](#settingservice-changepersona-0)                      | <code>void</code>                                                                                                                      |             |
+| [changeTheme(name)](#settingservice-changetheme-0)                          | <code>void</code>                                                                                                                      |             |
+| [init(options?, settingData?, integrations?)](#settingservice-init-0)       | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/settingservice.html" target="_blank">SettingService</a></code> |             |
+| [initializeSettings(initialSettings)](#settingservice-initializesettings-0) | <code>void</code>                                                                                                                      |             |
 
 <h4><a name="settingservice-changelocale-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/settingservice.html#changelocale"><p><code>changeLocale(value)</code></p>
 </a></h4>
@@ -97,6 +98,23 @@
 **Returns**
 
 <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/settingservice.html" target="_blank">SettingService</a></code>
+
+---
+
+<h4><a name="settingservice-initializesettings-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/settingservice.html#initializesettings"><p><code>initializeSettings(initialSettings)</code></p>
+</a></h4>
+
+**The `initializeSettings` call signature.**
+
+**Parameters**
+
+| Param               | Type                                                                                                                                | Description |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **initialSettings** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/appsettings.html" target="_blank">AppSettings</a></code> |             |
+
+**Returns**
+
+<code>void</code>
 
 ---
 

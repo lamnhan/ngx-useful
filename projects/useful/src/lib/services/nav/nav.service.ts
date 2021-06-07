@@ -12,7 +12,7 @@ import {
 } from '@angular/router';
 import { Observable, ReplaySubject } from 'rxjs';
 
-import { SettingService } from '../setting/setting.service';
+import { SettingService, AppSettings } from '../setting/setting.service';
 
 export type NavRouterEventHooks = 'RouteConfigLoadStart' | 'RouteConfigLoadEnd' | 'NavigationEnd';
 
@@ -59,7 +59,8 @@ export interface NavAdvanced extends NavRouteProps {
 
 export interface NavOptions {
   i18nRedirect?: boolean;
-  pageOffset?: number;
+  globalOffset?: number;
+  settingInitializing?: boolean;
 }
 
 export interface NavIntegrations {
@@ -264,37 +265,28 @@ export class NavService {
         }
         // scroll to position
         this.scrollTo(this.routePosition, 0, false);
-        // handle locale, persona, theme in params
-        if (this.integrations.settingService) {
+        // forward setting in params
+        if (this.options.settingInitializing && this.integrations.settingService) {
           const routeUrl = this.router.url.split('?').shift() as string;
           const routeQuery = this.route.snapshot.queryParams;
-          const routeFirstParam = routeUrl.split('/')[1];
-          // change locale
+          const routeFirstParam = routeUrl.split('/')[1]; // posible a locale code
+          // process to change data
+          const initialSettings: AppSettings = {};
           if (
             routeQuery.l
             || routeQuery.locale
             || this.i18nLocales.indexOf(routeFirstParam) !== -1
           ) {
-            this.integrations.settingService.changeLocale(
-              routeQuery.l
-              || routeQuery.locale
-              || routeFirstParam
-            );
+            initialSettings.locale = routeQuery.l || routeQuery.locale || routeFirstParam;
           }
-          // change persona
           if (routeQuery.p || routeQuery.persona) {
-            this.integrations.settingService.changePersona(
-              routeQuery.p
-              || routeQuery.persona
-            );
+            initialSettings.persona = routeQuery.p || routeQuery.persona;
           }
-          // change theme
           if (routeQuery.t || routeQuery.theme) {
-            this.integrations.settingService.changeTheme(
-              routeQuery.t
-              || routeQuery.theme
-            );
+            initialSettings.theme = routeQuery.t || routeQuery.theme;
           }
+          // notify the setting services
+          this.integrations.settingService.initializeSettings(initialSettings);
         }
       }
       // run hook
@@ -422,7 +414,7 @@ export class NavService {
   scrollTo(input: number | string | HTMLElement, offset = 0, smooth = true) {
     const position = (typeof input === 'number' ? input : (typeof input === 'string' ? document.getElementById(input) : input)?.getBoundingClientRect()?.top) || 0;
     return window.scrollTo({
-      top: position + (offset || this.options.pageOffset || 0),
+      top: position + (offset || this.options.globalOffset || 0),
       behavior: smooth ? 'smooth' : 'auto',
     });
   }

@@ -33,7 +33,7 @@ export class AppComponent {
     );
     this.navService.init(
       {
-        pageOffset: 114,
+        settingInitializing: true,
       },
       { settingService: this.settingService },
     );

@@ -49,7 +49,7 @@ export class SettingService {
   private readonly LSK_LOCALE = 'setting_locale';
   private options: SettingOptions = {};
   private integrations: SettingIntegrations = {};
-
+  private initialSettings?: AppSettings;
 
   // builtin data
   themes: BuiltinDataItem[] = [{text: 'Light', value: 'light'}];
@@ -120,15 +120,21 @@ export class SettingService {
     return this as SettingService;
   }
 
+  initializeSettings(initialSettings: AppSettings) {
+    this.initialSettings = initialSettings;
+  }
+
   changeTheme(name: string) {
+    // set value
+    this.theme = name;
+    if (this.integrations.localstorageService) {
+      this.integrations.localstorageService.set(this.LSK_THEME, name);
+    }
+    // special
     if (this.theme !== name) {
       // affect
       document.body.setAttribute('data-theme', name);
-      // set value
-      this.theme = name;
-      if (this.integrations.localstorageService) {
-        this.integrations.localstorageService.set(this.LSK_THEME, name);
-      }
+      // set remote
       if (
         this.integrations.userService?.currentUser
         && this.integrations.userService.data?.settings?.theme !== name
@@ -145,12 +151,14 @@ export class SettingService {
       ? true
       : this.options.personaValidator(name, this.integrations.userService);
     name = isValid ? name : 'default';
+    // set value
+    this.persona = name;
+    if (this.integrations.localstorageService) {
+      this.integrations.localstorageService.set(this.LSK_PERSONA, name);
+    }
+    // special
     if (this.persona !== name) {
-      // set value
-      this.persona = name;
-      if (this.integrations.localstorageService) {
-        this.integrations.localstorageService.set(this.LSK_PERSONA, name);
-      }
+      // set remote
       if (
         this.integrations.userService?.currentUser
         && this.integrations.userService.data?.settings?.persona !== name
@@ -163,16 +171,18 @@ export class SettingService {
   }
 
   changeLocale(value: string) {
+    // set value
+    this.locale = value;
+    if (this.integrations.localstorageService) {
+      this.integrations.localstorageService.set(this.LSK_LOCALE, value);
+    }
+    // special
     if (this.locale !== value) {
       // affect
       if (this.integrations.translateService) {
         this.integrations.translateService.setActiveLang(value);
       }
-      // set value
-      this.locale = value;
-      if (this.integrations.localstorageService) {
-        this.integrations.localstorageService.set(this.LSK_LOCALE, value);
-      }
+      // set remote
       if (
         this.integrations.userService?.currentUser
         && this.integrations.userService.data?.settings?.locale !== value
@@ -198,20 +208,23 @@ export class SettingService {
       ? of(remoteTheme)
       // local
       : !this.integrations.localstorageService
-        ? of('light')
+        ? of(this.initialSettings?.theme || 'light')
         : this.integrations.localstorageService
           .get<string>(this.LSK_THEME)
           .pipe(
             switchMap(theme => of(
               theme
                 ? theme
-                // default
-                : (
-                  this.options.browserColor
-                  && (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-                )
-                  ? 'dark'
-                  : 'light'
+                // from initial
+                : this.initialSettings?.theme
+                  ? this.initialSettings.theme
+                  // default
+                  : (
+                    this.options.browserColor
+                    && (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+                  )
+                    ? 'dark'
+                    : 'light'
             ))
           );
   }
@@ -222,11 +235,19 @@ export class SettingService {
       ? of(remotePersona)
       // local
       : !this.integrations.localstorageService
-        ? of('default')
+        ? of(this.initialSettings?.persona || 'default')
         : this.integrations.localstorageService
           .get<string>(this.LSK_PERSONA)
           .pipe(
-            switchMap(persona => of(persona ? persona : 'default'))
+            switchMap(persona => of(
+              persona
+                ? persona
+                // from initial
+                : this.initialSettings?.persona
+                  ? this.initialSettings.persona
+                  // default
+                  : 'default'
+            ))
           );
   }
   
@@ -236,16 +257,20 @@ export class SettingService {
       ? of(remoteLocale)
       // locale
       : !this.integrations.localstorageService
-        ? of('en-US')
+        ? of(this.initialSettings?.locale || 'en-US')
         : this.integrations.localstorageService
           .get<string>(this.LSK_LOCALE)
           .pipe(
             switchMap(locale => of(
               locale
                 ? locale
-                : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
-                  ? navigator.language
-                  : 'en-US'
+                // from initial
+                : this.initialSettings?.locale
+                  ? this.initialSettings.locale
+                  // default
+                  : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
+                    ? navigator.language
+                    : 'en-US'
             ))
           );
   }

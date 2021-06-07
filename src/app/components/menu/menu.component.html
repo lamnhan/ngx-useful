@@ -17,7 +17,7 @@
           [href]="item.href"
           [usefulRouterLink]="item.routerLink"
           usefulRouterLinkActive="active"
-          (click)="mobileMenuExpanded=false; nav.scrollToTop(); select.emit(item)"
+          (click)="mobileMenuExpanded=false; select.emit(item)"
           [innerHtml]="item.text"
         ></a>
         <ng-template #noLinkElse>
