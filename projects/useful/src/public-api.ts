@@ -28,6 +28,7 @@ export * from './lib/directives/router-external-active/router-external-active.di
 export {RouterExternalActiveDirectiveModule} from './lib/directives/router-external-active/router-external-active.module';
 
 export * from './lib/guards/auth.guard';
+export * from './lib/guards/admin.guard';
 
 export * from './lib/services/helper/helper.service';
 export * from './lib/services/error/error.service';
