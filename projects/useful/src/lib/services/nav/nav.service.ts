@@ -42,11 +42,13 @@ export interface MenuItem extends NavItem {
 export interface NavRouteProps {
   title?: string;
   data?: Record<string, unknown>;
+  position?: number;
   extras?: NavigationExtras;
 }
 
 export interface NavHistoryItem extends NavRouteProps {
   url: string;
+  position: number;
 }
 
 export interface NavAdvanced extends NavRouteProps {
@@ -55,7 +57,8 @@ export interface NavAdvanced extends NavRouteProps {
 }
 
 export interface NavOptions {
-  i18nRedirect?: boolean
+  i18nRedirect?: boolean;
+  pageOffset?: number;
 }
 
 export interface NavIntegrations {
@@ -126,9 +129,11 @@ export class NavService {
   routeUrl = '/';
   routeTitle?: string;
   routeData?: Record<string, unknown>;
+  routePosition = 0;
   routeExtras?: NavigationExtras;
-
+  
   // history
+  private previousRoutePosition = 0;
   private previousRoutes: NavHistoryItem[] = [];
 
   // i18n
@@ -234,6 +239,7 @@ export class NavService {
           ) {
             this.previousRoutes.push({
               url: activeUrl,
+              position: this.previousRoutePosition,
               title: this.routeTitle,
               data: this.routeData ? {...this.routeData} : undefined,
               extras: this.routeExtras ? {...this.routeExtras} : undefined,
@@ -247,6 +253,8 @@ export class NavService {
             this.backwardEnabled = false;
           }
         }
+        // scroll to position
+        this.scrollTo(this.routePosition, 0, false);
       }
       // run hook
       const hook = hooks[eventName] || ((e: Event) => e);
@@ -333,12 +341,12 @@ export class NavService {
     if (!backwardRoute) {
       return;
     }
-    const { url, title, data, extras } = backwardRoute;
-    return this.navigate(url, {title, data, extras});
+    const { url, title, data, position, extras } = backwardRoute;
+    return this.navigate(url, {title, data, position, extras});
   }
 
   navigate(input: string | string[], advanced: NavAdvanced = {}) {
-    const {title, data, extras, backwardable, locale } = advanced;
+    const {title, data, position = 0, extras, backwardable, locale } = advanced;
     // handle backward navigation
     if (backwardable !== undefined) {
       this.backwardEnabled = backwardable;
@@ -349,6 +357,7 @@ export class NavService {
       // initial history (add current route as the first item)
       this.previousRoutes.push({
         url: this.router.url,
+        position: window.pageYOffset,
         title: this.routeTitle,
         data: this.routeData ? {...this.routeData} : undefined,
         extras: this.routeExtras ? {...this.routeExtras} : undefined,
@@ -357,21 +366,24 @@ export class NavService {
     // set values
     this.routeTitle = title;
     this.routeData = data;
+    this.routePosition = position;
     this.routeExtras = extras;
+    // previous
+    this.previousRoutePosition = window.pageYOffset;
     // do navigate
     return this.router.navigate(this.getRoute(input, locale), extras);
   }
 
-  scrollToTop(offset = 0) {
-    return this.scrollTo(document.body, offset);
+  scrollToTop(offset = 0, smooth = true) {
+    return this.scrollTo(0, offset, smooth);
   }
 
-  scrollTo(input: string | HTMLElement, offset = 0) {
-    const elm = typeof input === 'string'
-      ? document.getElementById(input)
-      : input;
-    const position = (elm?.getBoundingClientRect()?.top || 0) + window.pageYOffset + offset;
-    return window.scrollTo({top: position, behavior: 'smooth'});
+  scrollTo(input: number | string | HTMLElement, offset = 0, smooth = true) {
+    const position = (typeof input === 'number' ? input : (typeof input === 'string' ? document.getElementById(input) : input)?.getBoundingClientRect()?.top) || 0;
+    return window.scrollTo({
+      top: position + (offset || this.options.pageOffset || 0),
+      behavior: smooth ? 'smooth' : 'auto',
+    });
   }
 
   private parseRouterUrl(routerUrl: string) {
