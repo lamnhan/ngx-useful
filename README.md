@@ -25,7 +25,7 @@
 Install ngx-useful:
 
 ```sh
-npm install --save @lamnhan/ngx-useful@0.0.8
+npm install --save @lamnhan/ngx-useful@0.0.10
 ```
 
 You may also want to install [@lamnhan/unistylus](https://unistylus.lamnhan.com).
