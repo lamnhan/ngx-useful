@@ -362,15 +362,16 @@ export class NavService {
     return this.router.navigate(this.getRoute(input, locale), extras);
   }
 
-  scrollToTop() {
-    return this.scrollTo(document.body);
+  scrollToTop(offset = 0) {
+    return this.scrollTo(document.body, offset);
   }
 
-  scrollTo(input: string | HTMLElement) {
+  scrollTo(input: string | HTMLElement, offset = 0) {
     const elm = typeof input === 'string'
       ? document.getElementById(input)
       : input;
-    return elm?.scrollIntoView({ behavior: 'smooth' });
+    const position = (elm?.getBoundingClientRect()?.top || 0) + window.pageYOffset + offset;
+    return window.scrollTo({top: position, behavior: 'smooth'});
   }
 
   private parseRouterUrl(routerUrl: string) {
