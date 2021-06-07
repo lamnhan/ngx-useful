@@ -1,5 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import {
+  ActivatedRoute,
   Router,
   Route,
   Routes,
@@ -86,6 +87,10 @@ export function i18nRoutes(
   const allRoutes: Routes = [];
   // home
   allRoutes.push(homeRoute);
+  // special localized home
+  Object
+    .keys(routeTranslations[Object.keys(routeTranslations)[0]])
+    .forEach(locale => allRoutes.push({...homeRoute, path: locale}));
   // routes
   routes.forEach(route => {
     // main
@@ -137,13 +142,15 @@ export class NavService {
   private previousRoutes: NavHistoryItem[] = [];
 
   // i18n
+  private i18nLocales: string[] = [];
   private i18nRouting?: I18nRouting;
   private i18nOrigins: Record<string, string> = {};
   public readonly onRefreshRouterLink = new ReplaySubject<void>(1);
 
   constructor(
-    private readonly ngZone: NgZone,
-    private readonly router: Router,
+    private ngZone: NgZone,
+    private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   init(
@@ -160,6 +167,8 @@ export class NavService {
     // handle i18n
     if (i18nRegistry) {
       const { routes, routeTranslations } = i18nRegistry;
+      // save i18n locales
+      this.i18nLocales = Object.keys(routeTranslations[Object.keys(routeTranslations)[0]]);
       // process routes / translations
       this.i18nRouting = {};
       routes.forEach(route => {
@@ -220,6 +229,10 @@ export class NavService {
           clearTimeout(this.loadingIndicatorTimer);
           setTimeout(() => this.hideLoadingIndicator(), 1000);
         }
+        // handle locale, persona, theme in params
+        const routeUrl = this.router.url;
+        const routeQuery = this.route.snapshot.queryParams;
+        console.log({routeUrl, routeQuery, locales: this.i18nLocales});
       } else if (event instanceof NavigationEnd) {
         eventName = 'NavigationEnd';
         // set route url
@@ -254,7 +267,7 @@ export class NavService {
           }
         }
         // scroll to position
-        this.scrollTo(this.routePosition, 0, false);
+        this.scrollTo(this.routePosition, 0, false);        
       }
       // run hook
       const hook = hooks[eventName] || ((e: Event) => e);

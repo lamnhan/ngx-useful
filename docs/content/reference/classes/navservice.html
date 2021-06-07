@@ -97,6 +97,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="navservice.html#onrefreshrouterlink" class="tsd-kind-icon">on<wbr>Refresh<wbr>Router<wbr>Link</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="navservice.html#routedata" class="tsd-kind-icon">route<wbr>Data</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="navservice.html#routeextras" class="tsd-kind-icon">route<wbr>Extras</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="navservice.html#routeposition" class="tsd-kind-icon">route<wbr>Position</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="navservice.html#routetitle" class="tsd-kind-icon">route<wbr>Title</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="navservice.html#routeurl" class="tsd-kind-icon">route<wbr>Url</a></li>
 							</ul>
@@ -130,13 +131,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Nav<wbr>Service<span class="tsd-signature-symbol">(</span>ngZone<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">NgZone</span>, router<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Router</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="navservice.html" class="tsd-signature-type">NavService</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Nav<wbr>Service<span class="tsd-signature-symbol">(</span>ngZone<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">NgZone</span>, router<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Router</span>, route<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ActivatedRoute</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="navservice.html" class="tsd-signature-type">NavService</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:137</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L148">projects/useful/src/lib/services/nav/nav.service.ts:148</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -146,6 +147,9 @@
 								</li>
 								<li>
 									<h5>router: <span class="tsd-signature-type">Router</span></h5>
+								</li>
+								<li>
+									<h5>route: <span class="tsd-signature-type">ActivatedRoute</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="navservice.html" class="tsd-signature-type">NavService</a></h4>
@@ -161,7 +165,7 @@
 					<div class="tsd-signature tsd-kind-icon">loading<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:120</li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L128">projects/useful/src/lib/services/nav/nav.service.ts:128</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -171,7 +175,7 @@
 					<div class="tsd-signature tsd-kind-icon">menu<wbr>Visible<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:121</li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L129">projects/useful/src/lib/services/nav/nav.service.ts:129</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -181,7 +185,7 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Refresh<wbr>Router<wbr>Link<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ReplaySubject</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = new ReplaySubject&lt;void&gt;(1)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:137</li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L148">projects/useful/src/lib/services/nav/nav.service.ts:148</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -191,7 +195,7 @@
 					<div class="tsd-signature tsd-kind-icon">route<wbr>Data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:128</li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L136">projects/useful/src/lib/services/nav/nav.service.ts:136</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -201,7 +205,17 @@
 					<div class="tsd-signature tsd-kind-icon">route<wbr>Extras<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">NavigationExtras</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:129</li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L138">projects/useful/src/lib/services/nav/nav.service.ts:138</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="routeposition" class="tsd-anchor"></a>
+					<h3>route<wbr>Position</h3>
+					<div class="tsd-signature tsd-kind-icon">route<wbr>Position<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L137">projects/useful/src/lib/services/nav/nav.service.ts:137</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -211,7 +225,7 @@
 					<div class="tsd-signature tsd-kind-icon">route<wbr>Title<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:127</li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L135">projects/useful/src/lib/services/nav/nav.service.ts:135</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -221,7 +235,7 @@
 					<div class="tsd-signature tsd-kind-icon">route<wbr>Url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;/&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:126</li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L134">projects/useful/src/lib/services/nav/nav.service.ts:134</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -238,7 +252,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:331</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L352">projects/useful/src/lib/services/nav/nav.service.ts:352</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -255,7 +269,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:275</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L296">projects/useful/src/lib/services/nav/nav.service.ts:296</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -281,7 +295,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:287</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L308">projects/useful/src/lib/services/nav/nav.service.ts:308</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -307,7 +321,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:319</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L340">projects/useful/src/lib/services/nav/nav.service.ts:340</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -333,7 +347,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:283</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L304">projects/useful/src/lib/services/nav/nav.service.ts:304</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -350,7 +364,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:144</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L156">projects/useful/src/lib/services/nav/nav.service.ts:156</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -384,7 +398,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:259</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L280">projects/useful/src/lib/services/nav/nav.service.ts:280</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -410,7 +424,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:268</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L289">projects/useful/src/lib/services/nav/nav.service.ts:289</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -427,7 +441,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:263</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L284">projects/useful/src/lib/services/nav/nav.service.ts:284</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -456,7 +470,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:323</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L344">projects/useful/src/lib/services/nav/nav.service.ts:344</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -473,7 +487,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:340</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L361">projects/useful/src/lib/services/nav/nav.service.ts:361</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -493,22 +507,28 @@
 					<a name="scrollto" class="tsd-anchor"></a>
 					<h3>scroll<wbr>To</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">scroll<wbr>To<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLElement</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">scroll<wbr>To<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLElement</span>, offset<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, smooth<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:369</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L394">projects/useful/src/lib/services/nav/nav.service.ts:394</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>input: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLElement</span></h5>
+									<h5>input: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLElement</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> offset: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> smooth: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -516,16 +536,25 @@
 					<a name="scrolltotop" class="tsd-anchor"></a>
 					<h3>scroll<wbr>ToTop</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">scroll<wbr>ToTop<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">scroll<wbr>ToTop<span class="tsd-signature-symbol">(</span>offset<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, smooth<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:365</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L390">projects/useful/src/lib/services/nav/nav.service.ts:390</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> offset: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> smooth: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -539,7 +568,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:279</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L300">projects/useful/src/lib/services/nav/nav.service.ts:300</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -556,7 +585,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in projects/useful/src/lib/services/nav/nav.service.ts:327</li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/de79f95/projects/useful/src/lib/services/nav/nav.service.ts#L348">projects/useful/src/lib/services/nav/nav.service.ts:348</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -597,6 +626,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="navservice.html#routeextras" class="tsd-kind-icon">route<wbr>Extras</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="navservice.html#routeposition" class="tsd-kind-icon">route<wbr>Position</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="navservice.html#routetitle" class="tsd-kind-icon">route<wbr>Title</a>

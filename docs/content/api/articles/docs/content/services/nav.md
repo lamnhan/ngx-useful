@@ -15,6 +15,7 @@
 | [onRefreshRouterLink](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#onrefreshrouterlink) | <code>ReplaySubject<void></code>     |             |
 | [routeData](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routedata)                     | <code>Record<string, unknown></code> |             |
 | [routeExtras](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routeextras)                 | <code>NavigationExtras</code>        |             |
+| [routePosition](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routeposition)             | <code>number</code>                  |             |
 | [routeTitle](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routetitle)                   | <code>undefined \| string</code>     |             |
 | [routeUrl](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routeurl)                       | <code>string</code>                  |             |
 
@@ -34,8 +35,8 @@
 | [isRouteActive(input, exact?, withLocale?)](#navservice-isrouteactive-0)   | <code>boolean</code>                                                                                                           |             |
 | [menuAction()](#navservice-menuaction-0)                                   | <code>void \| Promise<boolean></code>                                                                                          |             |
 | [navigate(input, advanced?)](#navservice-navigate-0)                       | <code>Promise<boolean></code>                                                                                                  |             |
-| [scrollTo(input)](#navservice-scrollto-0)                                  | <code>undefined \| void</code>                                                                                                 |             |
-| [scrollToTop()](#navservice-scrolltotop-0)                                 | <code>undefined \| void</code>                                                                                                 |             |
+| [scrollTo(input, offset?, smooth?)](#navservice-scrollto-0)                | <code>void</code>                                                                                                              |             |
+| [scrollToTop(offset?, smooth?)](#navservice-scrolltotop-0)                 | <code>void</code>                                                                                                              |             |
 | [showLoadingIndicator()](#navservice-showloadingindicator-0)               | <code>void</code>                                                                                                              |             |
 | [toggleMenu()](#navservice-togglemenu-0)                                   | <code>void</code>                                                                                                              |             |
 
@@ -212,31 +213,40 @@
 
 ---
 
-<h4><a name="navservice-scrollto-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#scrollto"><p><code>scrollTo(input)</code></p>
+<h4><a name="navservice-scrollto-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#scrollto"><p><code>scrollTo(input, offset?, smooth?)</code></p>
 </a></h4>
 
 **The `scrollTo` call signature.**
 
 **Parameters**
 
-| Param     | Type                               | Description |
-| --------- | ---------------------------------- | ----------- |
-| **input** | <code>string \| HTMLElement</code> |             |
+| Param     | Type                                         | Description |
+| --------- | -------------------------------------------- | ----------- |
+| **input** | <code>number \| string \| HTMLElement</code> |             |
+| offset    | <code>number</code>                          |             |
+| smooth    | <code>boolean</code>                         |             |
 
 **Returns**
 
-<code>undefined | void</code>
+<code>void</code>
 
 ---
 
-<h4><a name="navservice-scrolltotop-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#scrolltotop"><p><code>scrollToTop()</code></p>
+<h4><a name="navservice-scrolltotop-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#scrolltotop"><p><code>scrollToTop(offset?, smooth?)</code></p>
 </a></h4>
 
 **The `scrollToTop` call signature.**
 
+**Parameters**
+
+| Param  | Type                 | Description |
+| ------ | -------------------- | ----------- |
+| offset | <code>number</code>  |             |
+| smooth | <code>boolean</code> |             |
+
 **Returns**
 
-<code>undefined | void</code>
+<code>void</code>
 
 ---
 
