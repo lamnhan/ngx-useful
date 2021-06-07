@@ -64,8 +64,9 @@
 
       strong {
         display: block;
-        font-weight: 500;
-        color: var(--app-color-foreground);
+        color: var(--app-color-medium);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
       }
 
       a {
@@ -73,10 +74,8 @@
         text-decoration: none;
         color: var(--app-color-foreground);
         padding: .5rem 1rem;
-        opacity: .7;
         
         &:hover, &:focus, &:active, &.active {
-          opacity: 1;
           background: var(--app-color-background-shade);
         }
       }

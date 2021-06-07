@@ -16,9 +16,11 @@
  * ====================================================
  */
 
-// use light and dark theme
-@import '../../unistylus/projects/unistylus/src/scss/unistylus-light-dark';
+// register skins
+@import '../../unistylus/projects/unistylus/src/scss/skins/light-default';
+@import '../../unistylus/projects/unistylus/src/scss/skins/dark';
 
+// modify "default" and "dark" skin
 :root,
 [data-theme=default],
 [data-theme=light],
@@ -28,12 +30,15 @@
   --app-font-body: 'Roboto', sans-serif;
 }
 
-// register app styles
+// register soul
+@import '../../unistylus/projects/unistylus/src/scss/souls/bootstrap/full';
+
+// register app
 @import './theming/app.module';
 
 /**
  * ====================================================
- * Global styles 
+ * App styles 
  * ====================================================
  */
 
