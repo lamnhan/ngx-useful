@@ -125,12 +125,6 @@ export class SettingService {
   }
 
   changeTheme(name: string) {
-    // set value
-    this.theme = name;
-    if (this.integrations.localstorageService) {
-      this.integrations.localstorageService.set(this.LSK_THEME, name);
-    }
-    // special
     if (this.theme !== name) {
       // affect
       document.body.setAttribute('data-theme', name);
@@ -144,6 +138,11 @@ export class SettingService {
       // event
       this.onThemeChanged.next(name);
     }
+    // set value
+    this.theme = name;
+    if (this.integrations.localstorageService) {
+      this.integrations.localstorageService.set(this.LSK_THEME, name);
+    }
   }
 
   changePersona(name: string) {
@@ -151,12 +150,6 @@ export class SettingService {
       ? true
       : this.options.personaValidator(name, this.integrations.userService);
     name = isValid ? name : 'default';
-    // set value
-    this.persona = name;
-    if (this.integrations.localstorageService) {
-      this.integrations.localstorageService.set(this.LSK_PERSONA, name);
-    }
-    // special
     if (this.persona !== name) {
       // set remote
       if (
@@ -168,15 +161,14 @@ export class SettingService {
       // event
       this.onPersonaChanged.next(name);
     }
+    // set value
+    this.persona = name;
+    if (this.integrations.localstorageService) {
+      this.integrations.localstorageService.set(this.LSK_PERSONA, name);
+    }
   }
 
   changeLocale(value: string) {
-    // set value
-    this.locale = value;
-    if (this.integrations.localstorageService) {
-      this.integrations.localstorageService.set(this.LSK_LOCALE, value);
-    }
-    // special
     if (this.locale !== value) {
       // affect
       if (this.integrations.translateService) {
@@ -191,6 +183,11 @@ export class SettingService {
       }
       // event
       this.onLocaleChanged.next(value);
+    }
+    // set value
+    this.locale = value;
+    if (this.integrations.localstorageService) {
+      this.integrations.localstorageService.set(this.LSK_LOCALE, value);
     }
   }
 
