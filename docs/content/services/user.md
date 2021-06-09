@@ -15,7 +15,7 @@
 | [level](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#level)                 | <code>number</code>                                                                                                            |             |
 | [onUserChanged](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#onuserchanged) | <code>ReplaySubject<undefined \| User></code>                                                                                  |             |
 | [publicData](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#publicdata)       | <code>Profile</code>                                                                                                           |             |
-| [role](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#role)                   | <code>string</code>                                                                                                            |             |
+| [role](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#role)                   | <code>UserRoles</code>                                                                                                         |             |
 | [uid](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#uid)                     | <code>undefined \| string</code>                                                                                               |             |
 | [username](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#username)           | <code>undefined \| string</code>                                                                                               |             |
 
@@ -148,7 +148,7 @@
 
 | Param               | Type                                                                                                                                          | Description |
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| **userDataService** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/userdataservice.html" target="_blank">UserDataService</a></code>      |             |
+| **userDataService** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/globals.html#userdataservice" target="_blank">UserDataService</a></code>      |             |
 | options             | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/useroptions.html" target="_blank">UserOptions</a></code>           |             |
 | integrations        | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/userintegrations.html" target="_blank">UserIntegrations</a></code> |             |
 

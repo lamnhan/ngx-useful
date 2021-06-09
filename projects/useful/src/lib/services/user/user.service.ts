@@ -9,16 +9,20 @@ import {
   UserSettings,
   UserAddress,
   UserPublicly,
+  UserClaims,
+  UserRoles,
 } from '@lamnhan/schemata';
 
 import { HelperService } from '../helper/helper.service';
-import { NullableOptional } from '../database/database.service';
+import { NullableOptional, DatabaseData } from '../database/database.service';
 import { AuthService } from '../auth/auth.service';
-import { UserDataService } from '../../../schemata/services/user/user.service';
-import { ProfileDataService } from '../../../schemata/services/profile/profile.service';
+
 
 export type NativeUser = firebase.User;
 export type NativeUserCredential = firebase.auth.UserCredential;
+
+export type UserDataService = DatabaseData<User>;
+export type ProfileDataService = DatabaseData<Profile>;
 
 export interface UserOptions {
   profilePublished?: boolean;
@@ -41,7 +45,7 @@ export class UserService {
   publicData?: Profile;
   uid?: string;
   username?: string;
-  role = 'subscriber';
+  role: UserRoles = 'subscriber';
   level = 1;
 
   public readonly onUserChanged = new ReplaySubject<undefined | User>(1);
@@ -91,7 +95,7 @@ export class UserService {
         this.uid = this.currentUser?.uid;
         this.username = this.data?.username;
         this.role = this.getRole(this.data?.claims);
-        this.level = this.getLevel(this.data?.claims);
+        this.level = this.getLevel(this.role);
         // user changed
         this.onUserChanged.next(this.data);
       });
@@ -489,23 +493,16 @@ export class UserService {
     }));
   }
 
-  private getRole(claims: Record<string, unknown> = {}) {
-    const { sadmin, admin, editor, author, contributor } = claims;
-    return sadmin ? 'sadmin'
-      : admin ? 'admin'
-      : editor ? 'editor'
-      : author ? 'author'
-      : contributor ? 'contributor'
-      : 'subscriber';
+  private getRole(claims: UserClaims = {}) {
+    return claims.role || 'subscriber';
   }
 
-  private getLevel(claims: Record<string, unknown> = {}) {
-    const { sadmin, admin, editor, author, contributor } = claims;
-    return sadmin ? 6
-      : admin ? 5
-      : editor ? 4
-      : author ? 3
-      : contributor ? 2
+  private getLevel(role?: UserRoles) {
+    return role === 'sadmin' ? 6
+      :  role === 'admin' ? 5
+      :  role === 'editor' ? 4
+      :  role === 'author' ? 3
+      :  role === 'contributor' ? 2
       : 1;
   }
 }

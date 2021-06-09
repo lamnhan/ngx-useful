@@ -44,8 +44,7 @@ export class AppComponent {
         image: 'https://ngx-useful.lamnhan.com/assets/images/featured.jpg',
         url: 'https://ngx-useful.lamnhan.com/',
         lang: 'en',
-        ogLocale: 'en-US',
-        ogSiteName: 'Angular Useful'
+        ogLocale: 'en-US'
       },
       {},
       { settingService: this.settingService },
