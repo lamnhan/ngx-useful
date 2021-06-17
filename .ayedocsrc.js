@@ -33,5 +33,6 @@ module.exports = {
     'docs/content/directives/router-link.md': {main: ['RouterLinkDirective', 'FULL']},
     // guards
     'docs/content/guards/auth.md': {main: ['AuthGuard', 'FULL']},
+    'docs/content/guards/admin.md': {main: ['AdminGuard', 'FULL']},
   }
 };

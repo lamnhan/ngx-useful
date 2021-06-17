@@ -17,8 +17,8 @@
  */
 
 // register skins
-@import '../../unistylus/projects/unistylus/src/scss/skins/light-default';
-@import '../../unistylus/projects/unistylus/src/scss/skins/dark';
+@import '@unistylus/core/scss/skins/light-default';
+@import '@unistylus/core/scss/skins/dark';
 
 // modify "default" and "dark" skin
 :root,
@@ -31,7 +31,15 @@
 }
 
 // register soul
-@import '../../unistylus/projects/unistylus/src/scss/souls/bootstrap/full';
+@import '@unistylus/bootstrap/reset';
+@import '@unistylus/bootstrap/core';
+@import '@unistylus/bootstrap/content/typography';
+@import '@unistylus/bootstrap/form/form-switch';
+@import '@unistylus/bootstrap/components/icon';
+@import '@unistylus/bootstrap/components/table';
+@import '@unistylus/bootstrap/components/button-outline-light';
+@import '@unistylus/bootstrap/components/button-primary-xl';
+@import '@unistylus/bootstrap/components/button-outline-medium-xl';
 
 // register app
 @import './theming/app.module';

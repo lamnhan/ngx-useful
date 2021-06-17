@@ -140,6 +140,11 @@ export class DataService {
       level: 1,
       routerLink: ['guard', 'auth']
     },
+    {
+      text: 'Admin',
+      level: 1,
+      routerLink: ['guard', 'admin']
+    },
   ];
 
   constructor() { }
