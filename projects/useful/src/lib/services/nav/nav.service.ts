@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   ActivatedRoute,
   Router,
@@ -58,7 +58,6 @@ export interface NavAdvanced extends NavRouteProps {
 }
 
 export interface NavOptions {
-  i18nRedirect?: boolean;
   globalOffset?: number;
   settingInitializing?: boolean;
 }
@@ -145,11 +144,9 @@ export class NavService {
   // i18n
   private i18nLocales: string[] = [];
   private i18nRouting?: I18nRouting;
-  private i18nOrigins: Record<string, string> = {};
   public readonly onRefreshRouterLink = new ReplaySubject<void>(1);
 
   constructor(
-    private ngZone: NgZone,
     private router: Router,
     private route: ActivatedRoute,
   ) {}
@@ -183,11 +180,9 @@ export class NavService {
             const localizedPath = translation[locale];
             if (localizedPath === true) {
               routingItem[locale] = pathMap;
-              this.i18nOrigins[pathMap[0]] = locale;
             } else {
               const localizedPathMap = localizedPath.split('/').filter(value => !!value);
               routingItem[locale] = localizedPathMap;
-              this.i18nOrigins[localizedPathMap[0]] = locale;
             }
           });
         }
@@ -199,19 +194,6 @@ export class NavService {
           }
         });
       });
-      // watch for locale
-      if (this.options.i18nRedirect && this.integrations.settingService) {
-        this.integrations.settingService.onLocaleChanged.subscribe(locale => {
-          // refresh router link
-          this.onRefreshRouterLink.next();
-          // redirect i18n route
-          const {url, extras} = this.parseRouterUrl(this.router.url);
-          const pathInit = url.substr(1).split('/').shift() as string;
-          if (pathInit !== '' && this.i18nOrigins[pathInit] !== locale) {
-            this.ngZone.run(() => this.navigate(url, {extras, locale, backwardable: false}));
-          }
-        });
-      }
     }
     // register events
     this.router
