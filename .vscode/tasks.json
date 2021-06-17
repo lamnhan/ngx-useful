@@ -1,0 +1,38 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build:lib",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"label": "npm: build:lib",
+			"detail": "ng build useful && cpy README.md LICENSE dist/useful"
+		},
+		{
+			"type": "npm",
+			"script": "deploy:lib",
+			"problemMatcher": [],
+			"label": "npm: deploy:lib",
+			"detail": "cd ./dist/useful && npm publish && cd ../../"
+		},
+		{
+			"type": "npm",
+			"script": "build:app",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build:app",
+			"detail": "ng build && ayedocs generate"
+		},
+		{
+			"type": "npm",
+			"script": "deploy:app",
+			"problemMatcher": [],
+			"label": "npm: deploy:app",
+			"detail": "git add . && git commit -m 'deploy:app' && git push"
+		}
+	]
+}

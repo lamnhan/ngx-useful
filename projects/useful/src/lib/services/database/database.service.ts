@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { from, Observable } from 'rxjs';
+import { from, of, Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
@@ -18,6 +18,7 @@ export type DatabaseCollection<T> = AngularFirestoreCollection<T>;
 export interface DatabaseOptions {
   driver?: string;
   cacheTime?: number;
+  prerendering?: boolean;
 }
 
 export interface DatabaseIntegrations {
@@ -116,7 +117,16 @@ export class DatabaseService {
   }
 
   flatDoc<Type>(path: string, queryFn?: QueryFn) {
-    return !queryFn
+    // try to get item from prerender data
+    const docId = queryFn ? null : path.split('/').pop() as string;
+    const prerenderStringifiedData =
+      (!this.options.prerendering || !window.sessionStorage || !docId)
+      ? null
+      : sessionStorage.getItem(`prerender_data:${docId}`);
+    // result
+    return prerenderStringifiedData
+      ? of(JSON.parse(prerenderStringifiedData))
+      : !queryFn
       ? this.doc<Type>(path).get().pipe(
         map(doc => doc.data() || null),
         take(1)
