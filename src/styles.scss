@@ -37,9 +37,13 @@
 @import '@unistylus/bootstrap/form/form-switch';
 @import '@unistylus/bootstrap/components/icon';
 @import '@unistylus/bootstrap/components/table';
+@import '@unistylus/bootstrap/components/alert-danger';
+@import '@unistylus/bootstrap/components/button-primary';
 @import '@unistylus/bootstrap/components/button-outline-light';
 @import '@unistylus/bootstrap/components/button-primary-xl';
 @import '@unistylus/bootstrap/components/button-outline-medium-xl';
+@import '@unistylus/bootstrap/utilities/margin-top-2x';
+@import '@unistylus/bootstrap/utilities/margin-bottom-2x';
 
 // register app
 @import './theming/app.module';
