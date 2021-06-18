@@ -16,7 +16,8 @@ export interface AppCustomMetas {
   image?: string;
   locale?: string;
   lang?: string;
-  author?: string;
+  authorName?: string;
+  authorUrl?: string;
   ogType?: string;
   twitterCard?: string;
   twitterCreator?: string;
@@ -103,7 +104,8 @@ export class MetaService {
     const image = customMetas['image'] || appMetas['image'];
     const locale = customMetas['locale'] || appMetas['locale'];
     const lang = customMetas['lang'] || appMetas['lang'];
-    const author = customMetas['author'] || appMetas['author'];
+    const authorName = customMetas['authorName'] || appMetas['authorName'];
+    const authorUrl = customMetas['authorUrl'] || appMetas['authorUrl'];
     const ogType = customMetas['ogType'] || appMetas['ogType'];
     const twitterCard = customMetas['twitterCard'] || appMetas['twitterCard'];
     const twitterCreator = customMetas['twitterCreator'] || appMetas['twitterCreator'];
@@ -118,7 +120,8 @@ export class MetaService {
       image,
       locale,
       lang,
-      author,
+      authorName,
+      authorUrl,
       ogType,
       ogSiteName,
       fbAppId,
@@ -130,7 +133,7 @@ export class MetaService {
 
   private changeMetaTags(metas: AppMetas) {
     const {
-      url, title, description, image, locale, author,
+      url, title, description, image, locale, authorName, authorUrl,
       ogType, ogSiteName,  fbAppId,
       twitterCard, twitterCreator, twitterSite,
     } = metas;
@@ -158,9 +161,12 @@ export class MetaService {
     if (locale) {
       this.meta.updateTag({ property: 'og:locale', content: locale });
     }
-    if (author) {
-      this.changeHTMLLinkTags([{ rel: 'author', href: author }]);
-    }    
+    if (authorName) {
+      this.meta.updateTag({ itemprop: 'author', content: authorName });
+    }
+    if (authorUrl) {
+      this.changeHTMLLinkTags([{ rel: 'author', href: authorUrl }]);
+    }
     if (ogType) {
       this.meta.updateTag({ property: 'og:type', content: ogType });
     }
