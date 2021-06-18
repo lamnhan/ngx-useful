@@ -139,8 +139,10 @@ export class MetaService {
     } = metas;
     // update links and meta    
     if (url) {
-      this.meta.updateTag({ property: 'og:url', content: url });
+      this.meta.removeTag('itemprop="url"');
       this.changeHTMLLinkTags([{ rel: 'canonical', href: url }]);
+      this.meta.updateTag({ itemprop: 'url', content: url });
+      this.meta.updateTag({ property: 'og:url', content: url });
     }
     if (title) {
       this.meta.removeTag('itemprop="name"');
@@ -159,9 +161,12 @@ export class MetaService {
       this.meta.updateTag({ property: 'og:image', content: image });
     }    
     if (locale) {
+      this.meta.removeTag('itemprop="inLanguage"');
+      this.meta.updateTag({ itemprop: 'inLanguage', content: locale });
       this.meta.updateTag({ property: 'og:locale', content: locale });
     }
     if (authorName) {
+      this.meta.removeTag('itemprop="author"');
       this.meta.updateTag({ itemprop: 'author', content: authorName });
     }
     if (authorUrl) {
