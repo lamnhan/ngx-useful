@@ -8,16 +8,21 @@
 <h3><a name="navservice-properties"><p>NavService properties</p>
 </a></h3>
 
-| Name                                                                                                                | Type                                 | Description |
-| ------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ----------- |
-| [loading](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#loading)                         | <code>boolean</code>                 |             |
-| [menuVisible](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#menuvisible)                 | <code>boolean</code>                 |             |
-| [onRefreshRouterLink](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#onrefreshrouterlink) | <code>ReplaySubject<void></code>     |             |
-| [routeData](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routedata)                     | <code>Record<string, unknown></code> |             |
-| [routeExtras](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routeextras)                 | <code>NavigationExtras</code>        |             |
-| [routePosition](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routeposition)             | <code>number</code>                  |             |
-| [routeTitle](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routetitle)                   | <code>undefined \| string</code>     |             |
-| [routeUrl](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routeurl)                       | <code>string</code>                  |             |
+| Name                                                                                                                      | Type                                     | Description |
+| ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | ----------- |
+| [loading](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#loading)                               | <code>boolean</code>                     |             |
+| [menuVisible](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#menuvisible)                       | <code>boolean</code>                     |             |
+| [onNavigationEnd](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#onnavigationend)               | <code>ReplaySubject<NavService<>></code> |             |
+| [onRefreshRouterLink](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#onrefreshrouterlink)       | <code>ReplaySubject<void></code>         |             |
+| [onRouteConfigLoadEnd](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#onrouteconfigloadend)     | <code>ReplaySubject<NavService<>></code> |             |
+| [onRouteConfigLoadStart](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#onrouteconfigloadstart) | <code>ReplaySubject<NavService<>></code> |             |
+| [route](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#route)                                   | <code>ActivatedRoute</code>              |             |
+| [routeData](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routedata)                           | <code>Record<string, unknown></code>     |             |
+| [routeExtras](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routeextras)                       | <code>NavigationExtras</code>            |             |
+| [routePosition](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routeposition)                   | <code>number</code>                      |             |
+| [routeTitle](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routetitle)                         | <code>undefined \| string</code>         |             |
+| [routeUrl](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#routeurl)                             | <code>string</code>                      |             |
+| [router](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#router)                                 | <code>Router</code>                      |             |
 
 <h3><a name="navservice-methods"><p>NavService methods</p>
 </a></h3>
