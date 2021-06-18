@@ -152,8 +152,8 @@ export class NavService {
   public readonly onNavigationEnd = new ReplaySubject<NavService>(1);
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
+    public readonly router: Router,
+    public readonly route: ActivatedRoute,
   ) {}
 
   init(
