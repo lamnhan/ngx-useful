@@ -10,22 +10,22 @@ export interface MetaIntegrations {
 }
 
 export interface AppCustomMetas {
+  url?: string;
   title?: string;
   description?: string;
   image?: string;
-  url?: string;
-  author?: string;
+  locale?: string;
   lang?: string;
+  author?: string;
+  ogType?: string;
   twitterCard?: string;
   twitterCreator?: string;
-  ogType?: string;
-  ogLocale?: string;
 }
 
 export interface AppMetas extends AppCustomMetas {
-  twitterSite?: string;
   ogSiteName?: string;
   fbAppId?: string;
+  twitterSite?: string;
 }
 
 export interface MetaTranslations {
@@ -97,44 +97,48 @@ export class MetaService {
   private processMetaData(customMetas: AppCustomMetas, withLocale?: string) {
     const appMetas = this.getAppMetas(withLocale);
     // custom
+    const url = customMetas['url'] || location.href;
     const title = customMetas['title'] || appMetas['title'];
     const description = customMetas['description'] || appMetas['description'];
     const image = customMetas['image'] || appMetas['image'];
-    const url = customMetas['url'] || location.href;
-    const author = customMetas['author'] || appMetas['author'];
+    const locale = customMetas['locale'] || appMetas['locale'];
     const lang = customMetas['lang'] || appMetas['lang'];
+    const author = customMetas['author'] || appMetas['author'];
+    const ogType = customMetas['ogType'] || appMetas['ogType'];
     const twitterCard = customMetas['twitterCard'] || appMetas['twitterCard'];
     const twitterCreator = customMetas['twitterCreator'] || appMetas['twitterCreator'];
-    const ogType = customMetas['ogType'] || appMetas['ogType'];
-    const ogLocale = customMetas['ogLocale'] || appMetas['ogLocale'];
-    // default
-    const twitterSite = appMetas['twitterSite'];
+    // default (from index.html)
     const ogSiteName = appMetas['ogSiteName'];
     const fbAppId = appMetas['fbAppId'];
+    const twitterSite = appMetas['twitterSite'];
     return {
+      url,
       title,
       description,
       image,
-      url,
-      author,
+      locale,
       lang,
-      twitterCard,
-      twitterSite,
-      twitterCreator,
+      author,
       ogType,
       ogSiteName,
-      ogLocale,
       fbAppId,
+      twitterCard,
+      twitterCreator,
+      twitterSite,
     } as AppMetas;
   }
 
   private changeMetaTags(metas: AppMetas) {
     const {
-      title, description, image, url, author,
-      twitterCard, twitterSite, twitterCreator,
-      ogType, ogSiteName, ogLocale, fbAppId,
+      url, title, description, image, locale, author,
+      ogType, ogSiteName,  fbAppId,
+      twitterCard, twitterCreator, twitterSite,
     } = metas;
-    // update links and meta
+    // update links and meta    
+    if (url) {
+      this.meta.updateTag({ property: 'og:url', content: url });
+      this.changeHTMLLinkTags([{ rel: 'canonical', href: url }]);
+    }
     if (title) {
       this.meta.removeTag('itemprop="name"');
       this.meta.updateTag({ itemprop: 'name', content: title });
@@ -150,34 +154,30 @@ export class MetaService {
       this.meta.removeTag('itemprop="image"');
       this.meta.updateTag({ itemprop: 'image', content: image });
       this.meta.updateTag({ property: 'og:image', content: image });
-    }
-    if (url) {
-      this.meta.updateTag({ property: 'og:url', content: url });
-      this.changeHTMLLinkTags([{ rel: 'canonical', href: url }]);
+    }    
+    if (locale) {
+      this.meta.updateTag({ property: 'og:locale', content: locale });
     }
     if (author) {
       this.changeHTMLLinkTags([{ rel: 'author', href: author }]);
-    }
-    if (twitterCard) {
-      this.meta.updateTag({ name: 'twitter:card', content: twitterCard });
-    }
-    if (twitterSite) {
-      this.meta.updateTag({ name: 'twitter:site', content: twitterSite });
-    }
-    if (twitterCreator) {
-      this.meta.updateTag({ name: 'twitter:creator', content: twitterCreator });
-    }
+    }    
     if (ogType) {
       this.meta.updateTag({ property: 'og:type', content: ogType });
     }
     if (ogSiteName) {
       this.meta.updateTag({ property: 'og:site_name', content: ogSiteName });
     }
-    if (ogLocale) {
-      this.meta.updateTag({ property: 'og:locale', content: ogLocale });
-    }
     if (fbAppId) {
       this.meta.updateTag({ property: 'fb:app_id', content: fbAppId });
+    }
+    if (twitterCard) {
+      this.meta.updateTag({ name: 'twitter:card', content: twitterCard });
+    }
+    if (twitterCreator) {
+      this.meta.updateTag({ name: 'twitter:creator', content: twitterCreator });
+    }    
+    if (twitterSite) {
+      this.meta.updateTag({ name: 'twitter:site', content: twitterSite });
     }
   }
 
