@@ -146,6 +146,11 @@ export class NavService {
   private i18nRouting?: I18nRouting;
   public readonly onRefreshRouterLink = new ReplaySubject<void>(1);
 
+  // events
+  public readonly onRouteConfigLoadStart = new ReplaySubject<NavService>(1);
+  public readonly onRouteConfigLoadEnd = new ReplaySubject<NavService>(1);
+  public readonly onNavigationEnd = new ReplaySubject<NavService>(1);
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -205,6 +210,8 @@ export class NavService {
         // show loading indicator (longer than 1s)
         this.loadingIndicatorTimer =
           setTimeout(() => this.showLoadingIndicator(), 1000);
+        // emit
+        this.onRouteConfigLoadStart.next(this);
       } else if (event instanceof RouteConfigLoadEnd) {
         eventName = 'RouteConfigLoadEnd';
         // hide loadding
@@ -212,6 +219,8 @@ export class NavService {
           clearTimeout(this.loadingIndicatorTimer);
           setTimeout(() => this.hideLoadingIndicator(), 1000);
         }
+        // emit
+        this.onRouteConfigLoadEnd.next(this);
       } else if (event instanceof NavigationEnd) {
         eventName = 'NavigationEnd';
         // set route url
@@ -245,8 +254,6 @@ export class NavService {
             this.backwardEnabled = false;
           }
         }
-        // scroll to position
-        this.scrollTo(this.routePosition, 0, false);
         // forward setting in params
         if (this.options.settingInitializing && this.integrations.settingService) {
           const routeUrl = this.router.url.split('?').shift() as string;
@@ -270,6 +277,10 @@ export class NavService {
           // notify the setting services
           this.integrations.settingService.initializeSettings(initialSettings);
         }
+        // scroll to position
+        this.scrollTo(this.routePosition, 0, false);
+        // emit
+        this.onNavigationEnd.next(this);
       }
       // run hook
       const hook = hooks[eventName] || ((e: Event) => e);
