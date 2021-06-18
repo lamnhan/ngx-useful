@@ -33,6 +33,21 @@
 			"problemMatcher": [],
 			"label": "npm: deploy:app",
 			"detail": "git add . && git commit -m 'deploy:app' && git push"
+		},
+		{
+			"type": "npm",
+			"script": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build",
+			"detail": "npm run build:app && npm run build:lib"
+		},
+		{
+			"type": "npm",
+			"script": "deploy",
+			"problemMatcher": [],
+			"label": "npm: deploy",
+			"detail": "npm run deploy:app && npm run deploy:lib"
 		}
 	]
 }
