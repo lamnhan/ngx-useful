@@ -18,6 +18,8 @@ export interface AppCustomMetas {
   lang?: string;
   authorName?: string;
   authorUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
   ogType?: string;
   twitterCard?: string;
   twitterCreator?: string;
@@ -106,6 +108,8 @@ export class MetaService {
     const lang = customMetas['lang'] || appMetas['lang'];
     const authorName = customMetas['authorName'] || appMetas['authorName'];
     const authorUrl = customMetas['authorUrl'] || appMetas['authorUrl'];
+    const createdAt = customMetas['createdAt'] || appMetas['createdAt'];
+    const updatedAt = customMetas['updatedAt'] || appMetas['updatedAt'];
     const ogType = customMetas['ogType'] || appMetas['ogType'];
     const twitterCard = customMetas['twitterCard'] || appMetas['twitterCard'];
     const twitterCreator = customMetas['twitterCreator'] || appMetas['twitterCreator'];
@@ -122,6 +126,8 @@ export class MetaService {
       lang,
       authorName,
       authorUrl,
+      createdAt,
+      updatedAt,
       ogType,
       ogSiteName,
       fbAppId,
@@ -133,7 +139,8 @@ export class MetaService {
 
   private changeMetaTags(metas: AppMetas) {
     const {
-      url, title, description, image, locale, authorName, authorUrl,
+      url, title, description, image, locale,
+      authorName, authorUrl, createdAt, updatedAt,
       ogType, ogSiteName,  fbAppId,
       twitterCard, twitterCreator, twitterSite,
     } = metas;
@@ -171,6 +178,16 @@ export class MetaService {
     }
     if (authorUrl) {
       this.changeHTMLLinkTags([{ rel: 'author', href: authorUrl }]);
+    }
+    if (createdAt) {
+      this.meta.removeTag('itemprop="dateCreated"');
+      this.meta.removeTag('itemprop="datePublished"');
+      this.meta.updateTag({ itemprop: 'dateCreated', content: createdAt });
+      this.meta.updateTag({ itemprop: 'datePublished', content: createdAt });
+    }
+    if (updatedAt) {
+      this.meta.removeTag('itemprop="dateModified"');
+      this.meta.updateTag({ itemprop: 'dateModified', content: updatedAt });
     }
     if (ogType) {
       this.meta.updateTag({ property: 'og:type', content: ogType });
