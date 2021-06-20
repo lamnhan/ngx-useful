@@ -105,7 +105,9 @@ export class MetaService {
     const description = customMetas['description'] || appMetas['description'];
     const image = customMetas['image'] || appMetas['image'];
     const locale = customMetas['locale'] || appMetas['locale'];
-    const lang = customMetas['lang'] || appMetas['lang'];
+    const lang = customMetas['lang'] ||
+      (!locale ? '' : locale.split('-').shift() as string) ||
+      appMetas['lang'];
     const authorName = customMetas['authorName'] || appMetas['authorName'];
     const authorUrl = customMetas['authorUrl'] || appMetas['authorUrl'];
     const createdAt = customMetas['createdAt'] || appMetas['createdAt'];
