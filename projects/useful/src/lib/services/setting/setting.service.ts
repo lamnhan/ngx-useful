@@ -73,13 +73,17 @@ export class SettingService {
 
   constructor(private readonly zone: NgZone) {}
 
-  init(
-    options: SettingOptions = {},
-    settingData: BuiltinData = {},
-    integrations: SettingIntegrations = {},
-  ) {
+  setOptions(options: SettingOptions) {
     this.options = options;
-    // data
+    return this as SettingService;
+  }
+  
+  setIntegrations(integrations: SettingIntegrations) {
+    this.integrations = integrations;
+    return this as SettingService;
+  }
+
+  setData(settingData: BuiltinData) {
     const {themes, personas, locales} = settingData;
     if (themes) {
       this.themes = themes;
@@ -90,8 +94,10 @@ export class SettingService {
     if (locales) {
       this.locales = locales;
     }
-    // integrations
-    this.integrations = integrations;
+    return this as SettingService;
+  }
+
+  init() {
     // handle UI intensive settings
     this.remoteLoader()
     .pipe(

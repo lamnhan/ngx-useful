@@ -32,10 +32,10 @@ export class LocalstorageService {
 
   constructor() {}
 
-  init(config: LocalForageOptions = {}) {
+  init(localForageOptions: LocalForageOptions = {}) {
     this.localforage = createInstance({
       name: 'APP_LOCAL_STORAGE',
-      ...config,
+      ...localForageOptions,
     });
     // done
     return this as LocalstorageService;

@@ -32,10 +32,10 @@ export interface PersonaAction {
   providedIn: 'root'
 })
 export class PersonaService {
-  private menuRegistry?: Record<string, MenuItem>;
-  private personaActions?: Record<string, PersonaAction>;
   private options: PersonaOptions = {};
   private integrations: PersonaIntegrations = {};
+  private menuRegistry: Record<string, MenuItem> = {};
+  private personaActions: Record<string, PersonaAction> = {};
   
   data: PersonaData = {};
 
@@ -47,32 +47,42 @@ export class PersonaService {
 
   constructor() {}
 
-  init(
-    data: PersonaData,
-    options: PersonaOptions = {},
-    integrations: PersonaIntegrations = {},
-    menuRegistry?: Record<string, MenuItem>,
-    personaActions?: Record<string, PersonaAction>,
-  ) {
+  setOptions(options: PersonaOptions) {
     this.options = options;
+    return this as PersonaService;
+  }
+  
+  setIntegrations(integrations: PersonaIntegrations) {
     this.integrations = integrations;
+    return this as PersonaService;
+  }
+  
+  setMenuRegistry(menuRegistry: Record<string, MenuItem>) {
     this.menuRegistry = menuRegistry;
+    return this as PersonaService;
+  }
+
+  setActions(personaActions: Record<string, PersonaAction>) {
     this.personaActions = personaActions;
+    return this as PersonaService;
+  }
+
+  init(data: PersonaData) {
     // proccess menu & secondary menu & tabs
-    if (menuRegistry) {
+    if (this.menuRegistry) {
       Object.keys(data).forEach(persona => {
         const {menu, menu2nd, tabs} = data[persona];
         if (menu) {
           data[persona].menu =
-            menu.map(value => typeof value === 'string' ? menuRegistry[value] : value);
+            menu.map(value => typeof value === 'string' ? this.menuRegistry[value] : value);
         }
         if (menu2nd) {
           data[persona].menu2nd =
-            menu2nd.map(value => typeof value === 'string' ? menuRegistry[value] : value);
+            menu2nd.map(value => typeof value === 'string' ? this.menuRegistry[value] : value);
         }
         if (tabs) {
           data[persona].tabs =
-            tabs.map(value => typeof value === 'string' ? menuRegistry[value] : value);
+            tabs.map(value => typeof value === 'string' ? this.menuRegistry[value] : value);
         }
       });
     }

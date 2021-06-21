@@ -16,10 +16,10 @@ export interface AuthOptions {
   providedIn: 'root'
 })
 export class AuthService {
-  private service!: VendorAuthService;
   private options: AuthOptions = {};
-
+  private service!: VendorAuthService;
   driver = 'firebase';
+
   redirectUrl?: null | string;
   authenticated?: boolean;
   credential?: NativeUserCredential;
@@ -33,12 +33,16 @@ export class AuthService {
 
   constructor() {}
 
-  init(service: VendorAuthService, options: AuthOptions = {}) {
-    this.service = service;
+  setOptions(options: AuthOptions) {
     this.options = options;
     if (options.driver) {
       this.driver = options.driver;
     }
+    return this as AuthService;
+  }
+
+  init(service: VendorAuthService) {
+    this.service = service;
     // watch for changed
     this.service.onAuthStateChanged(user => {
       this.authenticated = !!user; // change status

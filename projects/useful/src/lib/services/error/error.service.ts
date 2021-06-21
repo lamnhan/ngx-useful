@@ -21,29 +21,34 @@ export interface ErrorIntegrations {
   providedIn: 'root'
 })
 export class ErrorService {
-  private config!: ErrorConfig;
   private options: ErrorOptions = {};
   private integrations: ErrorIntegrations = {};
+  private config!: ErrorConfig;
 
   private user?: string;
   private readonly baseAPIUrl = 'https://clouderrorreporting.googleapis.com/v1beta1/projects/';
 
   constructor() {}
 
-  init(
-    config: ErrorConfig,
-    options: ErrorOptions = {},
-    integrations: ErrorIntegrations = {},
-  ) {
-    this.config = config;
+  setOptions(options: ErrorOptions) {
     this.options = options;
+    return this as ErrorService;
+  }
+  
+  setIntegrations(integrations: ErrorIntegrations) {
     this.integrations = integrations;
+    return this as ErrorService;
+  }
+
+  init(config: ErrorConfig) {
+    this.config = config;
     // watch for user
     if (this.integrations.userService) {
       this.integrations.userService
         .onUserChanged
         .subscribe(user => this.user = user ? user.uid : undefined)
     }
+    return this as ErrorService;
   }
 
   report(error: string | Error) {

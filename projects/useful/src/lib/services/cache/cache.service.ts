@@ -25,10 +25,10 @@ export class CacheService {
 
   constructor() {}
 
-  init(config: LocalForageOptions = {}) {
+  init(localForageOptions: LocalForageOptions = {}) {
     this.localstorage = new LocalstorageService().init({
       name: 'APP_LOCAL_CACHE',
-      ...config,
+      ...localForageOptions,
     });
     // done
     return this as CacheService;

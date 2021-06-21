@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 export interface AppOptions {
   splashScreen?: boolean | string;
@@ -24,20 +25,25 @@ export class AppService {
 
   constructor() {}
 
-  init(
-    options: AppOptions = {},
-    customData: Record<string, unknown> = {},
-    dataLoader?: Observable<Record<string, unknown>>,
-  ) {
+  setOptions(options: AppOptions) {
     this.options = options;
+    return this as AppService;
+  }
+
+  setData(customData: Record<string, unknown>) {
     this.customData = customData;
-    // remote custom data
-    if (dataLoader) {
-      dataLoader.subscribe(remoteData => this.customData = {
-        ...this.customData,
-        ...remoteData,
-      });
-    }
+    return this as AppService;
+  }
+
+  setDataLoader(dataLoader: Observable<Record<string, unknown>>) {
+    dataLoader.pipe(take(1)).subscribe(remoteData => this.customData = {
+      ...this.customData,
+      ...remoteData,
+    });
+    return this as AppService;
+  }
+
+  init() {
     // set app host
     this.setHost();
     // set viewport

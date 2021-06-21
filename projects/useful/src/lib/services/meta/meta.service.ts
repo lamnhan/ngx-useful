@@ -39,10 +39,10 @@ export interface MetaTranslations {
   providedIn: 'root'
 })
 export class MetaService {
-  private defaultMetas: AppMetas = {};
-  private metaTranslations: MetaTranslations = {};
   private options: MetaOptions = {};
   private integrations: MetaIntegrations = {};
+  private defaultMetas: AppMetas = {};
+  private metaTranslations: MetaTranslations = {};
 
   appMetas: AppMetas = {};
 
@@ -51,17 +51,23 @@ export class MetaService {
     private meta: Meta,
   ) {}
 
+  setOptions(options: MetaOptions) {
+    this.options = options;
+    return this as MetaService;
+  }
+  
+  setIntegrations(integrations: MetaIntegrations) {
+    this.integrations = integrations;
+    return this as MetaService;
+  }
+ 
   init(
     defaultMetas: AppMetas,
-    options: MetaOptions = {},
-    integrations: MetaIntegrations = {},
     metaTranslations: MetaTranslations = {},
   ) {
     this.defaultMetas = defaultMetas;
-    this.metaTranslations = metaTranslations;
-    this.options = options;
-    this.integrations = integrations;
     this.appMetas = this.defaultMetas;
+    this.metaTranslations = metaTranslations;
     // watch for locale changed
     if (this.integrations.settingService) {
       this.integrations.settingService

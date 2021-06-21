@@ -29,26 +29,28 @@ export interface DatabaseIntegrations {
   providedIn: 'root'
 })
 export class DatabaseService {
-  private service!: VendorDatabaseService;
   private options: DatabaseOptions = {};
   private integrations: DatabaseIntegrations = {};
-
+  private service!: VendorDatabaseService;
   driver = 'firebase';
 
   constructor(private readonly helperService: HelperService) {}
 
-  init(
-    service: VendorDatabaseService,
-    options: DatabaseOptions = {},
-    integrations: DatabaseIntegrations = {},
-  ) {
-    this.service = service;
+  setOptions(options: DatabaseOptions) {
     this.options = options;
-    this.integrations = integrations;
     if (options.driver) {
       this.driver = options.driver;
     }
-    // done
+    return this as DatabaseService;
+  }
+  
+  setIntegrations(integrations: DatabaseIntegrations) {
+    this.integrations = integrations;
+    return this as DatabaseService;
+  }
+
+  init(vendorService: VendorDatabaseService) {
+    this.service = vendorService;
     return this as DatabaseService;
   }
 

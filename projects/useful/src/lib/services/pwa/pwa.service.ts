@@ -31,26 +31,30 @@ export class PwaService {
     private readonly localstorageService: LocalstorageService
   ) {}
 
-  init(options: PWAOptions = {}) {
+  setOptions(options: PWAOptions) {
     this.options = options;
     if (this.options.reminderAnnoying) {
       this.reminderAnnoying = this.options.reminderAnnoying;
     }
+    return this as PwaService;
+  }
+
+  init() {
     this.setRuntime();
     this.loadLocalMetrics()
-    .subscribe(({ installed, reminderCount, reminderTimestamp, reminderShowed }) => {
-      // installing status
-      this.installed = installed;
-      // reminder
-      this.reminderCount = reminderCount;
-      this.reminderTimestamp = reminderTimestamp;
-      if (!this.installed && this.options.reminder && reminderShowed) {
-        setTimeout(
-          () => this.showReminder(),
-          this.options.reminder === true ? 0 : (this.options.reminder * 1000)
-        );
-      }
-    });
+      .subscribe(({ installed, reminderCount, reminderTimestamp, reminderShowed }) => {
+        // installing status
+        this.installed = installed;
+        // reminder
+        this.reminderCount = reminderCount;
+        this.reminderTimestamp = reminderTimestamp;
+        if (!this.installed && this.options.reminder && reminderShowed) {
+          setTimeout(
+            () => this.showReminder(),
+            this.options.reminder === true ? 0 : (this.options.reminder * 1000)
+          );
+        }
+      });
     // done
     return this as PwaService;
   }

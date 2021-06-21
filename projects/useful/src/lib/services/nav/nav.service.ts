@@ -122,6 +122,7 @@ export function i18nRoutes(
 export class NavService {
   private options: NavOptions = {};
   private integrations: NavIntegrations = {};
+  private hooks: {[key in NavRouterEventHooks]?: (event: Event) => void} = {};
 
   // general
   loading = false;
@@ -155,51 +156,56 @@ export class NavService {
     public readonly route: ActivatedRoute,
   ) {}
 
-  init(
-    options: NavOptions = {},
-    integrations: NavIntegrations = {},
-    hooks: {[key in NavRouterEventHooks]?: (event: Event) => void} = {},
-    i18nRegistry?: {
-      routes: Routes;
-      routeTranslations: RouteTranslations
-    },
-  ) {
+  setOptions(options: NavOptions) {
     this.options = options;
+    return this as NavService;
+  }
+  
+  setIntegrations(integrations: NavIntegrations) {
     this.integrations = integrations;
-    // handle i18n
-    if (i18nRegistry) {
-      const { routes, routeTranslations } = i18nRegistry;
-      // save i18n locales
-      this.i18nLocales = Object.keys(routeTranslations[Object.keys(routeTranslations)[0]]);
-      // process routes / translations
-      this.i18nRouting = {};
-      routes.forEach(route => {
-        const path = route.path as string;
-        const pathMap = path.split('/').filter(value => !!value);
-        const translation = routeTranslations[path];
-        const routingItem: I18nRoutingItem = {};
-        // proccess translations
-        if (translation) {
-          Object.keys(translation).forEach(locale => {
-            const localizedPath = translation[locale];
-            if (localizedPath === true) {
-              routingItem[locale] = pathMap;
-            } else {
-              const localizedPathMap = localizedPath.split('/').filter(value => !!value);
-              routingItem[locale] = localizedPathMap;
-            }
-          });
-        }
-        // save original/localized routing
-        Object.keys(routingItem).forEach(locale => {
-          const init = routingItem[locale][0];
-          if (!this.i18nRouting?.[init]) {
-            (this.i18nRouting as I18nRouting)[init] = routingItem;
+    return this as NavService;
+  }
+  
+  setHooks(hooks: {[key in NavRouterEventHooks]?: (event: Event) => void}) {
+    this.hooks = hooks;
+    return this as NavService;
+  }
+  
+  setI18n(i18nRegistry: { routes: Routes; routeTranslations: RouteTranslations; }) {
+    const { routes, routeTranslations } = i18nRegistry;
+    // save i18n locales
+    this.i18nLocales = Object.keys(routeTranslations[Object.keys(routeTranslations)[0]]);
+    // process routes / translations
+    this.i18nRouting = {};
+    routes.forEach(route => {
+      const path = route.path as string;
+      const pathMap = path.split('/').filter(value => !!value);
+      const translation = routeTranslations[path];
+      const routingItem: I18nRoutingItem = {};
+      // proccess translations
+      if (translation) {
+        Object.keys(translation).forEach(locale => {
+          const localizedPath = translation[locale];
+          if (localizedPath === true) {
+            routingItem[locale] = pathMap;
+          } else {
+            const localizedPathMap = localizedPath.split('/').filter(value => !!value);
+            routingItem[locale] = localizedPathMap;
           }
         });
+      }
+      // save original/localized routing
+      Object.keys(routingItem).forEach(locale => {
+        const init = routingItem[locale][0];
+        if (!this.i18nRouting?.[init]) {
+          (this.i18nRouting as I18nRouting)[init] = routingItem;
+        }
       });
-    }
-    // register events
+    });
+    return this as NavService;
+  }
+
+  init() {
     this.router
       .events
       .subscribe(async event => {
@@ -261,6 +267,7 @@ export class NavService {
           // prerender locale
           const meta = document.querySelector('meta[itemprop="inLanguage"]');
           const prerenderLocale = !meta ? null : meta.getAttribute('content');
+          console.log({i18nLocales: this.i18nLocales, routeFirstParam, prerenderLocale});
           // process to change data
           const initialSettings: AppSettings = {};
           if (
@@ -286,10 +293,9 @@ export class NavService {
         this.onNavigationEnd.next(this);
       }
       // run hook
-      const hook = hooks[eventName] || ((e: Event) => e);
+      const hook = this.hooks?.[eventName] || ((e: Event) => e);
       hook(event);
     });
-    // done
     return this as NavService;
   }
 

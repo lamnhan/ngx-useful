@@ -21,13 +21,17 @@ export class FetchService {
 
   constructor(private helperService: HelperService) {}
 
-  init(
-    options: FetchOptions = {},
-    integrations: FetchIntegrations = {}
-  ) {
+  setOptions(options: FetchOptions) {
     this.options = options;
+    return this as FetchService;
+  }
+  
+  setIntegrations(integrations: FetchIntegrations) {
     this.integrations = integrations;
-    // init
+    return this as FetchService;
+  }
+
+  init() {
     return this as FetchService;
   }
 

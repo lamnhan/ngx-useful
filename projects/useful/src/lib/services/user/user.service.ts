@@ -36,9 +36,9 @@ export interface UserIntegrations {
   providedIn: 'root'
 })
 export class UserService {
-  private userDataService!: UserDataService;
   private options: UserOptions = {};
   private integrations: UserIntegrations = {};
+  private userDataService!: UserDataService;
 
   currentUser?: NativeUser;
   data?: User;
@@ -54,15 +54,19 @@ export class UserService {
     private helperService: HelperService,
     private authService: AuthService
   ) {}
-  
-  init(
-    userDataService: UserDataService,
-    options: UserOptions = {},
-    integrations: UserIntegrations = {},
-  ) {
-    this.userDataService = userDataService;
+
+  setOptions(options: UserOptions) {
     this.options = options;
+    return this as UserService;
+  }
+  
+  setIntegrations(integrations: UserIntegrations) {
     this.integrations = integrations;
+    return this as UserService;
+  }
+  
+  init(userDataService: UserDataService) {
+    this.userDataService = userDataService;
     // watch for auth
     this.authService
       .onAuthStateChanged
