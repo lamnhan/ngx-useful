@@ -200,12 +200,13 @@ export class SettingService {
   }
 
   private loadTheme(remoteTheme?: string) {
+    const initTheme = this.initialSettings?.theme;
     return remoteTheme
       // remote
       ? of(remoteTheme)
       // local
       : !this.integrations.localstorageService
-        ? of(this.initialSettings?.theme || 'light')
+        ? of(initTheme || 'light')
         : this.integrations.localstorageService
           .get<string>(this.LSK_THEME)
           .pipe(
@@ -213,8 +214,8 @@ export class SettingService {
               theme
                 ? theme
                 // from initial
-                : this.initialSettings?.theme
-                  ? this.initialSettings.theme
+                : initTheme
+                  ? initTheme
                   // default
                   : (
                     this.options.browserColor
@@ -227,12 +228,13 @@ export class SettingService {
   }
 
   private loadPersona(remotePersona?: string) {
+    const initPersona = this.initialSettings?.persona;
     return remotePersona
       // remote
       ? of(remotePersona)
       // local
       : !this.integrations.localstorageService
-        ? of(this.initialSettings?.persona || 'default')
+        ? of(initPersona || 'default')
         : this.integrations.localstorageService
           .get<string>(this.LSK_PERSONA)
           .pipe(
@@ -240,8 +242,8 @@ export class SettingService {
               persona
                 ? persona
                 // from initial
-                : this.initialSettings?.persona
-                  ? this.initialSettings.persona
+                : initPersona
+                  ? initPersona
                   // default
                   : 'default'
             ))
@@ -249,25 +251,34 @@ export class SettingService {
   }
   
   private loadLocale(remoteLocale?: string) {
+    // prerender locale
+    const meta = document.querySelector('meta[itemprop="inLanguage"]');
+    const prerenderLocale = !meta ? null : meta.getAttribute('content');
+    // init locale
+    const initLocale = this.initialSettings?.locale;
+    // result
     return remoteLocale
       // remote
       ? of(remoteLocale)
       // locale
       : !this.integrations.localstorageService
-        ? of(this.initialSettings?.locale || 'en-US')
+        ? of(prerenderLocale || initLocale || 'en-US')
         : this.integrations.localstorageService
           .get<string>(this.LSK_LOCALE)
           .pipe(
             switchMap(locale => of(
               locale
                 ? locale
-                // from initial
-                : this.initialSettings?.locale
-                  ? this.initialSettings.locale
-                  // default
-                  : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
-                    ? navigator.language
-                    : 'en-US'
+                // from prerender
+                : prerenderLocale
+                  ? prerenderLocale
+                  // from initial
+                  : initLocale
+                    ? initLocale
+                    // default
+                    : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
+                      ? navigator.language
+                      : 'en-US'
             ))
           );
   }
