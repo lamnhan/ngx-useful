@@ -267,16 +267,15 @@ export class NavService {
           // prerender locale
           const meta = document.querySelector('meta[itemprop="inLanguage"]');
           const prerenderLocale = !meta ? null : meta.getAttribute('content');
-          console.log({i18nLocales: this.i18nLocales, routeFirstParam, prerenderLocale});
           // process to change data
           const initialSettings: AppSettings = {};
           if (
-            prerenderLocale
-            || this.i18nLocales.indexOf(routeFirstParam) !== -1
+            this.i18nLocales.indexOf(routeFirstParam) !== -1
             || routeQuery.l
             || routeQuery.locale
+            || prerenderLocale
           ) {
-            initialSettings.locale = prerenderLocale || routeFirstParam || routeQuery.l || routeQuery.locale;
+            initialSettings.locale = routeFirstParam || routeQuery.l || routeQuery.locale || prerenderLocale;
           }
           if (routeQuery.p || routeQuery.persona) {
             initialSettings.persona = routeQuery.p || routeQuery.persona;
