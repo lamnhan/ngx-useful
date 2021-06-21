@@ -1,6 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import { of, combineLatest, ReplaySubject } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { take, switchMap } from 'rxjs/operators';
 import { TranslocoService } from '@ngneat/transloco';
 
 import { LocalstorageService } from '../localstorage/localstorage.service';
@@ -30,6 +30,7 @@ export interface AppSettings extends BuiltinUISettings, BuiltinGeneralSettings {
 export interface SettingOptions {
   browserColor?: boolean;
   browserLocale?: boolean;
+  withInitializing?: boolean;
   onReady?: () => void;
   personaValidator?: (persona: string, userService?: UserService) => boolean;
 }
@@ -49,7 +50,8 @@ export class SettingService {
   private readonly LSK_LOCALE = 'setting_locale';
   private options: SettingOptions = {};
   private integrations: SettingIntegrations = {};
-  private initialSettings?: AppSettings;
+  private settingInitilizer = new ReplaySubject<AppSettings>(1);
+  private initialized = false;
 
   // builtin data
   themes: BuiltinDataItem[] = [{text: 'Light', value: 'light'}];
@@ -90,18 +92,25 @@ export class SettingService {
     }
     // integrations
     this.integrations = integrations;
-    // emit default values
-    this.onThemeChanged.next(this.theme);
-    this.onPersonaChanged.next(this.persona);
-    this.onLocaleChanged.next(this.locale);
     // handle UI intensive settings
     this.remoteLoader()
     .pipe(
-      switchMap(uiSettings =>
+      switchMap(({theme, persona, locale}) =>
+        !this.options.withInitializing
+          ? of([{theme, persona, locale}, {}])
+          : combineLatest([
+            of({theme, persona, locale}),
+            this.settingInitilizer,
+          ])
+      ),
+      switchMap(([
+        {theme: remoteTheme, persona: remotePersona, locale: remoteLocale},
+        {theme: initTheme, persona: initPersona, locale: initLocale},
+      ]) =>
         combineLatest([
-          this.loadTheme(uiSettings.theme),
-          this.loadPersona(uiSettings.persona),
-          this.loadLocale(uiSettings.locale),
+          this.loadTheme({remoteTheme, initTheme}),
+          this.loadPersona({remotePersona, initPersona}),
+          this.loadLocale({remoteLocale, initLocale}),
         ])
       ),
     )
@@ -111,17 +120,27 @@ export class SettingService {
       this.changeTheme(theme);
       this.changePersona(persona);
       this.changeLocale(locale);
+      // set status
+      this.initialized = true;
       // trigger ready
       if (this.options.onReady) {
         this.options.onReady();
       }
     }));
+    // emit default values
+    this.onThemeChanged.next(this.theme);
+    this.onPersonaChanged.next(this.persona);
+    this.onLocaleChanged.next(this.locale);
     // done
     return this as SettingService;
   }
 
+  allowInitializing() {
+    return this.options.withInitializing && !this.initialized;
+  }
+
   initializeSettings(initialSettings: AppSettings) {
-    this.initialSettings = initialSettings;
+    this.settingInitilizer.next(initialSettings);
   }
 
   changeTheme(name: string) {
@@ -195,12 +214,12 @@ export class SettingService {
     return !this.integrations.userService
       ? of({} as AppSettings)
       : this.integrations.userService.onUserChanged.pipe(
+        take(1),
         switchMap(data => of(data?.settings ? data.settings : {})),
       );
   }
 
-  private loadTheme(remoteTheme?: string) {
-    const initTheme = this.initialSettings?.theme;
+  private loadTheme({remoteTheme, initTheme}: {remoteTheme?: string; initTheme?: string} = {}) {
     return remoteTheme
       // remote
       ? of(remoteTheme)
@@ -227,8 +246,7 @@ export class SettingService {
           );
   }
 
-  private loadPersona(remotePersona?: string) {
-    const initPersona = this.initialSettings?.persona;
+  private loadPersona({remotePersona, initPersona}: {remotePersona?: string; initPersona?: string} = {}) {
     return remotePersona
       // remote
       ? of(remotePersona)
@@ -250,35 +268,26 @@ export class SettingService {
           );
   }
   
-  private loadLocale(remoteLocale?: string) {
-    // prerender locale
-    const meta = document.querySelector('meta[itemprop="inLanguage"]');
-    const prerenderLocale = !meta ? null : meta.getAttribute('content');
-    // init locale
-    const initLocale = this.initialSettings?.locale;
-    // result
+  private loadLocale({remoteLocale, initLocale}: {remoteLocale?: string; initLocale?: string} = {}) {
     return remoteLocale
       // remote
       ? of(remoteLocale)
       // locale
       : !this.integrations.localstorageService
-        ? of(prerenderLocale || initLocale || 'en-US')
+        ? of(initLocale || 'en-US')
         : this.integrations.localstorageService
           .get<string>(this.LSK_LOCALE)
           .pipe(
             switchMap(locale => of(
               locale
                 ? locale
-                // from prerender
-                : prerenderLocale
-                  ? prerenderLocale
-                  // from initial
-                  : initLocale
-                    ? initLocale
-                    // default
-                    : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
-                      ? navigator.language
-                      : 'en-US'
+                // from initial
+                : initLocale
+                  ? initLocale
+                  // default
+                  : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
+                    ? navigator.language
+                    : 'en-US'
             ))
           );
   }

@@ -59,7 +59,6 @@ export interface NavAdvanced extends NavRouteProps {
 
 export interface NavOptions {
   globalOffset?: number;
-  settingInitializing?: boolean;
 }
 
 export interface NavIntegrations {
@@ -254,19 +253,23 @@ export class NavService {
             this.backwardEnabled = false;
           }
         }
-        // forward setting in params
-        if (this.options.settingInitializing && this.integrations.settingService) {
+        // forward settings
+        if (this.integrations.settingService && this.integrations.settingService.allowInitializing()) {
           const routeUrl = this.router.url.split('?').shift() as string;
           const routeQuery = this.route.snapshot.queryParams;
-          const routeFirstParam = routeUrl.split('/')[1]; // posible a locale code
+          const routeFirstParam = routeUrl.split('/')[1]; // possible a locale code
+          // prerender locale
+          const meta = document.querySelector('meta[itemprop="inLanguage"]');
+          const prerenderLocale = !meta ? null : meta.getAttribute('content');
           // process to change data
           const initialSettings: AppSettings = {};
           if (
-            routeQuery.l
-            || routeQuery.locale
+            prerenderLocale
             || this.i18nLocales.indexOf(routeFirstParam) !== -1
+            || routeQuery.l
+            || routeQuery.locale
           ) {
-            initialSettings.locale = routeQuery.l || routeQuery.locale || routeFirstParam;
+            initialSettings.locale = prerenderLocale || routeFirstParam || routeQuery.l || routeQuery.locale;
           }
           if (routeQuery.p || routeQuery.persona) {
             initialSettings.persona = routeQuery.p || routeQuery.persona;
