@@ -81,15 +81,27 @@ export function i18nRoutes(
   routes: Routes,
   routeTranslations: RouteTranslations,
   homeRoute: Route,
-  oopsRoute?: Route
+  oopsRoute?: Route,
+  localizedHomeRoutes?: boolean
 ): Routes {
   const allRoutes: Routes = [];
   // home
   allRoutes.push(homeRoute);
   // special localized home
-  Object
-    .keys(routeTranslations[Object.keys(routeTranslations)[0]])
-    .forEach(locale => allRoutes.push({...homeRoute, path: locale}));
+  if (localizedHomeRoutes) {
+    Object
+      .keys(routeTranslations[Object.keys(routeTranslations)[0]])
+      .forEach(locale => {
+        const localeLoweCased = locale.toLowerCase();
+        const [languageCode, countryCode] = localeLoweCased.split('-');
+        allRoutes.push(
+          {...homeRoute, path: locale},
+          {...homeRoute, path: localeLoweCased},
+          {...homeRoute, path: languageCode},
+          {...homeRoute, path: countryCode}
+        );
+      });
+  }
   // routes
   routes.forEach(route => {
     // main
@@ -231,6 +243,8 @@ export class NavService {
         // emit the event
         this.onRouteConfigLoadEnd.next(this);
       } else if (event instanceof NavigationEnd) {
+        // run hook
+        (this.hooks?.['NavigationEnd'] || ((e: Event) => e))(event);
         // set route url
         this.routeUrl = this.router.url;
         // refresh router link
@@ -265,25 +279,62 @@ export class NavService {
         // set initial/prioritized settings
         if (this.integrations.settingService && !this.integrations.settingService.isInitialized) {
           const routeUrl = this.router.url.split('?').shift() as string;
+          const pathSegments = routeUrl.substr(1).split('/');
+          const pathInit = pathSegments.shift() as string;
+          // set prioritized settings for none root path
+          if (pathInit !== '') {
+            // special localized homes
+            if (pathSegments.length === 1) {              
+              const localizedHomeRoute = (() => {
+                // full matches
+                if (pathInit.indexOf('-') !== -1) {
+                  // perfect match
+                  if(this.i18nLocales.indexOf(pathInit) !== -1) {
+                    return pathInit;
+                  }
+                  // lowercase match
+                  const [seg1, seg2] = pathInit.split('-');
+                  const posibleALocale = `${seg1}-${seg2.toUpperCase()}`;
+                  if(this.i18nLocales.indexOf(posibleALocale) !== -1) {
+                    return posibleALocale;
+                  }
+                }
+                // lang code or coutry code matches
+                else {
+                  const filteredLocales = this.i18nLocales.filter(locale => {
+                    const [languageCode, countryCode] = locale.split('-');
+                    const countryCodeLowerCased = countryCode.toLowerCase();
+                    return pathInit === languageCode || pathInit === countryCodeLowerCased;
+                  });
+                  if (filteredLocales.length) {
+                    return filteredLocales.shift() as string;
+                  }
+                }
+                return null;
+              })();
+              if (localizedHomeRoute) {
+                this.integrations.settingService.setPrioritizedLocale(localizedHomeRoute);
+              }
+            }
+            // localized routes
+            else {
+              const routeLocale = this.i18nOrigins[pathInit];
+              if (routeLocale) {
+                this.integrations.settingService.setPrioritizedLocale(routeLocale);
+              }
+            }
+          }
+          // set initial settings
           const routeQuery = this.route.snapshot.queryParams;
-          const pathInit = routeUrl.substr(1).split('/').shift() as string;
-          const routeLocale = this.i18nOrigins[pathInit];
-          // prerender
           const meta = document.querySelector('meta[itemprop="inLanguage"]');
           const prerenderLocale = !meta ? null : meta.getAttribute('content');
-          // set prioritized
-          if (pathInit !== '' && routeLocale) {
-            this.integrations.settingService.setPrioritizedLocale(routeLocale);
-          }
-          // set initial
           if (
-            this.i18nLocales.indexOf(pathInit) !== -1
-            || routeQuery.l
+            routeQuery.l
             || routeQuery.locale
             || prerenderLocale
           ) {
             this.integrations.settingService.setInitialLocale(
-              pathInit || routeQuery.l || routeQuery.locale || prerenderLocale
+              routeQuery.l || routeQuery.locale || prerenderLocale
             );
           }
           if (routeQuery.p || routeQuery.persona) {
@@ -292,17 +343,13 @@ export class NavService {
           if (routeQuery.t || routeQuery.theme) {
             this.integrations.settingService.setInitialTheme(routeQuery.t || routeQuery.theme);
           }
-        }
-        // run hook
-        (this.hooks?.['NavigationEnd'] || ((e: Event) => e))(event);
-        // notify the setting service
-        if (this.integrations.settingService && !this.integrations.settingService.isInitialized) {
+          // notify the setting service
           this.integrations.settingService.triggerSettingInitilizer();
         }
-        // emit the event
-        this.onNavigationEnd.next(this);
         // scroll to position
         this.scrollTo(this.routePosition, 0, false);
+        // emit the event
+        this.onNavigationEnd.next(this);
       }
     });
     return this as NavService;
