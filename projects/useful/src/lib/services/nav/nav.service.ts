@@ -143,6 +143,7 @@ export class NavService {
 
   // i18n
   private i18nLocales: string[] = [];
+  private i18nOrigins: Record<string, string> = {};
   private i18nRouting?: I18nRouting;
   public readonly onRefreshRouterLink = new ReplaySubject<void>(1);
 
@@ -188,9 +189,11 @@ export class NavService {
           const localizedPath = translation[locale];
           if (localizedPath === true) {
             routingItem[locale] = pathMap;
+            this.i18nOrigins[pathMap[0]] = locale;
           } else {
             const localizedPathMap = localizedPath.split('/').filter(value => !!value);
             routingItem[locale] = localizedPathMap;
+            this.i18nOrigins[localizedPathMap[0]] = locale;
           }
         });
       }
@@ -209,25 +212,25 @@ export class NavService {
     this.router
       .events
       .subscribe(async event => {
-      let eventName = '' as NavRouterEventHooks; // event name
       if (event instanceof RouteConfigLoadStart) {
-        eventName = 'RouteConfigLoadStart';
+        // run hook
+        (this.hooks?.['RouteConfigLoadStart'] || ((e: Event) => e))(event);
         // show loading indicator (longer than 1s)
         this.loadingIndicatorTimer =
           setTimeout(() => this.showLoadingIndicator(), 1000);
-        // emit
+        // emit the event
         this.onRouteConfigLoadStart.next(this);
       } else if (event instanceof RouteConfigLoadEnd) {
-        eventName = 'RouteConfigLoadEnd';
+        // run hook
+        (this.hooks?.['RouteConfigLoadEnd'] || ((e: Event) => e))(event);
         // hide loadding
         if (this.loadingIndicatorTimer) {
           clearTimeout(this.loadingIndicatorTimer);
           setTimeout(() => this.hideLoadingIndicator(), 1000);
         }
-        // emit
+        // emit the event
         this.onRouteConfigLoadEnd.next(this);
       } else if (event instanceof NavigationEnd) {
-        eventName = 'NavigationEnd';
         // set route url
         this.routeUrl = this.router.url;
         // refresh router link
@@ -259,41 +262,48 @@ export class NavService {
             this.backwardEnabled = false;
           }
         }
-        // forward settings
-        if (this.integrations.settingService && this.integrations.settingService.allowInitializing()) {
+        // set initial/prioritized settings
+        if (this.integrations.settingService && !this.integrations.settingService.isInitialized) {
           const routeUrl = this.router.url.split('?').shift() as string;
           const routeQuery = this.route.snapshot.queryParams;
-          const routeFirstParam = routeUrl.split('/')[1]; // possible a locale code
-          // prerender locale
+          const pathInit = routeUrl.substr(1).split('/').shift() as string;
+          const routeLocale = this.i18nOrigins[pathInit];
+          // prerender
           const meta = document.querySelector('meta[itemprop="inLanguage"]');
           const prerenderLocale = !meta ? null : meta.getAttribute('content');
-          // process to change data
-          const initialSettings: AppSettings = {};
+          // set prioritized
+          if (pathInit !== '' && routeLocale) {
+            this.integrations.settingService.setPrioritizedLocale(routeLocale);
+          }
+          // set initial
           if (
-            this.i18nLocales.indexOf(routeFirstParam) !== -1
+            this.i18nLocales.indexOf(pathInit) !== -1
             || routeQuery.l
             || routeQuery.locale
             || prerenderLocale
           ) {
-            initialSettings.locale = routeFirstParam || routeQuery.l || routeQuery.locale || prerenderLocale;
+            this.integrations.settingService.setInitialLocale(
+              pathInit || routeQuery.l || routeQuery.locale || prerenderLocale
+            );
           }
           if (routeQuery.p || routeQuery.persona) {
-            initialSettings.persona = routeQuery.p || routeQuery.persona;
+            this.integrations.settingService.setInitialPersona(routeQuery.p || routeQuery.persona);
           }
           if (routeQuery.t || routeQuery.theme) {
-            initialSettings.theme = routeQuery.t || routeQuery.theme;
+            this.integrations.settingService.setInitialTheme(routeQuery.t || routeQuery.theme);
           }
-          // notify the setting services
-          this.integrations.settingService.initializeSettings(initialSettings);
         }
+        // run hook
+        (this.hooks?.['NavigationEnd'] || ((e: Event) => e))(event);
+        // notify the setting service
+        if (this.integrations.settingService && !this.integrations.settingService.isInitialized) {
+          this.integrations.settingService.triggerSettingInitilizer();
+        }
+        // emit the event
+        this.onNavigationEnd.next(this);
         // scroll to position
         this.scrollTo(this.routePosition, 0, false);
-        // emit
-        this.onNavigationEnd.next(this);
       }
-      // run hook
-      const hook = this.hooks?.[eventName] || ((e: Event) => e);
-      hook(event);
     });
     return this as NavService;
   }

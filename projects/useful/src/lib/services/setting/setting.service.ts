@@ -1,20 +1,20 @@
 import { Injectable, NgZone } from '@angular/core';
 import { of, combineLatest, ReplaySubject } from 'rxjs';
-import { take, switchMap } from 'rxjs/operators';
+import { take, map, switchMap } from 'rxjs/operators';
 import { TranslocoService } from '@ngneat/transloco';
 
 import { LocalstorageService } from '../localstorage/localstorage.service';
 import { UserService } from '../user/user.service';
 
-export interface BuiltinDataItem {
+export interface BuiltinListingItem {
   value: string;
   text: string;
 }
 
-export interface BuiltinData {
-  themes?: BuiltinDataItem[];
-  personas?: BuiltinDataItem[];
-  locales?: BuiltinDataItem[];
+export interface BuiltinListing {
+  themes?: BuiltinListingItem[];
+  personas?: BuiltinListingItem[];
+  locales?: BuiltinListingItem[];
 }
 
 export interface BuiltinUISettings {
@@ -30,7 +30,8 @@ export interface AppSettings extends BuiltinUISettings, BuiltinGeneralSettings {
 export interface SettingOptions {
   browserColor?: boolean;
   browserLocale?: boolean;
-  withInitializing?: boolean;
+  waitForNavigationEnd?: boolean;
+  usePrioritized?: boolean;
   onReady?: () => void;
   personaValidator?: (persona: string, userService?: UserService) => boolean;
 }
@@ -50,17 +51,25 @@ export class SettingService {
   private readonly LSK_LOCALE = 'setting_locale';
   private options: SettingOptions = {};
   private integrations: SettingIntegrations = {};
-  private settingInitilizer = new ReplaySubject<AppSettings>(1);
-  private initialized = false;
+
+  // initializer
+  private settingInitilizer = new ReplaySubject(1);
+  isInitialized = false;
 
   // builtin data
-  themes: BuiltinDataItem[] = [{text: 'Light', value: 'light'}];
-  personas: BuiltinDataItem[] = [{text: 'Default', value: 'default'}];
-  locales: BuiltinDataItem[] = [{text: 'English', value: 'en-US'}];
+  themes: BuiltinListingItem[] = [{text: 'Light', value: 'light'}];
+  personas: BuiltinListingItem[] = [{text: 'Default', value: 'default'}];
+  locales: BuiltinListingItem[] = [{text: 'English', value: 'en-US'}];
 
   // UI intensive settings
+  private inititalTheme?: string;
+  private prioritizedTheme?: string;
   theme = 'light';
+  private inititalPersona?: string;
+  private prioritizedPersona?: string;
   persona = 'default';
+  private inititalLocale?: string;
+  private prioritizedLocale?: string;
   locale = 'en-US';
 
   // other settings
@@ -83,8 +92,8 @@ export class SettingService {
     return this as SettingService;
   }
 
-  setData(settingData: BuiltinData) {
-    const {themes, personas, locales} = settingData;
+  setListing(listing: BuiltinListing) {
+    const {themes, personas, locales} = listing;
     if (themes) {
       this.themes = themes;
     }
@@ -99,16 +108,10 @@ export class SettingService {
 
   init() {
     // handle UI intensive settings
-    this.remoteLoader()
-    .pipe(
-      switchMap(({theme, persona, locale}) =>
-        !this.options.withInitializing
-          ? of([{theme, persona, locale}, {}])
-          : combineLatest([
-            of({theme, persona, locale}),
-            this.settingInitilizer,
-          ])
-      ),
+    combineLatest([
+      this.initLoader(),
+      this.remoteLoader(),
+    ]).pipe(
       switchMap(([
         {theme: remoteTheme, persona: remotePersona, locale: remoteLocale},
         {theme: initTheme, persona: initPersona, locale: initLocale},
@@ -127,7 +130,7 @@ export class SettingService {
       this.changePersona(persona);
       this.changeLocale(locale);
       // set status
-      this.initialized = true;
+      this.isInitialized = true;
       // trigger ready
       if (this.options.onReady) {
         this.options.onReady();
@@ -141,12 +144,33 @@ export class SettingService {
     return this as SettingService;
   }
 
-  allowInitializing() {
-    return this.options.withInitializing && !this.initialized;
+  // for nav service navigation end only
+  triggerSettingInitilizer() {
+    this.settingInitilizer.next();
   }
 
-  initializeSettings(initialSettings: AppSettings) {
-    this.settingInitilizer.next(initialSettings);
+  setInitialTheme(theme: string) {
+    this.inititalTheme = theme;
+  }
+
+  setPrioritizedTheme(theme: string) {
+    this.prioritizedTheme = theme;
+  }
+
+  setInitialPersona(persona: string) {
+    this.inititalPersona = persona;
+  }
+
+  setPrioritizedPersona(persona: string) {
+    this.prioritizedPersona = persona;
+  }
+
+  setInitialLocale(locale: string) {
+    this.inititalLocale = locale;
+  }
+
+  setPrioritizedLocale(locale: string) {
+    this.prioritizedLocale = locale;
   }
 
   changeTheme(name: string) {
@@ -216,6 +240,19 @@ export class SettingService {
     }
   }
 
+  private initLoader() {
+    return !this.options.waitForNavigationEnd
+      ? of({} as AppSettings)
+      : this.settingInitilizer.pipe(
+        take(1),
+        map(() => ({
+          ...(this.inititalTheme ? {}: {theme: this.inititalTheme}),
+          ...(this.inititalPersona ? {}: {persona: this.inititalPersona}),
+          ...(this.inititalLocale ? {}: {locale: this.inititalLocale}),
+        })),
+      );
+  }
+
   private remoteLoader() {
     return !this.integrations.userService
       ? of({} as AppSettings)
@@ -226,75 +263,86 @@ export class SettingService {
   }
 
   private loadTheme({remoteTheme, initTheme}: {remoteTheme?: string; initTheme?: string} = {}) {
-    return remoteTheme
-      // remote
-      ? of(remoteTheme)
-      // local
-      : !this.integrations.localstorageService
-        ? of(initTheme || 'light')
-        : this.integrations.localstorageService
-          .get<string>(this.LSK_THEME)
-          .pipe(
-            switchMap(theme => of(
-              theme
-                ? theme
-                // from initial
-                : initTheme
-                  ? initTheme
-                  // default
-                  : (
-                    this.options.browserColor
-                    && (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-                  )
-                    ? 'dark'
-                    : 'light'
-            ))
-          );
+    // 1. prioritize
+    return (this.options.usePrioritized && this.prioritizedTheme)
+      // 2. remote
+      ? this.prioritizedTheme 
+      : remoteTheme
+        ? of(remoteTheme)
+        // 3. local
+        : !this.integrations.localstorageService
+          ? of(initTheme || 'light')
+          : this.integrations.localstorageService
+            .get<string>(this.LSK_THEME)
+            .pipe(
+              switchMap(theme => of(
+                theme
+                  ? theme
+                  // 4. from initial
+                  : initTheme
+                    ? initTheme
+                    // 5. from client
+                    : (
+                      this.options.browserColor
+                      && (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+                    )
+                      ? 'dark'
+                      // 6. default
+                      : 'light'
+              ))
+            );
   }
 
   private loadPersona({remotePersona, initPersona}: {remotePersona?: string; initPersona?: string} = {}) {
-    return remotePersona
-      // remote
-      ? of(remotePersona)
-      // local
-      : !this.integrations.localstorageService
-        ? of(initPersona || 'default')
-        : this.integrations.localstorageService
-          .get<string>(this.LSK_PERSONA)
-          .pipe(
-            switchMap(persona => of(
-              persona
-                ? persona
-                // from initial
-                : initPersona
-                  ? initPersona
-                  // default
-                  : 'default'
-            ))
-          );
+    // 1. prioritize
+    return (this.options.usePrioritized && this.prioritizedPersona)
+      // 2. remote
+      ? this.prioritizedPersona 
+      : remotePersona
+        ? of(remotePersona)
+        // 3. local
+        : !this.integrations.localstorageService
+          ? of(initPersona || 'default')
+          : this.integrations.localstorageService
+            .get<string>(this.LSK_PERSONA)
+            .pipe(
+              switchMap(persona => of(
+                persona
+                  ? persona
+                  // 4. from initial
+                  : initPersona
+                    ? initPersona
+                    // 5. default
+                    : 'default'
+              ))
+            );
   }
   
   private loadLocale({remoteLocale, initLocale}: {remoteLocale?: string; initLocale?: string} = {}) {
-    return remoteLocale
-      // remote
-      ? of(remoteLocale)
-      // locale
-      : !this.integrations.localstorageService
-        ? of(initLocale || 'en-US')
-        : this.integrations.localstorageService
-          .get<string>(this.LSK_LOCALE)
-          .pipe(
-            switchMap(locale => of(
-              locale
-                ? locale
-                // from initial
-                : initLocale
-                  ? initLocale
-                  // default
-                  : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
-                    ? navigator.language
-                    : 'en-US'
-            ))
-          );
+    // 1. prioritize
+    return (this.options.usePrioritized && this.prioritizedLocale)
+      ? this.prioritizedLocale
+      // 2. remote
+      : remoteLocale
+        ? of(remoteLocale)
+        // 3. locale
+        : !this.integrations.localstorageService
+          ? of(initLocale || 'en-US')
+          : this.integrations.localstorageService
+            .get<string>(this.LSK_LOCALE)
+            .pipe(
+              switchMap(locale => of(
+                locale
+                  ? locale
+                  // 4. from initial
+                  : initLocale
+                    ? initLocale
+                    // 5. from client
+                    : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
+                      ? navigator.language
+                      // 6. default
+                      : 'en-US'
+              ))
+            );
   }
 }
