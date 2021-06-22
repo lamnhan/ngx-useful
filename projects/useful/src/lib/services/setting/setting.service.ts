@@ -106,6 +106,20 @@ export class SettingService {
     return this as SettingService;
   }
 
+  setDefaults(defaultSettings: AppSettings) {
+    const {theme, persona, locale} = defaultSettings;
+    if (theme) {
+      this.theme = theme;
+    }
+    if (persona) {
+      this.persona = persona;
+    }
+    if (locale) {
+      this.locale = locale;
+    }
+    return this as SettingService;
+  }
+
   init() {
     // handle UI intensive settings
     combineLatest([
@@ -113,8 +127,8 @@ export class SettingService {
       this.remoteLoader(),
     ]).pipe(
       switchMap(([
-        {theme: remoteTheme, persona: remotePersona, locale: remoteLocale},
         {theme: initTheme, persona: initPersona, locale: initLocale},
+        {theme: remoteTheme, persona: remotePersona, locale: remoteLocale},
       ]) =>
         combineLatest([
           this.loadTheme({remoteTheme, initTheme}),
