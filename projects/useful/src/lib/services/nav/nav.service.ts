@@ -217,6 +217,11 @@ export class NavService {
         }
       });
     });
+    // watch for locale to update router link href
+    if (this.integrations.settingService) {
+      this.integrations.settingService.onLocaleChanged
+        .subscribe(() => this.onRefreshRouterLink.next());
+    }
     return this as NavService;
   }
 
@@ -279,12 +284,15 @@ export class NavService {
         // set initial/prioritized settings
         if (this.integrations.settingService && !this.integrations.settingService.isInitialized) {
           const routeUrl = this.router.url.split('?').shift() as string;
-          const pathSegments = routeUrl.substr(1).split('/');
-          const pathInit = pathSegments.shift() as string;
+          const pathInit = routeUrl.substr(1).split('/').shift() as string;
           // set prioritized settings for none root path
           if (pathInit !== '') {
+            // localized routes
+            if (this.i18nOrigins[pathInit]) {
+              this.integrations.settingService.setPrioritizedLocale(this.i18nOrigins[pathInit]);
+            }
             // special localized homes
-            if (pathSegments.length === 1) {              
+            else {
               const localizedHomeRoute = (() => {
                 // full matches
                 if (pathInit.indexOf('-') !== -1) {
@@ -314,13 +322,6 @@ export class NavService {
               })();
               if (localizedHomeRoute) {
                 this.integrations.settingService.setPrioritizedLocale(localizedHomeRoute);
-              }
-            }
-            // localized routes
-            else {
-              const routeLocale = this.i18nOrigins[pathInit];
-              if (routeLocale) {
-                this.integrations.settingService.setPrioritizedLocale(routeLocale);
               }
             }
           }

@@ -123,17 +123,14 @@ export class SettingService {
   init() {
     // handle UI intensive settings
     combineLatest([
-      this.initLoader(),
       this.remoteLoader(),
+      this.initLoader(),
     ]).pipe(
-      switchMap(([
-        {theme: initTheme, persona: initPersona, locale: initLocale},
-        {theme: remoteTheme, persona: remotePersona, locale: remoteLocale},
-      ]) =>
+      switchMap(([{theme: remoteTheme, persona: remotePersona, locale: remoteLocale}]) =>
         combineLatest([
-          this.loadTheme({remoteTheme, initTheme}),
-          this.loadPersona({remotePersona, initPersona}),
-          this.loadLocale({remoteLocale, initLocale}),
+          this.loadTheme(remoteTheme),
+          this.loadPersona(remotePersona),
+          this.loadLocale(remoteLocale),
         ])
       ),
     )
@@ -257,14 +254,7 @@ export class SettingService {
   private initLoader() {
     return !this.options.waitForNavigationEnd
       ? of({} as AppSettings)
-      : this.settingInitilizer.pipe(
-        take(1),
-        map(() => ({
-          ...(this.inititalTheme ? {}: {theme: this.inititalTheme}),
-          ...(this.inititalPersona ? {}: {persona: this.inititalPersona}),
-          ...(this.inititalLocale ? {}: {locale: this.inititalLocale}),
-        })),
-      );
+      : this.settingInitilizer;
   }
 
   private remoteLoader() {
@@ -276,16 +266,16 @@ export class SettingService {
       );
   }
 
-  private loadTheme({remoteTheme, initTheme}: {remoteTheme?: string; initTheme?: string} = {}) {
+  private loadTheme(remoteTheme?: string) {
     // 1. prioritize
     return (this.options.usePrioritized && this.prioritizedTheme)
       // 2. remote
-      ? this.prioritizedTheme 
+      ? of(this.prioritizedTheme)
       : remoteTheme
         ? of(remoteTheme)
         // 3. local
         : !this.integrations.localstorageService
-          ? of(initTheme || 'light')
+          ? of(this.inititalTheme || 'light')
           : this.integrations.localstorageService
             .get<string>(this.LSK_THEME)
             .pipe(
@@ -293,8 +283,8 @@ export class SettingService {
                 theme
                   ? theme
                   // 4. from initial
-                  : initTheme
-                    ? initTheme
+                  : this.inititalTheme
+                    ? this.inititalTheme
                     // 5. from client
                     : (
                       this.options.browserColor
@@ -307,16 +297,16 @@ export class SettingService {
             );
   }
 
-  private loadPersona({remotePersona, initPersona}: {remotePersona?: string; initPersona?: string} = {}) {
+  private loadPersona(remotePersona?: string) {
     // 1. prioritize
     return (this.options.usePrioritized && this.prioritizedPersona)
       // 2. remote
-      ? this.prioritizedPersona 
+      ? of(this.prioritizedPersona) 
       : remotePersona
         ? of(remotePersona)
         // 3. local
         : !this.integrations.localstorageService
-          ? of(initPersona || 'default')
+          ? of(this.inititalPersona || 'default')
           : this.integrations.localstorageService
             .get<string>(this.LSK_PERSONA)
             .pipe(
@@ -324,24 +314,24 @@ export class SettingService {
                 persona
                   ? persona
                   // 4. from initial
-                  : initPersona
-                    ? initPersona
+                  : this.inititalPersona
+                    ? this.inititalPersona
                     // 5. default
                     : 'default'
               ))
             );
   }
   
-  private loadLocale({remoteLocale, initLocale}: {remoteLocale?: string; initLocale?: string} = {}) {
+  private loadLocale(remoteLocale?: string) {
     // 1. prioritize
     return (this.options.usePrioritized && this.prioritizedLocale)
-      ? this.prioritizedLocale
+      ? of(this.prioritizedLocale)
       // 2. remote
       : remoteLocale
         ? of(remoteLocale)
         // 3. locale
         : !this.integrations.localstorageService
-          ? of(initLocale || 'en-US')
+          ? of(this.inititalLocale || 'en-US')
           : this.integrations.localstorageService
             .get<string>(this.LSK_LOCALE)
             .pipe(
@@ -349,8 +339,8 @@ export class SettingService {
                 locale
                   ? locale
                   // 4. from initial
-                  : initLocale
-                    ? initLocale
+                  : this.inititalLocale
+                    ? this.inititalLocale
                     // 5. from client
                     : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
                       ? navigator.language
