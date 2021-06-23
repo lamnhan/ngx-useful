@@ -3,7 +3,9 @@ import { Title, Meta } from '@angular/platform-browser';
 
 import { SettingService } from '../setting/setting.service';
 
-export interface MetaOptions {}
+export interface MetaOptions {
+  suffixSeparator?: string;
+}
 
 export interface MetaIntegrations {
   settingService?: SettingService;
@@ -43,7 +45,10 @@ export class MetaService {
   private integrations: MetaIntegrations = {};
   private defaultMetas: AppMetas = {};
   private metaTranslations: MetaTranslations = {};
-
+  private defaultSuffix = '';
+  private suffixTranslations: Record<string, string> = {};
+  
+  appSuffix = '';
   appMetas: AppMetas = {};
 
   constructor(
@@ -60,7 +65,17 @@ export class MetaService {
     this.integrations = integrations;
     return this as MetaService;
   }
- 
+
+  setSuffix(
+    defaultSuffix: string,
+    suffixTranslations: Record<string, string>
+  ) {
+    this.defaultSuffix = defaultSuffix;
+    this.appSuffix = defaultSuffix;
+    this.suffixTranslations = suffixTranslations;
+    return this as MetaService;
+  }
+
   init(
     defaultMetas: AppMetas,
     metaTranslations: MetaTranslations = {},
@@ -68,11 +83,14 @@ export class MetaService {
     this.defaultMetas = defaultMetas;
     this.appMetas = this.defaultMetas;
     this.metaTranslations = metaTranslations;
-    // watch for locale changed
+    // watch for locale changed (re-evaluate app values)
     if (this.integrations.settingService) {
       this.integrations.settingService
         .onLocaleChanged
-        .subscribe(locale => this.appMetas = this.getAppMetas(locale));
+        .subscribe(locale => {
+          this.appSuffix = this.getAppSuffix(locale);
+          this.appMetas = this.getAppMetas(locale);
+        });
     }
     // done
     return this as MetaService;
@@ -88,26 +106,41 @@ export class MetaService {
     return this as MetaService;
   }
 
-  changePageMetas(customMetas: AppCustomMetas = {}, withLocale?: string) {
-    const metas = this.processMetaData(customMetas, withLocale);
+  changePageMetas(
+    customMetas: AppCustomMetas = {},
+    withSuffix = false,
+    forLocale?: string
+  ) {
+    const metas = this.processMetaData(customMetas, withSuffix, forLocale);
     this.changePageTitle(metas.title || 'App');
     this.changePageLang(metas.lang || 'en');
     this.changeMetaTags(metas);
     return this as MetaService;
   }
 
-  private getAppMetas(withLocale?: string) {
-    const locale = withLocale
-      || this.integrations?.settingService?.locale
-      || 'en-US';
-    return this.metaTranslations[locale] || this.defaultMetas;
+  private getAppSuffix(forLocale?: string) {
+    return this.suffixTranslations[forLocale || this.integrations?.settingService?.locale || 'en-US']
+      || this.defaultSuffix;
   }
 
-  private processMetaData(customMetas: AppCustomMetas, withLocale?: string) {
-    const appMetas = this.getAppMetas(withLocale);
+  private getAppMetas(forLocale?: string) {
+    return this.metaTranslations[forLocale || this.integrations?.settingService?.locale || 'en-US']
+      || this.defaultMetas;
+  }
+
+  private processMetaData(
+    customMetas: AppCustomMetas,
+    withSuffix = false,
+    forLocale?: string
+  ) {
+    const appSuffix = this.getAppSuffix(forLocale);
+    const appMetas = this.getAppMetas(forLocale);
     // custom
     const url = customMetas['url'] || location.href;
-    const title = customMetas['title'] || appMetas['title'];
+    let title = customMetas['title'] || appMetas['title'];
+    if (withSuffix && appSuffix) { // add suffix
+      title = `${title} ${this.options.suffixSeparator || '—'} ${appSuffix}`;
+    }
     const description = customMetas['description'] || appMetas['description'];
     const image = customMetas['image'] || appMetas['image'];
     const locale = customMetas['locale'] || appMetas['locale'];
