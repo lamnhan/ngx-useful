@@ -77,8 +77,11 @@ export class SettingService {
 
   // events
   public readonly onThemeChanged = new ReplaySubject<string>(1);
+  private onThemeChangedAnyEmitted = false;
   public readonly onPersonaChanged = new ReplaySubject<string>(1);
+  private onPersonaChangedAnyEmitted = false;
   public readonly onLocaleChanged = new ReplaySubject<string>(1);
+  private onLocaleChangedAnyEmitted = false;
 
   constructor(private readonly zone: NgZone) {}
 
@@ -140,17 +143,13 @@ export class SettingService {
       this.changeTheme(theme);
       this.changePersona(persona);
       this.changeLocale(locale);
-      // set status
-      this.isInitialized = true;
       // trigger ready
       if (this.options.onReady) {
         this.options.onReady();
       }
+      // set status
+      this.isInitialized = true;
     }));
-    // emit default values
-    this.onThemeChanged.next(this.theme);
-    this.onPersonaChanged.next(this.persona);
-    this.onLocaleChanged.next(this.locale);
     // done
     return this as SettingService;
   }
@@ -185,6 +184,7 @@ export class SettingService {
   }
 
   changeTheme(name: string) {
+    // value changed only
     if (this.theme !== name) {
       // affect
       document.body.setAttribute('data-theme', name);
@@ -195,21 +195,26 @@ export class SettingService {
       ) {
         this.integrations.userService.updateSettings({ theme: name });
       }
-      // event
-      this.onThemeChanged.next(name);
     }
     // set value
     this.theme = name;
     if (this.integrations.localstorageService) {
       this.integrations.localstorageService.set(this.LSK_THEME, name);
+    }    
+    // emit event
+    if (this.theme !== name || !this.onThemeChangedAnyEmitted) {
+      this.onThemeChangedAnyEmitted = true;
+      this.onThemeChanged.next(name);
     }
   }
 
   changePersona(name: string) {
+    // check validation
     const isValid = !this.options.personaValidator
       ? true
       : this.options.personaValidator(name, this.integrations.userService);
     name = isValid ? name : 'default';
+    // value changed only
     if (this.persona !== name) {
       // set remote
       if (
@@ -218,17 +223,21 @@ export class SettingService {
       ) {
         this.integrations.userService.updateSettings({ persona: name });
       }
-      // event
-      this.onPersonaChanged.next(name);
     }
     // set value
     this.persona = name;
     if (this.integrations.localstorageService) {
       this.integrations.localstorageService.set(this.LSK_PERSONA, name);
     }
+    // emit event
+    if (this.persona !== name || !this.onPersonaChangedAnyEmitted) {
+      this.onPersonaChangedAnyEmitted = true;
+      this.onPersonaChanged.next(name);
+    }
   }
 
   changeLocale(value: string) {
+    // value changed only
     if (this.locale !== value) {
       // affect
       if (this.integrations.translateService) {
@@ -241,13 +250,16 @@ export class SettingService {
       ) {
         this.integrations.userService.updateSettings({ locale: value });
       }
-      // event
-      this.onLocaleChanged.next(value);
     }
     // set value
     this.locale = value;
     if (this.integrations.localstorageService) {
       this.integrations.localstorageService.set(this.LSK_LOCALE, value);
+    }
+    // emit event
+    if (this.locale !== value || !this.onLocaleChangedAnyEmitted) {
+      this.onLocaleChangedAnyEmitted = true;
+      this.onLocaleChanged.next(value);
     }
   }
 
