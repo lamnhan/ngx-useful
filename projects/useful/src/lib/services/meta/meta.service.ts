@@ -68,7 +68,7 @@ export class MetaService {
 
   setSuffix(
     defaultSuffix: string,
-    suffixTranslations: Record<string, string>
+    suffixTranslations: Record<string, string> = {}
   ) {
     this.defaultSuffix = defaultSuffix;
     this.appSuffix = defaultSuffix;

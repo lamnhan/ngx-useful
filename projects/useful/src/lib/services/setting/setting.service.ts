@@ -184,8 +184,14 @@ export class SettingService {
   }
 
   changeTheme(name: string) {
+    const currentTheme = this.theme;
+    // set value
+    this.theme = name;
+    if (this.integrations.localstorageService) {
+      this.integrations.localstorageService.set(this.LSK_THEME, name);
+    }    
     // value changed only
-    if (this.theme !== name) {
+    if (currentTheme !== name) {
       // affect
       document.body.setAttribute('data-theme', name);
       // set remote
@@ -196,26 +202,27 @@ export class SettingService {
         this.integrations.userService.updateSettings({ theme: name });
       }
     }
-    // set value
-    this.theme = name;
-    if (this.integrations.localstorageService) {
-      this.integrations.localstorageService.set(this.LSK_THEME, name);
-    }    
     // emit event
-    if (this.theme !== name || !this.onThemeChangedAnyEmitted) {
+    if (currentTheme !== name || !this.onThemeChangedAnyEmitted) {
       this.onThemeChangedAnyEmitted = true;
       this.onThemeChanged.next(name);
     }
   }
 
   changePersona(name: string) {
+    const currentPersona = this.persona;
     // check validation
     const isValid = !this.options.personaValidator
       ? true
       : this.options.personaValidator(name, this.integrations.userService);
     name = isValid ? name : 'default';
+    // set value
+    this.persona = name;
+    if (this.integrations.localstorageService) {
+      this.integrations.localstorageService.set(this.LSK_PERSONA, name);
+    }
     // value changed only
-    if (this.persona !== name) {
+    if (currentPersona !== name) {
       // set remote
       if (
         this.integrations.userService?.currentUser
@@ -224,21 +231,22 @@ export class SettingService {
         this.integrations.userService.updateSettings({ persona: name });
       }
     }
-    // set value
-    this.persona = name;
-    if (this.integrations.localstorageService) {
-      this.integrations.localstorageService.set(this.LSK_PERSONA, name);
-    }
     // emit event
-    if (this.persona !== name || !this.onPersonaChangedAnyEmitted) {
+    if (currentPersona !== name || !this.onPersonaChangedAnyEmitted) {
       this.onPersonaChangedAnyEmitted = true;
       this.onPersonaChanged.next(name);
     }
   }
 
   changeLocale(value: string) {
+    const currentLocale = this.locale;
+    // set value
+    this.locale = value;
+    if (this.integrations.localstorageService) {
+      this.integrations.localstorageService.set(this.LSK_LOCALE, value);
+    }
     // value changed only
-    if (this.locale !== value) {
+    if (currentLocale !== value) {
       // affect
       if (this.integrations.translateService) {
         this.integrations.translateService.setActiveLang(value);
@@ -251,13 +259,8 @@ export class SettingService {
         this.integrations.userService.updateSettings({ locale: value });
       }
     }
-    // set value
-    this.locale = value;
-    if (this.integrations.localstorageService) {
-      this.integrations.localstorageService.set(this.LSK_LOCALE, value);
-    }
     // emit event
-    if (this.locale !== value || !this.onLocaleChangedAnyEmitted) {
+    if (currentLocale !== value || !this.onLocaleChangedAnyEmitted) {
       this.onLocaleChangedAnyEmitted = true;
       this.onLocaleChanged.next(value);
     }
