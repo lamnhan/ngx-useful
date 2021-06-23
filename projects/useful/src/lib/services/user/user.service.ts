@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ReplaySubject, of, from, throwError, combineLatest } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, catchError } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import {
   Profile,
@@ -90,6 +90,7 @@ export class UserService {
         switchMap(({nativeUser, data, publicData}) =>
           this.publicProfilePatcher(nativeUser, data, publicData)
         ),
+        catchError(() => of({nativeUser: undefined, data: undefined, publicData: undefined})),
       )
       .subscribe(({nativeUser, data, publicData}) => {
         // set data
