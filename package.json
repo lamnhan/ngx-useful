@@ -45,7 +45,7 @@
     "@ngneat/transloco": "^2.21.0",
     "@unistylus/bootstrap": "0.0.2",
     "@unistylus/core": "0.0.1",
-    "firebase": "^8.6.8",
+    "firebase": "8.6.1",
     "howler": "^2.2.1",
     "localforage": "^1.9.0",
     "ngx-markdown": "^11.1.3",
