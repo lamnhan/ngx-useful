@@ -1,6 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import { of, combineLatest, ReplaySubject } from 'rxjs';
-import { take, map, switchMap } from 'rxjs/operators';
+import { take, switchMap } from 'rxjs/operators';
 import { TranslocoService } from '@ngneat/transloco';
 
 import { LocalstorageService } from '../localstorage/localstorage.service';
@@ -64,13 +64,16 @@ export class SettingService {
   // UI intensive settings
   private inititalTheme?: string;
   private prioritizedTheme?: string;
-  theme = 'light';
+  defaultTheme = 'light';
+  theme = this.defaultTheme;
   private inititalPersona?: string;
   private prioritizedPersona?: string;
-  persona = 'default';
+  defaultPersona = 'default';
+  persona = this.defaultPersona;
   private inititalLocale?: string;
   private prioritizedLocale?: string;
-  locale = 'en-US';
+  defaultLocale = 'en-US';
+  locale = this.defaultLocale;
 
   // other settings
   // ...
@@ -112,13 +115,13 @@ export class SettingService {
   setDefaults(defaultSettings: AppSettings) {
     const {theme, persona, locale} = defaultSettings;
     if (theme) {
-      this.theme = theme;
+      this.defaultTheme = theme;
     }
     if (persona) {
-      this.persona = persona;
+      this.defaultPersona = persona;
     }
     if (locale) {
-      this.locale = locale;
+      this.defaultLocale = locale;
     }
     return this as SettingService;
   }
@@ -307,7 +310,7 @@ export class SettingService {
                     )
                       ? 'dark'
                       // 6. default
-                      : 'light'
+                      : this.defaultTheme
               ))
             );
   }
@@ -332,7 +335,7 @@ export class SettingService {
                   : this.inititalPersona
                     ? this.inititalPersona
                     // 5. default
-                    : 'default'
+                    : this.defaultPersona
               ))
             );
   }
@@ -360,7 +363,7 @@ export class SettingService {
                     : (this.options.browserLocale && navigator.language.indexOf('-') !== -1)
                       ? navigator.language
                       // 6. default
-                      : 'en-US'
+                      : this.defaultLocale
               ))
             );
   }
