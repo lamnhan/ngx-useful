@@ -22,7 +22,7 @@
     "@angular/common": "~12.0.3",
     "@angular/platform-browser": "~12.0.3",
     "@angular/router": "~12.0.3",
-    "@lamnhan/schemata": "^0.0.12"
+    "@lamnhan/schemata": "^0.0.14"
   },
   "dependencies": {
     "@angular/fire": "^6.1.5",
