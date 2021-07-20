@@ -28,17 +28,13 @@ export interface UserOptions {
   profilePublished?: boolean;
 }
 
-export interface UserIntegrations {
-  profileDataService?: ProfileDataService
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   private options: UserOptions = {};
-  private integrations: UserIntegrations = {};
   private userDataService!: UserDataService;
+  private profileDataService!: ProfileDataService;
 
   currentUser?: NativeUser;
   data?: User;
@@ -60,13 +56,12 @@ export class UserService {
     return this as UserService;
   }
   
-  setIntegrations(integrations: UserIntegrations) {
-    this.integrations = integrations;
-    return this as UserService;
-  }
-  
-  init(userDataService: UserDataService) {
+  init(
+    userDataService: UserDataService,
+    profileDataService: ProfileDataService
+  ) {
     this.userDataService = userDataService;
+    this.profileDataService = profileDataService;
     // watch for auth
     this.authService
       .onAuthStateChanged
@@ -79,8 +74,8 @@ export class UserService {
               ? this.userDataService.flatDoc(nativeUser.uid)
               : of(undefined),
             // get profile doc
-            nativeUser?.uid && this.integrations.profileDataService
-              ? this.integrations.profileDataService.flatDoc(ref => ref.where('uid', '==', nativeUser.uid))
+            nativeUser?.uid
+              ? this.profileDataService.flatDoc(ref => ref.where('uid', '==', nativeUser.uid))
               : of(undefined)
           ])
         ),
@@ -113,9 +108,7 @@ export class UserService {
   }
 
   checkUsernameExists(username: string) {
-    return !this.integrations.profileDataService
-      ? of(true)
-      : this.integrations.profileDataService.exists(username);
+    return this.profileDataService.exists(username);
   }
 
   changeEmail(email: string) {
@@ -134,7 +127,7 @@ export class UserService {
         if (exists) {
           return throwError('User exists with the username: ' + username);
         }
-        if (!this.currentUser || !this.data || !this.publicData || !this.integrations.profileDataService) {
+        if (!this.currentUser || !this.data || !this.publicData) {
           return throwError('Can not change username.');
         }
         const uid = this.currentUser.uid;
@@ -147,7 +140,7 @@ export class UserService {
         return this.userDataService.update(uid, {username}).pipe(
           // remove current doc from /profiles
           switchMap(() =>
-            (this.integrations.profileDataService as ProfileDataService).delete(currentUsername)
+            this.profileDataService.delete(currentUsername)
           ),
           // add new doc to /profiles
           switchMap(() =>
@@ -159,7 +152,7 @@ export class UserService {
   }
 
   changePublicity(toPublic = false) {
-    if (!this.currentUser || !this.data || !this.publicData || !this.integrations.profileDataService) {
+    if (!this.currentUser || !this.data || !this.publicData) {
       return throwError('No user.');
     }
     // TODO
@@ -260,9 +253,7 @@ export class UserService {
         : this.data.publicly
     }).pipe(
       switchMap(() =>
-        this.integrations.profileDataService
-          ? this.integrations.profileDataService.update(username, profileDoc)
-          : of(undefined)
+        this.profileDataService.update(username, profileDoc)
       ),
     );
   }
@@ -338,14 +329,14 @@ export class UserService {
         ? this.userDataService.update(uid, userDoc)
         : of(undefined),
       // update profile doc
-      profileDoc && this.integrations.profileDataService
-        ? this.integrations.profileDataService.update(username, profileDoc)
+      profileDoc
+        ? this.profileDataService.update(username, profileDoc)
         : of(undefined),
     ]);
   }
 
   private publicProfilePatcher(nativeUser?: NativeUser, data?: User, publicData?: Profile) {
-    if (nativeUser && data && this.integrations.profileDataService && publicData) {
+    if (nativeUser && data && publicData) {
       const { displayName, photoURL } = data;
       const { id, title, thumbnail } = publicData;
       let profileDoc: undefined | Partial<Profile>;
@@ -357,7 +348,7 @@ export class UserService {
       }
       return !profileDoc
         ? of({nativeUser, data, publicData})
-        : this.integrations.profileDataService.update(id, profileDoc).pipe(
+        : this.profileDataService.update(id, profileDoc).pipe(
           map(() => ({nativeUser, data, publicData: {...publicData, ...profileDoc}}))
         );
     } else {
@@ -375,13 +366,6 @@ export class UserService {
       return of({ nativeUser: undefined, data: undefined, publicData: undefined });
     }
     // has user (signed up or signed in)
-    // without /profiles
-    else if (!this.integrations.profileDataService) {
-      return !userDoc
-        ? this.userInitializer(nativeUser)
-        : this.proccessUserData(nativeUser, userDoc);
-    }
-    // with /profiles
     else {
       const nativeUsername = this.authService.credential?.additionalUserInfo?.username;
       const defaultUsername = nativeUsername
@@ -390,7 +374,7 @@ export class UserService {
           ? nativeUser.email.split('@').shift() as string
           : nativeUser.uid.substr(-7);
       return !userDoc
-        ? this.integrations.profileDataService.exists(defaultUsername).pipe(
+        ? this.profileDataService.exists(defaultUsername).pipe(
           switchMap(exists =>
             this.userInitializer(nativeUser, !exists ? defaultUsername : nativeUser.uid)
           ),
@@ -471,7 +455,7 @@ export class UserService {
         profileDoc.props = props;
       }
     }
-    return (this.integrations.profileDataService as ProfileDataService).add(username, profileDoc).pipe(
+    return this.profileDataService.add(username, profileDoc).pipe(
       map(() => ({ nativeUser, data, publicData: profileDoc }))
     );
   }
