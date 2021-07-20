@@ -39,6 +39,7 @@ export class UserService {
   currentUser?: NativeUser;
   data?: User;
   publicData?: Profile;
+
   uid?: string;
   username?: string;
   role: UserRoles = 'subscriber';
@@ -75,17 +76,23 @@ export class UserService {
               : of(undefined),
             // get profile doc
             nativeUser?.uid
-              ? this.profileDataService.flatDoc(ref => ref.where('uid', '==', nativeUser.uid))
+              ? this.profileDataService.flatDoc(
+                ref => ref
+                  .where('uid', '==', nativeUser.uid)
+                  .where('type', '==', 'user')
+              )
               : of(undefined)
           ])
         ),
-        switchMap(([nativeUser, userDoc, profileDoc]) =>
-          this.handleAuthChanged(nativeUser, userDoc, profileDoc)
+        switchMap(([nativeUser, currentUserDoc, currentProfileDoc]) =>
+          this.handleAuthChanged(nativeUser, currentUserDoc, currentProfileDoc)
         ),
         switchMap(({nativeUser, data, publicData}) =>
           this.publicProfilePatcher(nativeUser, data, publicData)
         ),
-        catchError(() => of({nativeUser: undefined, data: undefined, publicData: undefined})),
+        catchError(() =>
+          of({nativeUser: undefined, data: undefined, publicData: undefined})
+        ),
       )
       .subscribe(({nativeUser, data, publicData}) => {
         // set data
@@ -336,30 +343,33 @@ export class UserService {
   }
 
   private publicProfilePatcher(nativeUser?: NativeUser, data?: User, publicData?: Profile) {
+    // signed up or signed in
     if (nativeUser && data && publicData) {
       const { displayName, photoURL } = data;
       const { id, title, thumbnail } = publicData;
-      let profileDoc: undefined | Partial<Profile>;
+      let profileUpdates: undefined | Partial<Profile>;
       if (displayName && (!title || title !== displayName)) {
-        profileDoc = {...profileDoc, title: displayName};
+        profileUpdates = {...profileUpdates, title: displayName};
       }
       if (photoURL && (!thumbnail || thumbnail !== photoURL)) {
-        profileDoc = {...profileDoc, thumbnail: photoURL};
+        profileUpdates = {...profileUpdates, thumbnail: photoURL};
       }
-      return !profileDoc
+      return !profileUpdates
         ? of({nativeUser, data, publicData})
-        : this.profileDataService.update(id, profileDoc).pipe(
-          map(() => ({nativeUser, data, publicData: {...publicData, ...profileDoc}}))
+        : this.profileDataService.update(id, profileUpdates).pipe(
+          map(() => ({nativeUser, data, publicData: {...publicData, ...profileUpdates}}))
         );
-    } else {
+    }
+    // no user or signed out
+    else {
       return of({nativeUser, data, publicData});
     }
   }
 
   private handleAuthChanged(
     nativeUser: null | NativeUser,
-    userDoc?: null | User,
-    profileDoc?: null | Profile
+    currentUserDoc?: null | User,
+    currentProfileDoc?: null | Profile
   ) {
     // no user (not yet signed in or signed out)
     if (!nativeUser) {
@@ -373,37 +383,41 @@ export class UserService {
         : nativeUser.email
           ? nativeUser.email.split('@').shift() as string
           : nativeUser.uid.substr(-7);
-      return !userDoc
+      return !currentUserDoc
+        // new user (create record in users/ and profiles/)
         ? this.profileDataService.exists(defaultUsername).pipe(
           switchMap(exists =>
             this.userInitializer(nativeUser, !exists ? defaultUsername : nativeUser.uid)
           ),
-          switchMap(({data}) =>
-            this.profileInitializer(nativeUser, data)
+          switchMap(userDoc =>
+            this.profileInitializer(nativeUser, userDoc)
           ),
         )
-        : this.proccessUserData(nativeUser, userDoc).pipe(
-          switchMap(({data}) =>
-            !profileDoc
-              ? this.profileInitializer(nativeUser, data)
-              : of({ nativeUser, data, publicData: profileDoc })
-          )
+        // existing user
+        : this.proccessUserData(nativeUser, currentUserDoc).pipe(
+          switchMap(userDoc =>
+            !currentProfileDoc
+              // some how no record in profiles/ (add one)
+              ? this.profileInitializer(nativeUser, userDoc)
+              // everything is ok
+              : of({ nativeUser, data: userDoc, publicData: currentProfileDoc })
+          ),
         );
     }
   }
 
-  private userInitializer(nativeUser: NativeUser, username?: string) {
+  private userInitializer(nativeUser: NativeUser, username: string) {
     const {uid} = nativeUser;
-    const userDoc = { uid, username: username || uid } as User;
+    const userDoc = {uid, username} as User;
     return this.userDataService.add(uid, userDoc).pipe(
       switchMap(() => this.proccessUserData(nativeUser, userDoc)),
     );
   }
 
-  private profileInitializer(nativeUser: NativeUser, data: User) {
+  private profileInitializer(nativeUser: NativeUser, userDoc: User) {
     const uid = nativeUser.uid;
-    const username = data.username as string;
-    const displayName = data.displayName as string;
+    const username = userDoc.username as string;
+    const displayName = userDoc.displayName as string;
     // basic fields
     const {profilePublished} = this.options;
     const profileDoc: Profile = {
@@ -411,6 +425,7 @@ export class UserService {
       id: username,
       title: profilePublished ? displayName : username,
       status: profilePublished ? 'publish' : 'draft',
+      type: 'user',
     };
     // custom fields
     if (profilePublished) {
@@ -424,7 +439,7 @@ export class UserService {
         phoneNumber,
         additionalData,
         publicly,
-      } = data;
+      } = userDoc;
       if (photoURL) {
         profileDoc.thumbnail = photoURL;
       }
@@ -456,30 +471,31 @@ export class UserService {
       }
     }
     return this.profileDataService.add(username, profileDoc).pipe(
-      map(() => ({ nativeUser, data, publicData: profileDoc }))
+      map(() => ({ nativeUser, data: userDoc, publicData: profileDoc }))
     );
   }
 
   private proccessUserData(nativeUser: NativeUser, userDoc: User) {
-    return from(nativeUser.getIdTokenResult()).pipe(map(idTokenResult => {
-      const isNew = this.authService.credential?.additionalUserInfo?.isNewUser;
-      const data = {
-        ...userDoc,
-        isAnonymous: nativeUser.isAnonymous ?? undefined,
-        isNew,
-        emailVerified: nativeUser.emailVerified ?? undefined,
-        uid: nativeUser.uid ?? undefined,
-        email: nativeUser.email ?? undefined,
-        phoneNumber: nativeUser.phoneNumber ?? undefined,
-        providerId: (nativeUser.providerId ?? undefined) as any,
-        providerData: (nativeUser.providerData ?? undefined) as any,
-        metadata: nativeUser.metadata ?? undefined,
-        claims: idTokenResult.claims ?? undefined,
-        displayName: nativeUser.displayName ?? userDoc.username,
-        photoURL: nativeUser.photoURL ?? `https://www.gravatar.com/avatar/${this.helperService.md5(nativeUser.email||'user@lamnhan.com')}?d=retro`,
-      } as User;
-      return { nativeUser, data, publicData: undefined };
-    }));
+    return from(nativeUser.getIdTokenResult()).pipe(
+      map(idTokenResult => {
+        const isNew = this.authService.credential?.additionalUserInfo?.isNewUser;
+        return {
+          ...userDoc,
+          isAnonymous: nativeUser.isAnonymous ?? undefined,
+          isNew,
+          emailVerified: nativeUser.emailVerified ?? undefined,
+          uid: nativeUser.uid ?? undefined,
+          email: nativeUser.email ?? undefined,
+          phoneNumber: nativeUser.phoneNumber ?? undefined,
+          providerId: (nativeUser.providerId ?? undefined) as any,
+          providerData: (nativeUser.providerData ?? undefined) as any,
+          metadata: nativeUser.metadata ?? undefined,
+          claims: idTokenResult.claims ?? undefined,
+          displayName: nativeUser.displayName ?? userDoc.username,
+          photoURL: nativeUser.photoURL ?? `https://www.gravatar.com/avatar/${this.helperService.md5(nativeUser.email||'user@lamnhan.com')}?d=retro`,
+        } as User;
+      }),
+    );
   }
 
   private getRole(claims: UserClaims = {}) {
