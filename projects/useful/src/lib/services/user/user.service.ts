@@ -478,19 +478,19 @@ export class UserService {
   private proccessUserData(nativeUser: NativeUser, userDoc: User) {
     return from(nativeUser.getIdTokenResult()).pipe(
       map(idTokenResult => {
-        const isNew = this.authService.credential?.additionalUserInfo?.isNewUser;
+        const isNew = !!this.authService.credential?.additionalUserInfo?.isNewUser;
         return {
           ...userDoc,
-          isAnonymous: nativeUser.isAnonymous ?? undefined,
+          isAnonymous: nativeUser.isAnonymous ?? false,
           isNew,
-          emailVerified: nativeUser.emailVerified ?? undefined,
-          uid: nativeUser.uid ?? undefined,
-          email: nativeUser.email ?? undefined,
-          phoneNumber: nativeUser.phoneNumber ?? undefined,
-          providerId: (nativeUser.providerId ?? undefined) as any,
-          providerData: (nativeUser.providerData ?? undefined) as any,
-          metadata: nativeUser.metadata ?? undefined,
-          claims: idTokenResult.claims ?? undefined,
+          emailVerified: nativeUser.emailVerified ?? false,
+          uid: nativeUser.uid,
+          email: nativeUser.email ?? '',
+          phoneNumber: nativeUser.phoneNumber ?? '',
+          providerId: nativeUser.providerId,
+          providerData: nativeUser.providerData ?? undefined,
+          metadata: nativeUser.metadata,
+          claims: idTokenResult.claims,
           displayName: nativeUser.displayName ?? userDoc.username,
           photoURL: nativeUser.photoURL ?? `https://www.gravatar.com/avatar/${this.helperService.md5(nativeUser.email||'user@lamnhan.com')}?d=retro`,
         } as User;
