@@ -7,20 +7,19 @@ import {
   ActivatedRouteSnapshot,
 } from '@angular/router';
 
-import { NavService } from '../services/nav/nav.service';
-import { AuthService } from '../services/auth/auth.service';
+import { NavService } from '../../services/nav/nav.service';
+import { AuthService } from '../../services/auth/auth.service';
+import { UserService } from '../../services/user/user.service';
 
-/**
- * Only allow authenticated user
- */
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard implements CanActivate, CanLoad {
+export class DashboardGuard implements CanActivate, CanLoad {
   constructor(
     private readonly ngZone: NgZone,
     private navService: NavService,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
@@ -28,15 +27,15 @@ export class AuthGuard implements CanActivate, CanLoad {
   }
 
   canLoad(route: Route) {
-    return this.handler(route.path || null);
+    return this.handler(route.path);
   }
 
-  private handler(url: null | string) {
-    if (this.authService.authenticated) {
+  private handler(url?: string) {
+    if (this.userService.allowedLevel(2)) {
       return true;
     }
-    // Store the attempted URL for redirecting
-    this.authService.setRedirectUrl(url);
+    // not passed url, redirect to login page
+    this.authService.setRedirectUrl(url || null);
     this.ngZone.run(() => this.navService.navigate(['login']));
     return false;
   }

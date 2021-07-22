@@ -32,12 +32,15 @@ import {PlayerService} from './services/player/player.service';
 import {AuthService} from './services/auth/auth.service';
 import {UserService} from './services/user/user.service';
 import {DatabaseService} from './services/database/database.service';
+import {StorageService} from './services/storage/storage.service';
 
 @NgModule({
   declarations: [],
   imports: [
+    // directives
     RouterLinkDirectiveModule,
     RouterExternalActiveDirectiveModule,
+    // pipes
     O2aPipeModule,
     O1iPipeModule,
     FilterPipeModule,
@@ -48,7 +51,6 @@ import {DatabaseService} from './services/database/database.service';
     ListPipeModule,
   ],
   providers: [
-    // normal services
     HelperService,
     ErrorService,
     NetworkService,
@@ -69,10 +71,13 @@ import {DatabaseService} from './services/database/database.service';
     AuthService,
     UserService,
     DatabaseService,
+    StorageService,
   ],
   exports: [
+    // directives
     RouterLinkDirectiveModule,
     RouterExternalActiveDirectiveModule,
+    // pipes
     O2aPipeModule,
     O1iPipeModule,
     FilterPipeModule,
