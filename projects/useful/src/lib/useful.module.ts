@@ -33,6 +33,7 @@ import {AuthService} from './services/auth/auth.service';
 import {UserService} from './services/user/user.service';
 import {DatabaseService} from './services/database/database.service';
 import {StorageService} from './services/storage/storage.service';
+import {GuardService} from './services/guard/guard.service';
 
 @NgModule({
   declarations: [],
@@ -72,6 +73,7 @@ import {StorageService} from './services/storage/storage.service';
     UserService,
     DatabaseService,
     StorageService,
+    GuardService,
   ],
   exports: [
     // directives

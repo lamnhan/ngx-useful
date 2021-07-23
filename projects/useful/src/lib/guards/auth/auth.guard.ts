@@ -7,6 +7,7 @@ import {
   ActivatedRouteSnapshot,
 } from '@angular/router';
 
+import { GuardService } from '../../services/guard/guard.service';
 import { NavService } from '../../services/nav/nav.service';
 import { AuthService } from '../../services/auth/auth.service';
 
@@ -19,6 +20,7 @@ import { AuthService } from '../../services/auth/auth.service';
 export class AuthGuard implements CanActivate, CanLoad {
   constructor(
     private readonly ngZone: NgZone,
+    private guardService: GuardService,
     private navService: NavService,
     private authService: AuthService
   ) {}
@@ -37,7 +39,7 @@ export class AuthGuard implements CanActivate, CanLoad {
     }
     // not passed url, redirect to login page
     this.authService.setRedirectUrl(url || null);
-    this.ngZone.run(() => this.navService.navigate(['login']));
+    this.ngZone.run(() => this.navService.navigate(this.guardService.authHandler));
     return false;
   }
 }

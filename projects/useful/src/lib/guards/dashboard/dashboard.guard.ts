@@ -7,6 +7,7 @@ import {
   ActivatedRouteSnapshot,
 } from '@angular/router';
 
+import { GuardService } from '../../services/guard/guard.service';
 import { NavService } from '../../services/nav/nav.service';
 import { AuthService } from '../../services/auth/auth.service';
 import { UserService } from '../../services/user/user.service';
@@ -17,6 +18,7 @@ import { UserService } from '../../services/user/user.service';
 export class DashboardGuard implements CanActivate, CanLoad {
   constructor(
     private readonly ngZone: NgZone,
+    private guardService: GuardService,
     private navService: NavService,
     private authService: AuthService,
     private userService: UserService
@@ -36,7 +38,7 @@ export class DashboardGuard implements CanActivate, CanLoad {
     }
     // not passed url, redirect to login page
     this.authService.setRedirectUrl(url || null);
-    this.ngZone.run(() => this.navService.navigate(['login']));
+    this.ngZone.run(() => this.navService.navigate(this.guardService.dashboardHandler));
     return false;
   }
 }

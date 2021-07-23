@@ -51,3 +51,4 @@ export * from './lib/services/auth/auth.service';
 export * from './lib/services/user/user.service';
 export * from './lib/services/database/database.service';
 export * from './lib/services/storage/storage.service';
+export * from './lib/services/guard/guard.service';
