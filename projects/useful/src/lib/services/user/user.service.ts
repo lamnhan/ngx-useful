@@ -373,14 +373,20 @@ export class UserService {
     // signed up or signed in
     if (nativeUser && data && publicData) {
       const { displayName, photoURL } = data;
-      const { id, title, thumbnail } = publicData;
+      const { id, title, status, thumbnail } = publicData;
       let profileUpdates: undefined | Partial<Profile>;
+      // title
       if (displayName && (!title || title !== displayName)) {
         profileUpdates = {...profileUpdates, title: displayName};
       }
-      if (photoURL && (!thumbnail || thumbnail !== photoURL)) {
-        profileUpdates = {...profileUpdates, thumbnail: photoURL};
+      // publish only
+      if (status === 'publish') {
+        // thumbnail
+        if (photoURL && (!thumbnail || thumbnail !== photoURL)) {
+          profileUpdates = {...profileUpdates, thumbnail: photoURL};
+        }
       }
+      // patch
       return !profileUpdates
         ? of({nativeUser, data, publicData})
         : this.profileDataService.update(id, profileUpdates).pipe(
