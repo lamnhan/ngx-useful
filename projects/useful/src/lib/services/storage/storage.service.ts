@@ -12,7 +12,9 @@ export interface StorageOptions {
 }
 
 export interface UploadCustom {
-  folder?: string;
+  uploadFolder?: string;
+  noDateGrouping?: boolean;
+  noRandomSuffix?: boolean;
   customMetadata?: Record<string, any>;
 }
 
@@ -88,9 +90,9 @@ export class StorageService {
   }
 
   private extractUploadInputs(path: string, custom: UploadCustom = {}) {
-    const {folder, customMetadata = {} } = custom;
+    const {uploadFolder, noDateGrouping, noRandomSuffix, customMetadata = {} } = custom;
     // add random suffix to avoid overwriting
-    if (this.options.randomSuffix) {
+    if (!noRandomSuffix && this.options.randomSuffix) {
       const randomSuffix = Math.random().toString(36).substring(7);
       const ext = path.indexOf('.') === -1 ? null : path.split('.').pop() as string;
       path = !ext
@@ -99,8 +101,8 @@ export class StorageService {
     }
     // upload file to firebase storage
     const fullPath =
-      (this.getRootFolder(folder)) + '/' +
-      (!this.options.dateGrouping ? '' : (this.getDateGroupingPath() + '/')) +
+      (this.getRootFolder(uploadFolder)) + '/' +
+      (noDateGrouping || !this.options.dateGrouping ? '' : (this.getDateGroupingPath() + '/')) +
       path;
     const fileName = fullPath.split('/').pop() as string;
     // result
