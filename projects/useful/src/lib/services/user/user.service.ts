@@ -26,7 +26,6 @@ export type ProfileDataService = DatabaseData<Profile>;
 
 export interface UserOptions {
   profilePublished?: boolean;
-  additionalClaims?: string[];
 }
 
 @Injectable({
@@ -528,12 +527,8 @@ export class UserService {
     }
     // badges
     if (claims) {
-      const allClaimNames = [
-        ...(this.options.additionalClaims || []),
-        'role',
-        'legit',
-      ];
-      result.badges = allClaimNames
+      result.badges = this.authService
+        .getClaimNames()
         .filter(name => !!claims[name])
         .map(name => claims[name] as string);
     }

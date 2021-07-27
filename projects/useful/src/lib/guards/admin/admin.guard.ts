@@ -37,7 +37,7 @@ export class AdminGuard implements CanActivate, CanLoad {
       return true;
     }
     // not passed url, redirect to login page
-    this.authService.setRedirectUrl(url || null);
+    this.authService.setRedirectUrl(url);
     this.ngZone.run(() => this.navService.navigate(this.guardService.adminHandler));
     return false;
   }

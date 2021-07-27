@@ -10,6 +10,7 @@ export type VendorAuthService = AngularFireAuth; // | AngularSheetbaseAuth
 
 export interface AuthOptions {
   driver?: string;
+  additionalClaims?: string[];
 }
 
 @Injectable({
@@ -20,7 +21,7 @@ export class AuthService {
   private service!: VendorAuthService;
   driver = 'firebase';
 
-  redirectUrl?: null | string;
+  redirectUrl?: string;
   authenticated?: boolean;
   credential?: NativeUserCredential;
 
@@ -51,8 +52,16 @@ export class AuthService {
     // done
     return this as AuthService;
   }
+
+  getClaimNames() {
+    return [
+      ...(this.options.additionalClaims || []),
+      'role',
+      'legit',
+    ];
+  }
   
-  setRedirectUrl(url: null | string) {
+  setRedirectUrl(url?: string) {
     this.redirectUrl = url;
   }
 
