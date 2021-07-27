@@ -169,7 +169,6 @@ export class UserService {
     if (!toPublic) {
       Object.keys(profileDoc).forEach(key => {
         if (this.databaseService.isTypeDelete((profileDoc as any)[key])) {
-          console.log('Delete', key, (profileDoc as any)[key]);
           delete (this.publicData as any)?.[key];
         }
       });
