@@ -109,8 +109,8 @@ export class StorageService {
     return { fileName, fullPath, customMetadata };
   }
 
-  private getRootFolder(folder?: string) {
-    return folder || this.options.uploadFolder || this.defaultFolder;
+  private getRootFolder(uploadFolder?: string) {
+    return uploadFolder || this.options.uploadFolder || this.defaultFolder;
   }
 
   private getDateGroupingPath() {
