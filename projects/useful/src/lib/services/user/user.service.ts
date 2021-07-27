@@ -14,9 +14,8 @@ import {
 } from '@lamnhan/schemata';
 
 import { HelperService } from '../helper/helper.service';
-import { NullableOptional, DatabaseData } from '../database/database.service';
+import { NullableOptional, DatabaseService, DatabaseData } from '../database/database.service';
 import { AuthService } from '../auth/auth.service';
-
 
 export type NativeUser = firebase.User;
 export type NativeUserCredential = firebase.auth.UserCredential;
@@ -49,7 +48,8 @@ export class UserService {
 
   constructor(
     private helperService: HelperService,
-    private authService: AuthService
+    private databaseService: DatabaseService,
+    private authService: AuthService,
   ) {}
 
   setOptions(options: UserOptions) {
@@ -168,7 +168,8 @@ export class UserService {
     // in service
     if (!toPublic) {
       Object.keys(profileDoc).forEach(key => {
-        if ((profileDoc as any)[key] === null) {
+        if (this.databaseService.isTypeDelete((profileDoc as any)[key])) {
+          console.log('Delete', key, (profileDoc as any)[key]);
           delete (this.publicData as any)?.[key];
         }
       });
@@ -269,7 +270,7 @@ export class UserService {
     });
     return this.userDataService.update(uid, {
       publicly: (!this.data.publicly || !Object.keys(this.data.publicly).length)
-        ? null
+        ? this.databaseService.getValueDelete() as any
         : this.data.publicly
     }).pipe(
       switchMap(() =>
@@ -525,13 +526,6 @@ export class UserService {
     if (phoneNumber && publicly?.phoneNumber) {
       result.phoneNumber = phoneNumber;
     }
-    // badges
-    if (claims) {
-      result.badges = this.authService
-        .getClaimNames()
-        .filter(name => !!claims[name])
-        .map(name => claims[name] as string);
-    }
     // props
     if (additionalData) {
       const props = {} as Record<string, unknown>;
@@ -546,24 +540,23 @@ export class UserService {
 
   private getCleanupPublicProfileProperties() {
     const result: NullableOptional<Partial<Profile>> = {};
+    const del = this.databaseService.getValueDelete() as any;
     // thumbnail
-    result.thumbnail = null;
+    result.thumbnail = del;
     // image
-    result.image = null;
+    result.image = del;
     // description
-    result.description = null;
+    result.description = del;
     // content
-    result.content = null;
+    result.content = del;
     // url
-    result.url = null;
+    result.url = del;
     // email
-    result.email = null;
+    result.email = del;
     // phone number
-    result.phoneNumber = null;
-    // badges
-    result.badges = null;
+    result.phoneNumber = del;
     // props
-    result.props = null;
+    result.props = del;
     // result
     return result;
   }

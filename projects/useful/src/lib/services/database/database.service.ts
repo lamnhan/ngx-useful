@@ -54,6 +54,24 @@ export class DatabaseService {
     return this as DatabaseService;
   }
 
+  getValueIncrement(by = 1) {
+    return firebase.firestore.FieldValue.increment(by);
+  }
+
+  getValueDelete() {
+    return firebase.firestore.FieldValue.delete();
+  }
+
+  isTypeIncrement(value: any) {
+    return value instanceof firebase.firestore.FieldValue
+      && value.isEqual(this.getValueIncrement());
+  }
+
+  isTypeDelete(value: any) {
+    return value instanceof firebase.firestore.FieldValue
+      && value.isEqual(this.getValueDelete());
+  }
+
   exists(path: string, queryFn?: QueryFn) {
     return !queryFn 
       ? this.flatDoc(path).pipe(map(item => !!item))
@@ -79,7 +97,7 @@ export class DatabaseService {
   increment(path: string, data: Record<string, number>) {
     const item = {} as Record<string, unknown>;
     Object.keys(data).forEach(field =>
-      item[field] = firebase.firestore.FieldValue.increment(data[field]));
+      item[field] = this.getValueIncrement(data[field]));
     return this.update(path, item);
   }
 
