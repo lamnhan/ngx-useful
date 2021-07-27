@@ -61,7 +61,33 @@ export class StorageService {
     return this.ref(fullPath).delete();
   }
 
+  upload(path: string, data: File | Blob, custom: UploadCustom = {}) {
+    const { fileName, fullPath, customMetadata } = this.extractUploadInputs(path, custom);
+    const task = this.ref(fullPath).put(data, { customMetadata });
+    return { name: fileName, fullPath, task };
+  }
+
   uploadFile(path: string, file: File, custom: UploadCustom = {}) {
+    return this.upload(path, file, custom);
+  }
+
+  uploadBlob(path: string, blob: Blob, custom: UploadCustom = {}) {
+    return this.upload(path, blob, custom);
+  }
+
+  buildMediaItem(name: string, fullPath: string): MediaItem {
+    const ref = this.ref(fullPath);
+    return {
+      ref,
+      name,
+      type: this.getFileType(name),
+      fullPath,
+      downloadUrl$: ref.getDownloadURL(),
+      metadata$: ref.getMetadata(),
+    };
+  }
+
+  private extractUploadInputs(path: string, custom: UploadCustom = {}) {
     const {folder, customMetadata = {} } = custom;
     // add random suffix to avoid overwriting
     if (this.options.randomSuffix) {
@@ -77,21 +103,8 @@ export class StorageService {
       (!this.options.dateGrouping ? '' : (this.getDateGroupingPath() + '/')) +
       path;
     const fileName = fullPath.split('/').pop() as string;
-    const task = this.ref(fullPath).put(file, { customMetadata });
-    // return value
-    return { name: fileName, fullPath, task };
-  }
-
-  buildMediaItem(name: string, fullPath: string): MediaItem {
-    const ref = this.ref(fullPath);
-    return {
-      ref,
-      name,
-      type: this.getFileType(name),
-      fullPath,
-      downloadUrl$: ref.getDownloadURL(),
-      metadata$: ref.getMetadata(),
-    };
+    // result
+    return { fileName, fullPath, customMetadata };
   }
 
   private getRootFolder(folder?: string) {
