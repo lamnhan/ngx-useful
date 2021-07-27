@@ -26,6 +26,7 @@ export type ProfileDataService = DatabaseData<Profile>;
 
 export interface UserOptions {
   profilePublished?: boolean;
+  additionalClaims?: string[];
 }
 
 @Injectable({
@@ -163,8 +164,19 @@ export class UserService {
       return throwError('No user.');
     }
     const profileDoc: NullableOptional<Partial<Profile>> = !toPublic
-      ? { status: 'draft', ...this.getCleanupPublicProfileProperties() }
-      : { status: 'publish', ...this.getPublicProfileProperties(this.data) };
+      ? { ...this.getCleanupPublicProfileProperties(), status: 'draft' }
+      : { ...this.getPublicProfileProperties(this.data), status: 'publish' };
+    // in service
+    if (!toPublic) {
+      Object.keys(profileDoc).forEach(key => {
+        if ((profileDoc as any)[key] === null) {
+          delete (this.publicData as any)?.[key];
+        }
+      });
+    } else {
+      this.publicData = { ...this.publicData, ...(profileDoc as Partial<Profile>) };
+    }
+    // remotely
     return this.profileDataService.update(this.publicData.id, profileDoc);
   }
 
@@ -482,6 +494,7 @@ export class UserService {
       url,
       email,
       phoneNumber,
+      claims,
       additionalData,
       publicly,
     } = data;
@@ -513,6 +526,17 @@ export class UserService {
     if (phoneNumber && publicly?.phoneNumber) {
       result.phoneNumber = phoneNumber;
     }
+    // badges
+    if (claims) {
+      const allClaimNames = [
+        ...(this.options.additionalClaims || []),
+        'role',
+        'legit',
+      ];
+      result.badges = allClaimNames
+        .filter(name => !!claims[name])
+        .map(name => claims[name] as string);
+    }
     // props
     if (additionalData) {
       const props = {} as Record<string, unknown>;
@@ -541,6 +565,8 @@ export class UserService {
     result.email = null;
     // phone number
     result.phoneNumber = null;
+    // badges
+    result.badges = null;
     // props
     result.props = null;
     // result
