@@ -162,8 +162,10 @@ export class UserService {
     if (!this.currentUser || !this.data || !this.publicData) {
       return throwError('No user.');
     }
-    // TODO
-    return throwError('TODO: ...');
+    const profileDoc: NullableOptional<Partial<Profile>> = !toPublic
+      ? { status: 'draft', ...this.getCleanupPublicProfileProperties() }
+      : { status: 'publish', ...this.getPublicProfileProperties(this.data) };
+    return this.profileDataService.update(this.publicData.id, profileDoc);
   }
 
   updateSettings(settings: UserSettings) {
@@ -342,6 +344,19 @@ export class UserService {
     ]);
   }
 
+  private getRole(claims: UserClaims = {}) {
+    return claims.role || 'subscriber';
+  }
+
+  private getLevel(role?: UserRoles) {
+    return role === 'sadmin' ? 6
+      :  role === 'admin' ? 5
+      :  role === 'editor' ? 4
+      :  role === 'author' ? 3
+      :  role === 'contributor' ? 2
+      : 1;
+  }
+
   private publicProfilePatcher(nativeUser?: NativeUser, data?: User, publicData?: Profile) {
     // signed up or signed in
     if (nativeUser && data && publicData) {
@@ -426,50 +441,9 @@ export class UserService {
       title: profilePublished ? displayName : username,
       status: profilePublished ? 'publish' : 'draft',
       type: 'user',
+      // custom fields
+      ...(!profilePublished ? {} : this.getPublicProfileProperties(userDoc)),
     };
-    // custom fields
-    if (profilePublished) {
-      const {
-        photoURL,
-        coverPhoto,
-        intro,
-        detail,
-        url,
-        email,
-        phoneNumber,
-        additionalData,
-        publicly,
-      } = userDoc;
-      if (photoURL) {
-        profileDoc.thumbnail = photoURL;
-      }
-      if (coverPhoto) {
-        profileDoc.image = coverPhoto;
-      }
-      if (intro) {
-        profileDoc.description = intro;
-      }
-      if (detail) {
-        profileDoc.content = detail;
-      }
-      if (url) {
-        profileDoc.url = url;
-      }
-      // special fields
-      if (email && publicly?.email) {
-        profileDoc.email = email;
-      }
-      if (phoneNumber && publicly?.phoneNumber) {
-        profileDoc.phoneNumber = phoneNumber;
-      }
-      if (additionalData) {
-        const props = {} as Record<string, unknown>;
-        Object.keys(additionalData).forEach(key =>
-          publicly?.[key] ? !!(props[key] = additionalData[key]) : false  
-        );
-        profileDoc.props = props;
-      }
-    }
     return this.profileDataService.add(username, profileDoc).pipe(
       map(() => ({ nativeUser, data: userDoc, publicData: profileDoc }))
     );
@@ -498,16 +472,78 @@ export class UserService {
     );
   }
 
-  private getRole(claims: UserClaims = {}) {
-    return claims.role || 'subscriber';
+  private getPublicProfileProperties(data: User) {
+    const result: Partial<Profile> = {};
+    const {
+      photoURL,
+      coverPhoto,
+      intro,
+      detail,
+      url,
+      email,
+      phoneNumber,
+      additionalData,
+      publicly,
+    } = data;
+    // thumbnail
+    if (photoURL) {
+      result.thumbnail = photoURL;
+    }
+    // 
+    if (coverPhoto) {
+      result.image = coverPhoto;
+    }
+    // description
+    if (intro) {
+      result.description = intro;
+    }
+    // content
+    if (detail) {
+      result.content = detail;
+    }
+    // url
+    if (url) {
+      result.url = url;
+    }
+    // email
+    if (email && publicly?.email) {
+      result.email = email;
+    }
+    // phone number
+    if (phoneNumber && publicly?.phoneNumber) {
+      result.phoneNumber = phoneNumber;
+    }
+    // props
+    if (additionalData) {
+      const props = {} as Record<string, unknown>;
+      Object.keys(additionalData).forEach(key =>
+        publicly?.[key] ? !!(props[key] = additionalData[key]) : false  
+      );
+      result.props = props;
+    }
+    // result
+    return result;
   }
 
-  private getLevel(role?: UserRoles) {
-    return role === 'sadmin' ? 6
-      :  role === 'admin' ? 5
-      :  role === 'editor' ? 4
-      :  role === 'author' ? 3
-      :  role === 'contributor' ? 2
-      : 1;
+  private getCleanupPublicProfileProperties() {
+    const result: NullableOptional<Partial<Profile>> = {};
+    // thumbnail
+    result.thumbnail = null;
+    // image
+    result.image = null;
+    // description
+    result.description = null;
+    // content
+    result.content = null;
+    // url
+    result.url = null;
+    // email
+    result.email = null;
+    // phone number
+    result.phoneNumber = null;
+    // props
+    result.props = null;
+    // result
+    return result;
   }
 }
