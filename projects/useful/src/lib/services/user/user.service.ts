@@ -355,6 +355,25 @@ export class UserService {
     ]);
   }
 
+  removeCoverPhoto() {
+    if (!this.currentUser || !this.data || !this.publicData) {
+      return throwError('No user.');
+    }
+    const uid = this.currentUser.uid;
+    const username = this.data.username as string;
+    const del = this.databaseService.getValueDelete() as any;
+    // in service
+    delete this.data.coverPhoto;
+    delete this.publicData.image;
+    // remotely
+    return combineLatest([
+      // update user doc
+      this.userDataService.update(uid, {coverPhoto: del}),
+      // update profile doc
+      this.profileDataService.update(username, {image: del}),
+    ]);
+  }
+
   private getRole(claims: UserClaims = {}) {
     return claims.role || 'subscriber';
   }
