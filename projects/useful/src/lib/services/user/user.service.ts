@@ -118,6 +118,16 @@ export class UserService {
     return this.profileDataService.exists(username);
   }
 
+  verifyEmail() {
+    if (!this.currentUser || !this.data) {
+      return throwError('No user.');
+    }
+    if (this.data.emailVerified) {
+      return throwError('Email already verified.');
+    }
+    return from(this.currentUser.sendEmailVerification());
+  }
+
   changeEmail(email: string) {
     // TODO
     console.log('TODO: ...');
