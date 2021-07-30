@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>BuiltinData | @lamnhan/ngx-useful</title>
+	<title>StorageOptions | @lamnhan/ngx-useful</title>
 	<meta name="description" content="Documentation for @lamnhan/ngx-useful">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="builtindata.html">BuiltinData</a>
+					<a href="storageoptions.html">StorageOptions</a>
 				</li>
 			</ul>
-			<h1>Interface BuiltinData</h1>
+			<h1>Interface StorageOptions</h1>
 		</div>
 	</div>
 </header>
@@ -68,7 +68,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">BuiltinData</span>
+						<span class="target">StorageOptions</span>
 					</li>
 				</ul>
 			</section>
@@ -79,9 +79,10 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="builtindata.html#locales" class="tsd-kind-icon">locales</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="builtindata.html#personas" class="tsd-kind-icon">personas</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="builtindata.html#themes" class="tsd-kind-icon">themes</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="storageoptions.html#dategrouping" class="tsd-kind-icon">date<wbr>Grouping</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="storageoptions.html#driver" class="tsd-kind-icon">driver</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="storageoptions.html#randomsuffix" class="tsd-kind-icon">random<wbr>Suffix</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="storageoptions.html#uploadfolder" class="tsd-kind-icon">upload<wbr>Folder</a></li>
 							</ul>
 						</section>
 					</div>
@@ -90,32 +91,42 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="locales" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> locales</h3>
-					<div class="tsd-signature tsd-kind-icon">locales<span class="tsd-signature-symbol">:</span> <a href="builtindataitem.html" class="tsd-signature-type">BuiltinDataItem</a><span class="tsd-signature-symbol">[]</span></div>
+					<a name="dategrouping" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> date<wbr>Grouping</h3>
+					<div class="tsd-signature tsd-kind-icon">date<wbr>Grouping<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L17">projects/useful/src/lib/services/setting/setting.service.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/storage/storage.service.ts#L11">projects/useful/src/lib/services/storage/storage.service.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="personas" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> personas</h3>
-					<div class="tsd-signature tsd-kind-icon">personas<span class="tsd-signature-symbol">:</span> <a href="builtindataitem.html" class="tsd-signature-type">BuiltinDataItem</a><span class="tsd-signature-symbol">[]</span></div>
+					<a name="driver" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> driver</h3>
+					<div class="tsd-signature tsd-kind-icon">driver<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L16">projects/useful/src/lib/services/setting/setting.service.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/storage/storage.service.ts#L9">projects/useful/src/lib/services/storage/storage.service.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="themes" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> themes</h3>
-					<div class="tsd-signature tsd-kind-icon">themes<span class="tsd-signature-symbol">:</span> <a href="builtindataitem.html" class="tsd-signature-type">BuiltinDataItem</a><span class="tsd-signature-symbol">[]</span></div>
+					<a name="randomsuffix" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> random<wbr>Suffix</h3>
+					<div class="tsd-signature tsd-kind-icon">random<wbr>Suffix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L15">projects/useful/src/lib/services/setting/setting.service.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/storage/storage.service.ts#L12">projects/useful/src/lib/services/storage/storage.service.ts:12</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="uploadfolder" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> upload<wbr>Folder</h3>
+					<div class="tsd-signature tsd-kind-icon">upload<wbr>Folder<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/storage/storage.service.ts#L10">projects/useful/src/lib/services/storage/storage.service.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -134,16 +145,19 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="builtindata.html" class="tsd-kind-icon">Builtin<wbr>Data</a>
+						<a href="storageoptions.html" class="tsd-kind-icon">Storage<wbr>Options</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="builtindata.html#locales" class="tsd-kind-icon">locales</a>
+								<a href="storageoptions.html#dategrouping" class="tsd-kind-icon">date<wbr>Grouping</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="builtindata.html#personas" class="tsd-kind-icon">personas</a>
+								<a href="storageoptions.html#driver" class="tsd-kind-icon">driver</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="builtindata.html#themes" class="tsd-kind-icon">themes</a>
+								<a href="storageoptions.html#randomsuffix" class="tsd-kind-icon">random<wbr>Suffix</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="storageoptions.html#uploadfolder" class="tsd-kind-icon">upload<wbr>Folder</a>
 							</li>
 						</ul>
 					</li>

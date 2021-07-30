@@ -18,7 +18,7 @@
 | [methodAllowedForGithub](https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#methodallowedforgithub)               | <code>boolean</code>                                                                                                                               |             |
 | [methodAllowedForGoogle](https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#methodallowedforgoogle)               | <code>boolean</code>                                                                                                                               |             |
 | [onAuthStateChanged](https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#onauthstatechanged)                       | <code>ReplaySubject<null \| User></code>                                                                                                           |             |
-| [redirectUrl](https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#redirecturl)                                     | <code>null \| string</code>                                                                                                                        |             |
+| [redirectUrl](https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#redirecturl)                                     | <code>undefined \| string</code>                                                                                                                   |             |
 
 <h3><a name="authservice-methods"><p>AuthService methods</p>
 </a></h3>
@@ -26,10 +26,12 @@
 | Function                                                                                                       | Returns type                                                                                                                     | Description |
 | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | [createUserWithEmailAndPassword(email, password)](#authservice-createuserwithemailandpassword-0)               | <code>Observable<UserCredential></code>                                                                                          |             |
+| [getClaimNames()](#authservice-getclaimnames-0)                                                                | <code>string[]</code>                                                                                                            |             |
 | [handleAccountExistsWithDifferentCredential(email)](#authservice-handleaccountexistswithdifferentcredential-0) | <code>Observable<string[]></code>                                                                                                |             |
-| [init(service, options?)](#authservice-init-0)                                                                 | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html" target="_blank">AuthService</a></code> |             |
+| [init(service)](#authservice-init-0)                                                                           | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html" target="_blank">AuthService</a></code> |             |
 | [sendPasswordResetEmail(email)](#authservice-sendpasswordresetemail-0)                                         | <code>Observable<void></code>                                                                                                    |             |
-| [setRedirectUrl(url)](#authservice-setredirecturl-0)                                                           | <code>void</code>                                                                                                                |             |
+| [setOptions(options)](#authservice-setoptions-0)                                                               | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html" target="_blank">AuthService</a></code> |             |
+| [setRedirectUrl(url?)](#authservice-setredirecturl-0)                                                          | <code>void</code>                                                                                                                |             |
 | [signInWithEmailAndPassword(email, password)](#authservice-signinwithemailandpassword-0)                       | <code>Observable<UserCredential></code>                                                                                          |             |
 | [signInWithPopupForFacebook()](#authservice-signinwithpopupforfacebook-0)                                      | <code>Observable<UserCredential></code>                                                                                          |             |
 | [signInWithPopupForGithub()](#authservice-signinwithpopupforgithub-0)                                          | <code>Observable<UserCredential></code>                                                                                          |             |
@@ -54,6 +56,17 @@
 
 ---
 
+<h4><a name="authservice-getclaimnames-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#getclaimnames"><p><code>getClaimNames()</code></p>
+</a></h4>
+
+**The `getClaimNames` call signature.**
+
+**Returns**
+
+<code>string[]</code>
+
+---
+
 <h4><a name="authservice-handleaccountexistswithdifferentcredential-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#handleaccountexistswithdifferentcredential"><p><code>handleAccountExistsWithDifferentCredential(email)</code></p>
 </a></h4>
 
@@ -71,7 +84,7 @@
 
 ---
 
-<h4><a name="authservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#init"><p><code>init(service, options?)</code></p>
+<h4><a name="authservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#init"><p><code>init(service)</code></p>
 </a></h4>
 
 **The `init` call signature.**
@@ -81,7 +94,6 @@
 | Param       | Type                                                                                                                                         | Description |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | **service** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/globals.html#vendorauthservice" target="_blank">VendorAuthService</a></code> |             |
-| options     | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/authoptions.html" target="_blank">AuthOptions</a></code>          |             |
 
 **Returns**
 
@@ -106,16 +118,33 @@
 
 ---
 
-<h4><a name="authservice-setredirecturl-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#setredirecturl"><p><code>setRedirectUrl(url)</code></p>
+<h4><a name="authservice-setoptions-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#setoptions"><p><code>setOptions(options)</code></p>
+</a></h4>
+
+**The `setOptions` call signature.**
+
+**Parameters**
+
+| Param       | Type                                                                                                                                | Description |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **options** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/authoptions.html" target="_blank">AuthOptions</a></code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html" target="_blank">AuthService</a></code>
+
+---
+
+<h4><a name="authservice-setredirecturl-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html#setredirecturl"><p><code>setRedirectUrl(url?)</code></p>
 </a></h4>
 
 **The `setRedirectUrl` call signature.**
 
 **Parameters**
 
-| Param   | Type                        | Description |
-| ------- | --------------------------- | ----------- |
-| **url** | <code>null \| string</code> |             |
+| Param | Type                             | Description |
+| ----- | -------------------------------- | ----------- |
+| url   | <code>undefined \| string</code> |             |
 
 **Returns**
 

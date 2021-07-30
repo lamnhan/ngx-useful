@@ -83,7 +83,8 @@
 						<h2>Getting started</h2>
 					</a>
 					<p>Install ngx-useful:</p>
-					<pre><code class="language-sh">npm install --save @lamnhan/ngx-useful@0.0.10</code></pre>
+					<pre><code class="language-sh">npm install --save @lamnhan/ngx-useful@0.0.10
+</code></pre>
 					<p>You may also want to install <a href="https://unistylus.lamnhan.com">@lamnhan/unistylus</a>.</p>
 					<p>Basic usage, three steps to use a service:</p>
 					<pre><code class="language-ts"><span class="hljs-comment">// 1. provide services in ---&gt; app.module.ts</span>
@@ -93,7 +94,8 @@
 <span class="hljs-built_in">this</span>.appService.init(...);
 
 <span class="hljs-comment">// 3. inject where needed</span>
-<span class="hljs-function"><span class="hljs-title">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> appService: AppService</span>)</span> {}</code></pre>
+<span class="hljs-function"><span class="hljs-title">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> appService: AppService</span>)</span> {}
+</code></pre>
 					<p>See <a href="https://ngx-useful.lamnhan.com/guides">guides</a> for more articles. Also see the list of: <a href="https://ngx-useful.lamnhan.com/services">services</a>, <a href="https://ngx-useful.lamnhan.com/pipes">pipes</a>, <a href="https://ngx-useful.lamnhan.com/directives">directives</a>, <a href="https://ngx-useful.lamnhan.com/guards">guards</a>.</p>
 				</section>
 				<section id="modules" data-note="AUTO-GENERATED CONTENT, DO NOT EDIT DIRECTLY!">
@@ -314,6 +316,9 @@
 					<li class=" tsd-kind-class">
 						<a href="classes/currencyxpipemodule.html" class="tsd-kind-icon">Currencyx<wbr>Pipe<wbr>Module</a>
 					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/dashboardguard.html" class="tsd-kind-icon">Dashboard<wbr>Guard</a>
+					</li>
 					<li class=" tsd-kind-class tsd-has-type-parameter">
 						<a href="classes/databasedata.html" class="tsd-kind-icon">Database<wbr>Data</a>
 					</li>
@@ -340,6 +345,9 @@
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/filterpipemodule.html" class="tsd-kind-icon">Filter<wbr>Pipe<wbr>Module</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/guardservice.html" class="tsd-kind-icon">Guard<wbr>Service</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/helperservice.html" class="tsd-kind-icon">Helper<wbr>Service</a>
@@ -408,6 +416,9 @@
 						<a href="classes/settingservice.html" class="tsd-kind-icon">Setting<wbr>Service</a>
 					</li>
 					<li class=" tsd-kind-class">
+						<a href="classes/storageservice.html" class="tsd-kind-icon">Storage<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-class">
 						<a href="classes/usefulmodule.html" class="tsd-kind-icon">Useful<wbr>Module</a>
 					</li>
 					<li class=" tsd-kind-class">
@@ -432,13 +443,13 @@
 						<a href="interfaces/authoptions.html" class="tsd-kind-icon">Auth<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/builtindata.html" class="tsd-kind-icon">Builtin<wbr>Data</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/builtindataitem.html" class="tsd-kind-icon">Builtin<wbr>Data<wbr>Item</a>
-					</li>
-					<li class=" tsd-kind-interface">
 						<a href="interfaces/builtingeneralsettings.html" class="tsd-kind-icon">Builtin<wbr>General<wbr>Settings</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/builtinlisting.html" class="tsd-kind-icon">Builtin<wbr>Listing</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/builtinlistingitem.html" class="tsd-kind-icon">Builtin<wbr>Listing<wbr>Item</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/builtinuisettings.html" class="tsd-kind-icon">BuiltinUISettings</a>
@@ -579,7 +590,13 @@
 						<a href="interfaces/settingoptions.html" class="tsd-kind-icon">Setting<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/userintegrations.html" class="tsd-kind-icon">User<wbr>Integrations</a>
+						<a href="interfaces/storageitem.html" class="tsd-kind-icon">Storage<wbr>Item</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/storageoptions.html" class="tsd-kind-icon">Storage<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/uploadcustom.html" class="tsd-kind-icon">Upload<wbr>Custom</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/useroptions.html" class="tsd-kind-icon">User<wbr>Options</a>
@@ -649,6 +666,9 @@
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#vendordatabaseservice" class="tsd-kind-icon">Vendor<wbr>Database<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#vendorstorageservice" class="tsd-kind-icon">Vendor<wbr>Storage<wbr>Service</a>
 					</li>
 					<li class=" tsd-kind-variable">
 						<a href="globals.html#context" class="tsd-kind-icon">context</a>

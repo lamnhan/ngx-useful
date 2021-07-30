@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>UserIntegrations | @lamnhan/ngx-useful</title>
+	<title>BuiltinListing | @lamnhan/ngx-useful</title>
 	<meta name="description" content="Documentation for @lamnhan/ngx-useful">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="userintegrations.html">UserIntegrations</a>
+					<a href="builtinlisting.html">BuiltinListing</a>
 				</li>
 			</ul>
-			<h1>Interface UserIntegrations</h1>
+			<h1>Interface BuiltinListing</h1>
 		</div>
 	</div>
 </header>
@@ -68,7 +68,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">UserIntegrations</span>
+						<span class="target">BuiltinListing</span>
 					</li>
 				</ul>
 			</section>
@@ -79,7 +79,9 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="userintegrations.html#profiledataservice" class="tsd-kind-icon">profile<wbr>Data<wbr>Service</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="builtinlisting.html#locales" class="tsd-kind-icon">locales</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="builtinlisting.html#personas" class="tsd-kind-icon">personas</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="builtinlisting.html#themes" class="tsd-kind-icon">themes</a></li>
 							</ul>
 						</section>
 					</div>
@@ -88,12 +90,32 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="profiledataservice" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> profile<wbr>Data<wbr>Service</h3>
-					<div class="tsd-signature tsd-kind-icon">profile<wbr>Data<wbr>Service<span class="tsd-signature-symbol">:</span> <a href="../globals.html#profiledataservice" class="tsd-signature-type">ProfileDataService</a></div>
+					<a name="locales" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> locales</h3>
+					<div class="tsd-signature tsd-kind-icon">locales<span class="tsd-signature-symbol">:</span> <a href="builtinlistingitem.html" class="tsd-signature-type">BuiltinListingItem</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L32">projects/useful/src/lib/services/user/user.service.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L17">projects/useful/src/lib/services/setting/setting.service.ts:17</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="personas" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> personas</h3>
+					<div class="tsd-signature tsd-kind-icon">personas<span class="tsd-signature-symbol">:</span> <a href="builtinlistingitem.html" class="tsd-signature-type">BuiltinListingItem</a><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L16">projects/useful/src/lib/services/setting/setting.service.ts:16</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="themes" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> themes</h3>
+					<div class="tsd-signature tsd-kind-icon">themes<span class="tsd-signature-symbol">:</span> <a href="builtinlistingitem.html" class="tsd-signature-type">BuiltinListingItem</a><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L15">projects/useful/src/lib/services/setting/setting.service.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -112,10 +134,16 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="userintegrations.html" class="tsd-kind-icon">User<wbr>Integrations</a>
+						<a href="builtinlisting.html" class="tsd-kind-icon">Builtin<wbr>Listing</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="userintegrations.html#profiledataservice" class="tsd-kind-icon">profile<wbr>Data<wbr>Service</a>
+								<a href="builtinlisting.html#locales" class="tsd-kind-icon">locales</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="builtinlisting.html#personas" class="tsd-kind-icon">personas</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="builtinlisting.html#themes" class="tsd-kind-icon">themes</a>
 							</li>
 						</ul>
 					</li>

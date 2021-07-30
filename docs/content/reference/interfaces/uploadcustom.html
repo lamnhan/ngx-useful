@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>BuiltinDataItem | @lamnhan/ngx-useful</title>
+	<title>UploadCustom | @lamnhan/ngx-useful</title>
 	<meta name="description" content="Documentation for @lamnhan/ngx-useful">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="builtindataitem.html">BuiltinDataItem</a>
+					<a href="uploadcustom.html">UploadCustom</a>
 				</li>
 			</ul>
-			<h1>Interface BuiltinDataItem</h1>
+			<h1>Interface UploadCustom</h1>
 		</div>
 	</div>
 </header>
@@ -68,7 +68,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">BuiltinDataItem</span>
+						<span class="target">UploadCustom</span>
 					</li>
 				</ul>
 			</section>
@@ -79,8 +79,10 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="builtindataitem.html#text" class="tsd-kind-icon">text</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="builtindataitem.html#value" class="tsd-kind-icon">value</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="uploadcustom.html#custommetadata" class="tsd-kind-icon">custom<wbr>Metadata</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="uploadcustom.html#nodategrouping" class="tsd-kind-icon">no<wbr>Date<wbr>Grouping</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="uploadcustom.html#norandomsuffix" class="tsd-kind-icon">no<wbr>Random<wbr>Suffix</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="uploadcustom.html#uploadfolder" class="tsd-kind-icon">upload<wbr>Folder</a></li>
 							</ul>
 						</section>
 					</div>
@@ -89,22 +91,42 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="text" class="tsd-anchor"></a>
-					<h3>text</h3>
-					<div class="tsd-signature tsd-kind-icon">text<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="custommetadata" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> custom<wbr>Metadata</h3>
+					<div class="tsd-signature tsd-kind-icon">custom<wbr>Metadata<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L11">projects/useful/src/lib/services/setting/setting.service.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/storage/storage.service.ts#L19">projects/useful/src/lib/services/storage/storage.service.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="value" class="tsd-anchor"></a>
-					<h3>value</h3>
-					<div class="tsd-signature tsd-kind-icon">value<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="nodategrouping" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> no<wbr>Date<wbr>Grouping</h3>
+					<div class="tsd-signature tsd-kind-icon">no<wbr>Date<wbr>Grouping<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L10">projects/useful/src/lib/services/setting/setting.service.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/storage/storage.service.ts#L17">projects/useful/src/lib/services/storage/storage.service.ts:17</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="norandomsuffix" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> no<wbr>Random<wbr>Suffix</h3>
+					<div class="tsd-signature tsd-kind-icon">no<wbr>Random<wbr>Suffix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/storage/storage.service.ts#L18">projects/useful/src/lib/services/storage/storage.service.ts:18</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="uploadfolder" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> upload<wbr>Folder</h3>
+					<div class="tsd-signature tsd-kind-icon">upload<wbr>Folder<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/storage/storage.service.ts#L16">projects/useful/src/lib/services/storage/storage.service.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -123,13 +145,19 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="builtindataitem.html" class="tsd-kind-icon">Builtin<wbr>Data<wbr>Item</a>
+						<a href="uploadcustom.html" class="tsd-kind-icon">Upload<wbr>Custom</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="builtindataitem.html#text" class="tsd-kind-icon">text</a>
+								<a href="uploadcustom.html#custommetadata" class="tsd-kind-icon">custom<wbr>Metadata</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="builtindataitem.html#value" class="tsd-kind-icon">value</a>
+								<a href="uploadcustom.html#nodategrouping" class="tsd-kind-icon">no<wbr>Date<wbr>Grouping</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="uploadcustom.html#norandomsuffix" class="tsd-kind-icon">no<wbr>Random<wbr>Suffix</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="uploadcustom.html#uploadfolder" class="tsd-kind-icon">upload<wbr>Folder</a>
 							</li>
 						</ul>
 					</li>

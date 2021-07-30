@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>DatexPipe | @lamnhan/ngx-useful</title>
+	<title>DashboardGuard | @lamnhan/ngx-useful</title>
 	<meta name="description" content="Documentation for @lamnhan/ngx-useful">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="datexpipe.html">DatexPipe</a>
+					<a href="dashboardguard.html">DashboardGuard</a>
 				</li>
 			</ul>
-			<h1>Class DatexPipe</h1>
+			<h1>Class DashboardGuard</h1>
 		</div>
 	</div>
 </header>
@@ -68,14 +68,15 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">DatexPipe</span>
+						<span class="target">DashboardGuard</span>
 					</li>
 				</ul>
 			</section>
 			<section class="tsd-panel">
 				<h3>Implements</h3>
 				<ul class="tsd-hierarchy">
-					<li><span class="tsd-signature-type">PipeTransform</span></li>
+					<li><span class="tsd-signature-type">CanActivate</span></li>
+					<li><span class="tsd-signature-type">CanLoad</span></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -85,13 +86,14 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="datexpipe.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="dashboardguard.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="datexpipe.html#transform" class="tsd-kind-icon">transform</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="dashboardguard.html#canactivate" class="tsd-kind-icon">can<wbr>Activate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="dashboardguard.html#canload" class="tsd-kind-icon">can<wbr>Load</a></li>
 							</ul>
 						</section>
 					</div>
@@ -103,22 +105,34 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Datex<wbr>Pipe<span class="tsd-signature-symbol">(</span>dateService<span class="tsd-signature-symbol">: </span><a href="dateservice.html" class="tsd-signature-type">DateService</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="datexpipe.html" class="tsd-signature-type">DatexPipe</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Dashboard<wbr>Guard<span class="tsd-signature-symbol">(</span>ngZone<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">NgZone</span>, guardService<span class="tsd-signature-symbol">: </span><a href="guardservice.html" class="tsd-signature-type">GuardService</a>, navService<span class="tsd-signature-symbol">: </span><a href="navservice.html" class="tsd-signature-type">NavService</a>, authService<span class="tsd-signature-symbol">: </span><a href="authservice.html" class="tsd-signature-type">AuthService</a>, userService<span class="tsd-signature-symbol">: </span><a href="userservice.html" class="tsd-signature-type">UserService</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="dashboardguard.html" class="tsd-signature-type">DashboardGuard</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/pipes/datex/datex.pipe.ts#L8">projects/useful/src/lib/pipes/datex/datex.pipe.ts:8</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/guards/dashboard/dashboard.guard.ts#L18">projects/useful/src/lib/guards/dashboard/dashboard.guard.ts:18</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>dateService: <a href="dateservice.html" class="tsd-signature-type">DateService</a></h5>
+									<h5>ngZone: <span class="tsd-signature-type">NgZone</span></h5>
+								</li>
+								<li>
+									<h5>guardService: <a href="guardservice.html" class="tsd-signature-type">GuardService</a></h5>
+								</li>
+								<li>
+									<h5>navService: <a href="navservice.html" class="tsd-signature-type">NavService</a></h5>
+								</li>
+								<li>
+									<h5>authService: <a href="authservice.html" class="tsd-signature-type">AuthService</a></h5>
+								</li>
+								<li>
+									<h5>userService: <a href="userservice.html" class="tsd-signature-type">UserService</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="datexpipe.html" class="tsd-signature-type">DatexPipe</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="dashboardguard.html" class="tsd-signature-type">DashboardGuard</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -126,28 +140,51 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="transform" class="tsd-anchor"></a>
-					<h3>transform</h3>
+					<a name="canactivate" class="tsd-anchor"></a>
+					<h3>can<wbr>Activate</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">transform<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+						<li class="tsd-signature tsd-kind-icon">can<wbr>Activate<span class="tsd-signature-symbol">(</span>route<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ActivatedRouteSnapshot</span>, state<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RouterStateSnapshot</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/pipes/datex/datex.pipe.ts#L14">projects/useful/src/lib/pipes/datex/datex.pipe.ts:14</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/guards/dashboard/dashboard.guard.ts#L27">projects/useful/src/lib/guards/dashboard/dashboard.guard.ts:27</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <span class="tsd-signature-type">any</span></h5>
+									<h5>route: <span class="tsd-signature-type">ActivatedRouteSnapshot</span></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>state: <span class="tsd-signature-type">RouterStateSnapshot</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="canload" class="tsd-anchor"></a>
+					<h3>can<wbr>Load</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">can<wbr>Load<span class="tsd-signature-symbol">(</span>route<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Route</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/guards/dashboard/dashboard.guard.ts#L31">projects/useful/src/lib/guards/dashboard/dashboard.guard.ts:31</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>route: <span class="tsd-signature-type">Route</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -166,13 +203,16 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class">
-						<a href="datexpipe.html" class="tsd-kind-icon">Datex<wbr>Pipe</a>
+						<a href="dashboardguard.html" class="tsd-kind-icon">Dashboard<wbr>Guard</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="datexpipe.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="dashboardguard.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="datexpipe.html#transform" class="tsd-kind-icon">transform</a>
+								<a href="dashboardguard.html#canactivate" class="tsd-kind-icon">can<wbr>Activate</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="dashboardguard.html#canload" class="tsd-kind-icon">can<wbr>Load</a>
 							</li>
 						</ul>
 					</li>

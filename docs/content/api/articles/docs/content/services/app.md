@@ -18,13 +18,16 @@
 <h3><a name="appservice-methods"><p>AppService methods</p>
 </a></h3>
 
-| Function                                                       | Returns type                                                                                                                   | Description |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| [addData(data)](#appservice-adddata-0)                         | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html" target="_blank">AppService</a></code> |             |
-| [getData(key)](#appservice-getdata-0)                          | <code>Value</code>                                                                                                             |             |
-| [hideSplashScreen()](#appservice-hidesplashscreen-0)           | <code>void</code>                                                                                                              |             |
-| [init(options?, customData?, dataLoader?)](#appservice-init-0) | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html" target="_blank">AppService</a></code> |             |
-| [share(title?, text?, url?)](#appservice-share-0)              | <code>null \| string \| Promise<void></code>                                                                                   |             |
+| Function                                                 | Returns type                                                                                                                   | Description |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| [addData(data)](#appservice-adddata-0)                   | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html" target="_blank">AppService</a></code> |             |
+| [getData(key)](#appservice-getdata-0)                    | <code>Value</code>                                                                                                             |             |
+| [hideSplashScreen()](#appservice-hidesplashscreen-0)     | <code>void</code>                                                                                                              |             |
+| [init()](#appservice-init-0)                             | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html" target="_blank">AppService</a></code> |             |
+| [setData(customData)](#appservice-setdata-0)             | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html" target="_blank">AppService</a></code> |             |
+| [setDataLoader(dataLoader)](#appservice-setdataloader-0) | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html" target="_blank">AppService</a></code> |             |
+| [setOptions(options)](#appservice-setoptions-0)          | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html" target="_blank">AppService</a></code> |             |
+| [share(title?, text?, url?)](#appservice-share-0)        | <code>null \| string \| Promise<void></code>                                                                                   |             |
 
 <h4><a name="appservice-adddata-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html#adddata"><p><code>addData(data)</code></p>
 </a></h4>
@@ -71,18 +74,61 @@
 
 ---
 
-<h4><a name="appservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html#init"><p><code>init(options?, customData?, dataLoader?)</code></p>
+<h4><a name="appservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html#init"><p><code>init()</code></p>
 </a></h4>
 
 **The `init` call signature.**
 
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html" target="_blank">AppService</a></code>
+
+---
+
+<h4><a name="appservice-setdata-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html#setdata"><p><code>setData(customData)</code></p>
+</a></h4>
+
+**The `setData` call signature.**
+
 **Parameters**
 
-| Param      | Type                                                                                                                              | Description |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| options    | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/appoptions.html" target="_blank">AppOptions</a></code> |             |
-| customData | <code>Record<string, unknown></code>                                                                                              |             |
-| dataLoader | <code>Observable<Record<string, unknown>></code>                                                                                  |             |
+| Param          | Type                                 | Description |
+| -------------- | ------------------------------------ | ----------- |
+| **customData** | <code>Record<string, unknown></code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html" target="_blank">AppService</a></code>
+
+---
+
+<h4><a name="appservice-setdataloader-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html#setdataloader"><p><code>setDataLoader(dataLoader)</code></p>
+</a></h4>
+
+**The `setDataLoader` call signature.**
+
+**Parameters**
+
+| Param          | Type                                             | Description |
+| -------------- | ------------------------------------------------ | ----------- |
+| **dataLoader** | <code>Observable<Record<string, unknown>></code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html" target="_blank">AppService</a></code>
+
+---
+
+<h4><a name="appservice-setoptions-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html#setoptions"><p><code>setOptions(options)</code></p>
+</a></h4>
+
+**The `setOptions` call signature.**
+
+**Parameters**
+
+| Param       | Type                                                                                                                              | Description |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **options** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/appoptions.html" target="_blank">AppOptions</a></code> |             |
 
 **Returns**
 

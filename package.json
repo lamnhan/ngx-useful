@@ -59,6 +59,7 @@
     "@angular-devkit/build-angular": "~12.0.3",
     "@angular/cli": "~12.0.3",
     "@angular/compiler-cli": "~12.0.3",
+    "@lamnhan/ayedocs": "^1.0.7",
     "@types/howler": "^2.2.2",
     "@types/jasmine": "~3.6.0",
     "@types/node": "^12.11.1",

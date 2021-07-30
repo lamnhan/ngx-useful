@@ -86,6 +86,7 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="metaservice.html#appmetas" class="tsd-kind-icon">app<wbr>Metas</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="metaservice.html#appsuffix" class="tsd-kind-icon">app<wbr>Suffix</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -95,6 +96,9 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="metaservice.html#changepagemetas" class="tsd-kind-icon">change<wbr>Page<wbr>Metas</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="metaservice.html#changepagetitle" class="tsd-kind-icon">change<wbr>Page<wbr>Title</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="metaservice.html#init" class="tsd-kind-icon">init</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="metaservice.html#setintegrations" class="tsd-kind-icon">set<wbr>Integrations</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="metaservice.html#setoptions" class="tsd-kind-icon">set<wbr>Options</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="metaservice.html#setsuffix" class="tsd-kind-icon">set<wbr>Suffix</a></li>
 							</ul>
 						</section>
 					</div>
@@ -112,7 +116,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/meta/meta.service.ts#L47">projects/useful/src/lib/services/meta/meta.service.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/meta/meta.service.ts#L52">projects/useful/src/lib/services/meta/meta.service.ts:52</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -137,7 +141,17 @@
 					<div class="tsd-signature tsd-kind-icon">app<wbr>Metas<span class="tsd-signature-symbol">:</span> <a href="../interfaces/appmetas.html" class="tsd-signature-type">AppMetas</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/meta/meta.service.ts#L47">projects/useful/src/lib/services/meta/meta.service.ts:47</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/meta/meta.service.ts#L52">projects/useful/src/lib/services/meta/meta.service.ts:52</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="appsuffix" class="tsd-anchor"></a>
+					<h3>app<wbr>Suffix</h3>
+					<div class="tsd-signature tsd-kind-icon">app<wbr>Suffix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/meta/meta.service.ts#L51">projects/useful/src/lib/services/meta/meta.service.ts:51</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -154,7 +168,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/meta/meta.service.ts#L80">projects/useful/src/lib/services/meta/meta.service.ts:80</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/meta/meta.service.ts#L104">projects/useful/src/lib/services/meta/meta.service.ts:104</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -171,13 +185,13 @@
 					<a name="changepagemetas" class="tsd-anchor"></a>
 					<h3>change<wbr>Page<wbr>Metas</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">change<wbr>Page<wbr>Metas<span class="tsd-signature-symbol">(</span>customMetas<span class="tsd-signature-symbol">?: </span><a href="../interfaces/appcustommetas.html" class="tsd-signature-type">AppCustomMetas</a>, withLocale<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metaservice.html" class="tsd-signature-type">MetaService</a></li>
+						<li class="tsd-signature tsd-kind-icon">change<wbr>Page<wbr>Metas<span class="tsd-signature-symbol">(</span>customMetas<span class="tsd-signature-symbol">?: </span><a href="../interfaces/appcustommetas.html" class="tsd-signature-type">AppCustomMetas</a>, withSuffix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, forLocale<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metaservice.html" class="tsd-signature-type">MetaService</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/meta/meta.service.ts#L85">projects/useful/src/lib/services/meta/meta.service.ts:85</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/meta/meta.service.ts#L109">projects/useful/src/lib/services/meta/meta.service.ts:109</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -186,7 +200,10 @@
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> customMetas: <a href="../interfaces/appcustommetas.html" class="tsd-signature-type">AppCustomMetas</a><span class="tsd-signature-symbol"> = {}</span></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> withLocale: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> withSuffix: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> forLocale: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="metaservice.html" class="tsd-signature-type">MetaService</a></h4>
@@ -203,7 +220,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/meta/meta.service.ts#L75">projects/useful/src/lib/services/meta/meta.service.ts:75</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/meta/meta.service.ts#L99">projects/useful/src/lib/services/meta/meta.service.ts:99</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -220,13 +237,13 @@
 					<a name="init" class="tsd-anchor"></a>
 					<h3>init</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">init<span class="tsd-signature-symbol">(</span>defaultMetas<span class="tsd-signature-symbol">: </span><a href="../interfaces/appmetas.html" class="tsd-signature-type">AppMetas</a>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/metaoptions.html" class="tsd-signature-type">MetaOptions</a>, integrations<span class="tsd-signature-symbol">?: </span><a href="../interfaces/metaintegrations.html" class="tsd-signature-type">MetaIntegrations</a>, metaTranslations<span class="tsd-signature-symbol">?: </span><a href="../interfaces/metatranslations.html" class="tsd-signature-type">MetaTranslations</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metaservice.html" class="tsd-signature-type">MetaService</a></li>
+						<li class="tsd-signature tsd-kind-icon">init<span class="tsd-signature-symbol">(</span>defaultMetas<span class="tsd-signature-symbol">: </span><a href="../interfaces/appmetas.html" class="tsd-signature-type">AppMetas</a>, metaTranslations<span class="tsd-signature-symbol">?: </span><a href="../interfaces/metatranslations.html" class="tsd-signature-type">MetaTranslations</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metaservice.html" class="tsd-signature-type">MetaService</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/meta/meta.service.ts#L54">projects/useful/src/lib/services/meta/meta.service.ts:54</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/meta/meta.service.ts#L79">projects/useful/src/lib/services/meta/meta.service.ts:79</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -235,13 +252,79 @@
 									<h5>defaultMetas: <a href="../interfaces/appmetas.html" class="tsd-signature-type">AppMetas</a></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> options: <a href="../interfaces/metaoptions.html" class="tsd-signature-type">MetaOptions</a><span class="tsd-signature-symbol"> = {}</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> integrations: <a href="../interfaces/metaintegrations.html" class="tsd-signature-type">MetaIntegrations</a><span class="tsd-signature-symbol"> = {}</span></h5>
-								</li>
-								<li>
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> metaTranslations: <a href="../interfaces/metatranslations.html" class="tsd-signature-type">MetaTranslations</a><span class="tsd-signature-symbol"> = {}</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="metaservice.html" class="tsd-signature-type">MetaService</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setintegrations" class="tsd-anchor"></a>
+					<h3>set<wbr>Integrations</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Integrations<span class="tsd-signature-symbol">(</span>integrations<span class="tsd-signature-symbol">: </span><a href="../interfaces/metaintegrations.html" class="tsd-signature-type">MetaIntegrations</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metaservice.html" class="tsd-signature-type">MetaService</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/meta/meta.service.ts#L64">projects/useful/src/lib/services/meta/meta.service.ts:64</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>integrations: <a href="../interfaces/metaintegrations.html" class="tsd-signature-type">MetaIntegrations</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="metaservice.html" class="tsd-signature-type">MetaService</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setoptions" class="tsd-anchor"></a>
+					<h3>set<wbr>Options</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Options<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><a href="../interfaces/metaoptions.html" class="tsd-signature-type">MetaOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metaservice.html" class="tsd-signature-type">MetaService</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/meta/meta.service.ts#L59">projects/useful/src/lib/services/meta/meta.service.ts:59</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>options: <a href="../interfaces/metaoptions.html" class="tsd-signature-type">MetaOptions</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="metaservice.html" class="tsd-signature-type">MetaService</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setsuffix" class="tsd-anchor"></a>
+					<h3>set<wbr>Suffix</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Suffix<span class="tsd-signature-symbol">(</span>defaultSuffix<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, suffixTranslations<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metaservice.html" class="tsd-signature-type">MetaService</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/meta/meta.service.ts#L69">projects/useful/src/lib/services/meta/meta.service.ts:69</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>defaultSuffix: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> suffixTranslations: <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = {}</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="metaservice.html" class="tsd-signature-type">MetaService</a></h4>
@@ -271,6 +354,9 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="metaservice.html#appmetas" class="tsd-kind-icon">app<wbr>Metas</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="metaservice.html#appsuffix" class="tsd-kind-icon">app<wbr>Suffix</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="metaservice.html#changepagelang" class="tsd-kind-icon">change<wbr>Page<wbr>Lang</a>
 							</li>
@@ -282,6 +368,15 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="metaservice.html#init" class="tsd-kind-icon">init</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="metaservice.html#setintegrations" class="tsd-kind-icon">set<wbr>Integrations</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="metaservice.html#setoptions" class="tsd-kind-icon">set<wbr>Options</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="metaservice.html#setsuffix" class="tsd-kind-icon">set<wbr>Suffix</a>
 							</li>
 						</ul>
 					</li>

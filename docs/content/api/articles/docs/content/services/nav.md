@@ -27,23 +27,27 @@
 <h3><a name="navservice-methods"><p>NavService methods</p>
 </a></h3>
 
-| Function                                                                   | Returns type                                                                                                                   | Description |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| [back()](#navservice-back-0)                                               | <code>undefined \| Promise<boolean></code>                                                                                     |             |
-| [getMenuIcon(menuClass?, backClass?)](#navservice-getmenuicon-0)           | <code>string</code>                                                                                                            |             |
-| [getRoute(input, withLocale?)](#navservice-getroute-0)                     | <code>string[]</code>                                                                                                          |             |
-| [getRouteUrl(input, withLocale?)](#navservice-getrouteurl-0)               | <code>string</code>                                                                                                            |             |
-| [hideLoadingIndicator()](#navservice-hideloadingindicator-0)               | <code>void</code>                                                                                                              |             |
-| [init(options?, integrations?, hooks?, i18nRegistry?)](#navservice-init-0) | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html" target="_blank">NavService</a></code> |             |
-| [isActive(url, exact?)](#navservice-isactive-0)                            | <code>boolean</code>                                                                                                           |             |
-| [isBackwardable()](#navservice-isbackwardable-0)                           | <code>boolean</code>                                                                                                           |             |
-| [isRouteActive(input, exact?, withLocale?)](#navservice-isrouteactive-0)   | <code>boolean</code>                                                                                                           |             |
-| [menuAction()](#navservice-menuaction-0)                                   | <code>void \| Promise<boolean></code>                                                                                          |             |
-| [navigate(input, advanced?)](#navservice-navigate-0)                       | <code>Promise<boolean></code>                                                                                                  |             |
-| [scrollTo(input, offset?, smooth?)](#navservice-scrollto-0)                | <code>void</code>                                                                                                              |             |
-| [scrollToTop(offset?, smooth?)](#navservice-scrolltotop-0)                 | <code>void</code>                                                                                                              |             |
-| [showLoadingIndicator()](#navservice-showloadingindicator-0)               | <code>void</code>                                                                                                              |             |
-| [toggleMenu()](#navservice-togglemenu-0)                                   | <code>void</code>                                                                                                              |             |
+| Function                                                                 | Returns type                                                                                                                   | Description |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| [back()](#navservice-back-0)                                             | <code>undefined \| Promise<boolean></code>                                                                                     |             |
+| [getMenuIcon(menuClass?, backClass?)](#navservice-getmenuicon-0)         | <code>string</code>                                                                                                            |             |
+| [getRoute(input, withLocale?)](#navservice-getroute-0)                   | <code>string[]</code>                                                                                                          |             |
+| [getRouteUrl(input, withLocale?)](#navservice-getrouteurl-0)             | <code>string</code>                                                                                                            |             |
+| [hideLoadingIndicator()](#navservice-hideloadingindicator-0)             | <code>void</code>                                                                                                              |             |
+| [init()](#navservice-init-0)                                             | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html" target="_blank">NavService</a></code> |             |
+| [isActive(url, exact?)](#navservice-isactive-0)                          | <code>boolean</code>                                                                                                           |             |
+| [isBackwardable()](#navservice-isbackwardable-0)                         | <code>boolean</code>                                                                                                           |             |
+| [isRouteActive(input, exact?, withLocale?)](#navservice-isrouteactive-0) | <code>boolean</code>                                                                                                           |             |
+| [menuAction()](#navservice-menuaction-0)                                 | <code>void \| Promise<boolean></code>                                                                                          |             |
+| [navigate(input, advanced?)](#navservice-navigate-0)                     | <code>Promise<boolean></code>                                                                                                  |             |
+| [scrollTo(input, offset?, smooth?)](#navservice-scrollto-0)              | <code>void</code>                                                                                                              |             |
+| [scrollToTop(offset?, smooth?)](#navservice-scrolltotop-0)               | <code>void</code>                                                                                                              |             |
+| [setHooks(hooks)](#navservice-sethooks-0)                                | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html" target="_blank">NavService</a></code> |             |
+| [setI18n(i18nRegistry)](#navservice-seti18n-0)                           | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html" target="_blank">NavService</a></code> |             |
+| [setIntegrations(integrations)](#navservice-setintegrations-0)           | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html" target="_blank">NavService</a></code> |             |
+| [setOptions(options)](#navservice-setoptions-0)                          | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html" target="_blank">NavService</a></code> |             |
+| [showLoadingIndicator()](#navservice-showloadingindicator-0)             | <code>void</code>                                                                                                              |             |
+| [toggleMenu()](#navservice-togglemenu-0)                                 | <code>void</code>                                                                                                              |             |
 
 <h4><a name="navservice-back-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#back"><p><code>back()</code></p>
 </a></h4>
@@ -121,19 +125,10 @@
 
 ---
 
-<h4><a name="navservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#init"><p><code>init(options?, integrations?, hooks?, i18nRegistry?)</code></p>
+<h4><a name="navservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#init"><p><code>init()</code></p>
 </a></h4>
 
 **The `init` call signature.**
-
-**Parameters**
-
-| Param        | Type                                                                                                                                        | Description |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| options      | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/navoptions.html" target="_blank">NavOptions</a></code>           |             |
-| integrations | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/navintegrations.html" target="_blank">NavIntegrations</a></code> |             |
-| hooks        | <code>object</code>                                                                                                                         |             |
-| i18nRegistry | <code>undefined \| object</code>                                                                                                            |             |
 
 **Returns**
 
@@ -252,6 +247,74 @@
 **Returns**
 
 <code>void</code>
+
+---
+
+<h4><a name="navservice-sethooks-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#sethooks"><p><code>setHooks(hooks)</code></p>
+</a></h4>
+
+**The `setHooks` call signature.**
+
+**Parameters**
+
+| Param     | Type                | Description |
+| --------- | ------------------- | ----------- |
+| **hooks** | <code>object</code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html" target="_blank">NavService</a></code>
+
+---
+
+<h4><a name="navservice-seti18n-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#seti18n"><p><code>setI18n(i18nRegistry)</code></p>
+</a></h4>
+
+**The `setI18n` call signature.**
+
+**Parameters**
+
+| Param            | Type                | Description |
+| ---------------- | ------------------- | ----------- |
+| **i18nRegistry** | <code>object</code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html" target="_blank">NavService</a></code>
+
+---
+
+<h4><a name="navservice-setintegrations-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#setintegrations"><p><code>setIntegrations(integrations)</code></p>
+</a></h4>
+
+**The `setIntegrations` call signature.**
+
+**Parameters**
+
+| Param            | Type                                                                                                                                        | Description |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **integrations** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/navintegrations.html" target="_blank">NavIntegrations</a></code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html" target="_blank">NavService</a></code>
+
+---
+
+<h4><a name="navservice-setoptions-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#setoptions"><p><code>setOptions(options)</code></p>
+</a></h4>
+
+**The `setOptions` call signature.**
+
+**Parameters**
+
+| Param       | Type                                                                                                                              | Description |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **options** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/navoptions.html" target="_blank">NavOptions</a></code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html" target="_blank">NavService</a></code>
 
 ---
 

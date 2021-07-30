@@ -30,9 +30,15 @@
 | [getCollection(path, queryFn?, caching?)](#databaseservice-getcollection-0)         | <code>Observable<Type[]></code>                                                                                                                |             |
 | [getDoc(path, queryFn?, caching?)](#databaseservice-getdoc-0)                       | <code>Observable<any></code>                                                                                                                   |             |
 | [getRecord(path, queryFn?, caching?)](#databaseservice-getrecord-0)                 | <code>Observable<Record<string, Type>></code>                                                                                                  |             |
+| [getValueDelete()](#databaseservice-getvaluedelete-0)                               | <code>FieldValue<></code>                                                                                                                      |             |
+| [getValueIncrement(by?)](#databaseservice-getvalueincrement-0)                      | <code>FieldValue<></code>                                                                                                                      |             |
 | [increment(path, data)](#databaseservice-increment-0)                               | <code>Observable<void></code>                                                                                                                  |             |
-| [init(service, options?, integrations?)](#databaseservice-init-0)                   | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>       |             |
+| [init(vendorService)](#databaseservice-init-0)                                      | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>       |             |
+| [isTypeDelete(value)](#databaseservice-istypedelete-0)                              | <code>boolean</code>                                                                                                                           |             |
+| [isTypeIncrement(value)](#databaseservice-istypeincrement-0)                        | <code>boolean</code>                                                                                                                           |             |
 | [set(path, item)](#databaseservice-set-0)                                           | <code>Observable<void></code>                                                                                                                  |             |
+| [setIntegrations(integrations)](#databaseservice-setintegrations-0)                 | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>       |             |
+| [setOptions(options)](#databaseservice-setoptions-0)                                | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>       |             |
 | [streamCollection(path, queryFn?)](#databaseservice-streamcollection-0)             | <code>Observable<Type[]></code>                                                                                                                |             |
 | [streamDoc(path, queryFn?)](#databaseservice-streamdoc-0)                           | <code>Observable<null \| Type></code>                                                                                                          |             |
 | [streamRecord(path, queryFn?)](#databaseservice-streamrecord-0)                     | <code>Observable<Record<string, Type>></code>                                                                                                  |             |
@@ -276,6 +282,34 @@
 
 ---
 
+<h4><a name="databaseservice-getvaluedelete-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#getvaluedelete"><p><code>getValueDelete()</code></p>
+</a></h4>
+
+**The `getValueDelete` call signature.**
+
+**Returns**
+
+<code>FieldValue<></code>
+
+---
+
+<h4><a name="databaseservice-getvalueincrement-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#getvalueincrement"><p><code>getValueIncrement(by?)</code></p>
+</a></h4>
+
+**The `getValueIncrement` call signature.**
+
+**Parameters**
+
+| Param | Type                | Description |
+| ----- | ------------------- | ----------- |
+| by    | <code>number</code> |             |
+
+**Returns**
+
+<code>FieldValue<></code>
+
+---
+
 <h4><a name="databaseservice-increment-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#increment"><p><code>increment(path, data)</code></p>
 </a></h4>
 
@@ -294,22 +328,54 @@
 
 ---
 
-<h4><a name="databaseservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#init"><p><code>init(service, options?, integrations?)</code></p>
+<h4><a name="databaseservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#init"><p><code>init(vendorService)</code></p>
 </a></h4>
 
 **The `init` call signature.**
 
 **Parameters**
 
-| Param        | Type                                                                                                                                                  | Description |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| **service**  | <code><a href="https://ngx-useful.lamnhan.com/content/reference/globals.html#vendordatabaseservice" target="_blank">VendorDatabaseService</a></code>  |             |
-| options      | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/databaseoptions.html" target="_blank">DatabaseOptions</a></code>           |             |
-| integrations | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/databaseintegrations.html" target="_blank">DatabaseIntegrations</a></code> |             |
+| Param             | Type                                                                                                                                                 | Description |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **vendorService** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/globals.html#vendordatabaseservice" target="_blank">VendorDatabaseService</a></code> |             |
 
 **Returns**
 
 <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>
+
+---
+
+<h4><a name="databaseservice-istypedelete-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#istypedelete"><p><code>isTypeDelete(value)</code></p>
+</a></h4>
+
+**The `isTypeDelete` call signature.**
+
+**Parameters**
+
+| Param     | Type             | Description |
+| --------- | ---------------- | ----------- |
+| **value** | <code>any</code> |             |
+
+**Returns**
+
+<code>boolean</code>
+
+---
+
+<h4><a name="databaseservice-istypeincrement-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#istypeincrement"><p><code>isTypeIncrement(value)</code></p>
+</a></h4>
+
+**The `isTypeIncrement` call signature.**
+
+**Parameters**
+
+| Param     | Type             | Description |
+| --------- | ---------------- | ----------- |
+| **value** | <code>any</code> |             |
+
+**Returns**
+
+<code>boolean</code>
 
 ---
 
@@ -328,6 +394,40 @@
 **Returns**
 
 <code>Observable<void></code>
+
+---
+
+<h4><a name="databaseservice-setintegrations-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#setintegrations"><p><code>setIntegrations(integrations)</code></p>
+</a></h4>
+
+**The `setIntegrations` call signature.**
+
+**Parameters**
+
+| Param            | Type                                                                                                                                                  | Description |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **integrations** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/databaseintegrations.html" target="_blank">DatabaseIntegrations</a></code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>
+
+---
+
+<h4><a name="databaseservice-setoptions-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#setoptions"><p><code>setOptions(options)</code></p>
+</a></h4>
+
+**The `setOptions` call signature.**
+
+**Parameters**
+
+| Param       | Type                                                                                                                                        | Description |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **options** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/databaseoptions.html" target="_blank">DatabaseOptions</a></code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>
 
 ---
 

@@ -83,6 +83,7 @@ See [guides](https://ngx-useful.lamnhan.com/guides) for more articles. Also see 
 | [DateService](https://ngx-useful.lamnhan.com/content/reference/classes/dateservice.html)                 | (DON'T USE YET) Date service                  |
 | [ErrorService](https://ngx-useful.lamnhan.com/content/reference/classes/errorservice.html)               |                                               |
 | [FetchService](https://ngx-useful.lamnhan.com/content/reference/classes/fetchservice.html)               |                                               |
+| [GuardService](https://ngx-useful.lamnhan.com/content/reference/classes/guardservice.html)               |                                               |
 | [HelperService](https://ngx-useful.lamnhan.com/content/reference/classes/helperservice.html)             |                                               |
 | [LocalstorageService](https://ngx-useful.lamnhan.com/content/reference/classes/localstorageservice.html) |                                               |
 | [MetaService](https://ngx-useful.lamnhan.com/content/reference/classes/metaservice.html)                 |                                               |
@@ -93,6 +94,7 @@ See [guides](https://ngx-useful.lamnhan.com/guides) for more articles. Also see 
 | [PlayerService](https://ngx-useful.lamnhan.com/content/reference/classes/playerservice.html)             |                                               |
 | [PwaService](https://ngx-useful.lamnhan.com/content/reference/classes/pwaservice.html)                   |                                               |
 | [SettingService](https://ngx-useful.lamnhan.com/content/reference/classes/settingservice.html)           |                                               |
+| [StorageService](https://ngx-useful.lamnhan.com/content/reference/classes/storageservice.html)           |                                               |
 | [UserService](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html)                 |                                               |
 
 </section>

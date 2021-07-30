@@ -15,7 +15,7 @@
 | [getBulk(keys)](#localstorageservice-getbulk-0)                 | <code>Observable<Result></code>                                                                                                                  |             |
 | [getLocalforage()](#localstorageservice-getlocalforage-0)       | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/localforage.html" target="_blank">LocalForage</a></code>              |             |
 | [increment(key, by?)](#localstorageservice-increment-0)         | <code>Observable<number></code>                                                                                                                  |             |
-| [init(config?)](#localstorageservice-init-0)                    | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/localstorageservice.html" target="_blank">LocalstorageService</a></code> |             |
+| [init(localForageOptions?)](#localstorageservice-init-0)        | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/localstorageservice.html" target="_blank">LocalstorageService</a></code> |             |
 | [iterate(handler)](#localstorageservice-iterate-0)              | <code>Observable<Promise<unknown>></code>                                                                                                        |             |
 | [iterateKeys(handler)](#localstorageservice-iteratekeys-0)      | <code>Observable<void></code>                                                                                                                    |             |
 | [keys()](#localstorageservice-keys-0)                           | <code>Observable<string[]></code>                                                                                                                |             |
@@ -100,16 +100,16 @@
 
 ---
 
-<h4><a name="localstorageservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/localstorageservice.html#init"><p><code>init(config?)</code></p>
+<h4><a name="localstorageservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/localstorageservice.html#init"><p><code>init(localForageOptions?)</code></p>
 </a></h4>
 
 **The `init` call signature.**
 
 **Parameters**
 
-| Param  | Type                            | Description |
-| ------ | ------------------------------- | ----------- |
-| config | <code>LocalForageOptions</code> |             |
+| Param              | Type                            | Description |
+| ------------------ | ------------------------------- | ----------- |
+| localForageOptions | <code>LocalForageOptions</code> |             |
 
 **Returns**
 

@@ -24,7 +24,8 @@
 | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------- |
 | [dismissReminder()](#pwaservice-dismissreminder-0)        | <code>void</code>                                                                                                              |             |
 | [hideReminder()](#pwaservice-hidereminder-0)              | <code>void</code>                                                                                                              |             |
-| [init(options?)](#pwaservice-init-0)                      | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/pwaservice.html" target="_blank">PwaService</a></code> |             |
+| [init()](#pwaservice-init-0)                              | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/pwaservice.html" target="_blank">PwaService</a></code> |             |
+| [setOptions(options)](#pwaservice-setoptions-0)           | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/pwaservice.html" target="_blank">PwaService</a></code> |             |
 | [showReminder(manualShowed?)](#pwaservice-showreminder-0) | <code>void</code>                                                                                                              |             |
 
 <h4><a name="pwaservice-dismissreminder-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/pwaservice.html#dismissreminder"><p><code>dismissReminder()</code></p>
@@ -49,16 +50,27 @@
 
 ---
 
-<h4><a name="pwaservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/pwaservice.html#init"><p><code>init(options?)</code></p>
+<h4><a name="pwaservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/pwaservice.html#init"><p><code>init()</code></p>
 </a></h4>
 
 **The `init` call signature.**
 
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/pwaservice.html" target="_blank">PwaService</a></code>
+
+---
+
+<h4><a name="pwaservice-setoptions-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/pwaservice.html#setoptions"><p><code>setOptions(options)</code></p>
+</a></h4>
+
+**The `setOptions` call signature.**
+
 **Parameters**
 
-| Param   | Type                                                                                                                              | Description |
-| ------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| options | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/pwaoptions.html" target="_blank">PWAOptions</a></code> |             |
+| Param       | Type                                                                                                                              | Description |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **options** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/pwaoptions.html" target="_blank">PWAOptions</a></code> |             |
 
 **Returns**
 

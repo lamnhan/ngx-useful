@@ -85,6 +85,10 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="settingservice.html#defaultlocale" class="tsd-kind-icon">default<wbr>Locale</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="settingservice.html#defaultpersona" class="tsd-kind-icon">default<wbr>Persona</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="settingservice.html#defaulttheme" class="tsd-kind-icon">default<wbr>Theme</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="settingservice.html#isinitialized" class="tsd-kind-icon">is<wbr>Initialized</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="settingservice.html#locale" class="tsd-kind-icon">locale</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="settingservice.html#locales" class="tsd-kind-icon">locales</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="settingservice.html#onlocalechanged" class="tsd-kind-icon">on<wbr>Locale<wbr>Changed</a></li>
@@ -103,7 +107,17 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#changepersona" class="tsd-kind-icon">change<wbr>Persona</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#changetheme" class="tsd-kind-icon">change<wbr>Theme</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#init" class="tsd-kind-icon">init</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#initializesettings" class="tsd-kind-icon">initialize<wbr>Settings</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#setdefaults" class="tsd-kind-icon">set<wbr>Defaults</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#setinitiallocale" class="tsd-kind-icon">set<wbr>Initial<wbr>Locale</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#setinitialpersona" class="tsd-kind-icon">set<wbr>Initial<wbr>Persona</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#setinitialtheme" class="tsd-kind-icon">set<wbr>Initial<wbr>Theme</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#setintegrations" class="tsd-kind-icon">set<wbr>Integrations</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#setlisting" class="tsd-kind-icon">set<wbr>Listing</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#setoptions" class="tsd-kind-icon">set<wbr>Options</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#setprioritizedlocale" class="tsd-kind-icon">set<wbr>Prioritized<wbr>Locale</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#setprioritizedpersona" class="tsd-kind-icon">set<wbr>Prioritized<wbr>Persona</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#setprioritizedtheme" class="tsd-kind-icon">set<wbr>Prioritized<wbr>Theme</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="settingservice.html#triggersettinginitilizer" class="tsd-kind-icon">trigger<wbr>Setting<wbr>Initilizer</a></li>
 							</ul>
 						</section>
 					</div>
@@ -121,7 +135,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L70">projects/useful/src/lib/services/setting/setting.service.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L87">projects/useful/src/lib/services/setting/setting.service.ts:87</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -138,22 +152,62 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="locale" class="tsd-anchor"></a>
-					<h3>locale</h3>
-					<div class="tsd-signature tsd-kind-icon">locale<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;en-US&quot;</span></div>
+					<a name="defaultlocale" class="tsd-anchor"></a>
+					<h3>default<wbr>Locale</h3>
+					<div class="tsd-signature tsd-kind-icon">default<wbr>Locale<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;en-US&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L62">projects/useful/src/lib/services/setting/setting.service.ts:62</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L75">projects/useful/src/lib/services/setting/setting.service.ts:75</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="defaultpersona" class="tsd-anchor"></a>
+					<h3>default<wbr>Persona</h3>
+					<div class="tsd-signature tsd-kind-icon">default<wbr>Persona<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;default&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L71">projects/useful/src/lib/services/setting/setting.service.ts:71</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="defaulttheme" class="tsd-anchor"></a>
+					<h3>default<wbr>Theme</h3>
+					<div class="tsd-signature tsd-kind-icon">default<wbr>Theme<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;light&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L67">projects/useful/src/lib/services/setting/setting.service.ts:67</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="isinitialized" class="tsd-anchor"></a>
+					<h3>is<wbr>Initialized</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Initialized<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L57">projects/useful/src/lib/services/setting/setting.service.ts:57</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="locale" class="tsd-anchor"></a>
+					<h3>locale</h3>
+					<div class="tsd-signature tsd-kind-icon">locale<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = this.defaultLocale</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L76">projects/useful/src/lib/services/setting/setting.service.ts:76</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="locales" class="tsd-anchor"></a>
 					<h3>locales</h3>
-					<div class="tsd-signature tsd-kind-icon">locales<span class="tsd-signature-symbol">:</span> <a href="../interfaces/builtindataitem.html" class="tsd-signature-type">BuiltinDataItem</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = [{text: &#x27;English&#x27;, value: &#x27;en-US&#x27;}]</span></div>
+					<div class="tsd-signature tsd-kind-icon">locales<span class="tsd-signature-symbol">:</span> <a href="../interfaces/builtinlistingitem.html" class="tsd-signature-type">BuiltinListingItem</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = [{text: &#x27;English&#x27;, value: &#x27;en-US&#x27;}]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L57">projects/useful/src/lib/services/setting/setting.service.ts:57</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L62">projects/useful/src/lib/services/setting/setting.service.ts:62</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -163,7 +217,7 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Locale<wbr>Changed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ReplaySubject</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = new ReplaySubject&lt;string&gt;(1)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L70">projects/useful/src/lib/services/setting/setting.service.ts:70</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L86">projects/useful/src/lib/services/setting/setting.service.ts:86</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -173,7 +227,7 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Persona<wbr>Changed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ReplaySubject</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = new ReplaySubject&lt;string&gt;(1)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L69">projects/useful/src/lib/services/setting/setting.service.ts:69</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L84">projects/useful/src/lib/services/setting/setting.service.ts:84</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -183,47 +237,47 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Theme<wbr>Changed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ReplaySubject</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = new ReplaySubject&lt;string&gt;(1)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L68">projects/useful/src/lib/services/setting/setting.service.ts:68</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L82">projects/useful/src/lib/services/setting/setting.service.ts:82</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="persona" class="tsd-anchor"></a>
 					<h3>persona</h3>
-					<div class="tsd-signature tsd-kind-icon">persona<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;default&quot;</span></div>
+					<div class="tsd-signature tsd-kind-icon">persona<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = this.defaultPersona</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L61">projects/useful/src/lib/services/setting/setting.service.ts:61</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L72">projects/useful/src/lib/services/setting/setting.service.ts:72</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="personas" class="tsd-anchor"></a>
 					<h3>personas</h3>
-					<div class="tsd-signature tsd-kind-icon">personas<span class="tsd-signature-symbol">:</span> <a href="../interfaces/builtindataitem.html" class="tsd-signature-type">BuiltinDataItem</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = [{text: &#x27;Default&#x27;, value: &#x27;default&#x27;}]</span></div>
+					<div class="tsd-signature tsd-kind-icon">personas<span class="tsd-signature-symbol">:</span> <a href="../interfaces/builtinlistingitem.html" class="tsd-signature-type">BuiltinListingItem</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = [{text: &#x27;Default&#x27;, value: &#x27;default&#x27;}]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L56">projects/useful/src/lib/services/setting/setting.service.ts:56</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L61">projects/useful/src/lib/services/setting/setting.service.ts:61</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="theme" class="tsd-anchor"></a>
 					<h3>theme</h3>
-					<div class="tsd-signature tsd-kind-icon">theme<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;light&quot;</span></div>
+					<div class="tsd-signature tsd-kind-icon">theme<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = this.defaultTheme</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L60">projects/useful/src/lib/services/setting/setting.service.ts:60</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L68">projects/useful/src/lib/services/setting/setting.service.ts:68</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="themes" class="tsd-anchor"></a>
 					<h3>themes</h3>
-					<div class="tsd-signature tsd-kind-icon">themes<span class="tsd-signature-symbol">:</span> <a href="../interfaces/builtindataitem.html" class="tsd-signature-type">BuiltinDataItem</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = [{text: &#x27;Light&#x27;, value: &#x27;light&#x27;}]</span></div>
+					<div class="tsd-signature tsd-kind-icon">themes<span class="tsd-signature-symbol">:</span> <a href="../interfaces/builtinlistingitem.html" class="tsd-signature-type">BuiltinListingItem</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = [{text: &#x27;Light&#x27;, value: &#x27;light&#x27;}]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L55">projects/useful/src/lib/services/setting/setting.service.ts:55</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L60">projects/useful/src/lib/services/setting/setting.service.ts:60</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -240,7 +294,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L171">projects/useful/src/lib/services/setting/setting.service.ts:171</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L244">projects/useful/src/lib/services/setting/setting.service.ts:244</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -263,7 +317,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L148">projects/useful/src/lib/services/setting/setting.service.ts:148</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L215">projects/useful/src/lib/services/setting/setting.service.ts:215</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -286,7 +340,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L127">projects/useful/src/lib/services/setting/setting.service.ts:127</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L189">projects/useful/src/lib/services/setting/setting.service.ts:189</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -303,25 +357,36 @@
 					<a name="init" class="tsd-anchor"></a>
 					<h3>init</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">init<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/settingoptions.html" class="tsd-signature-type">SettingOptions</a>, settingData<span class="tsd-signature-symbol">?: </span><a href="../interfaces/builtindata.html" class="tsd-signature-type">BuiltinData</a>, integrations<span class="tsd-signature-symbol">?: </span><a href="../interfaces/settingintegrations.html" class="tsd-signature-type">SettingIntegrations</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="settingservice.html" class="tsd-signature-type">SettingService</a></li>
+						<li class="tsd-signature tsd-kind-icon">init<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="settingservice.html" class="tsd-signature-type">SettingService</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L74">projects/useful/src/lib/services/setting/setting.service.ts:74</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L129">projects/useful/src/lib/services/setting/setting.service.ts:129</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="settingservice.html" class="tsd-signature-type">SettingService</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setdefaults" class="tsd-anchor"></a>
+					<h3>set<wbr>Defaults</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Defaults<span class="tsd-signature-symbol">(</span>defaultSettings<span class="tsd-signature-symbol">: </span><a href="../interfaces/appsettings.html" class="tsd-signature-type">AppSettings</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="settingservice.html" class="tsd-signature-type">SettingService</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L115">projects/useful/src/lib/services/setting/setting.service.ts:115</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> options: <a href="../interfaces/settingoptions.html" class="tsd-signature-type">SettingOptions</a><span class="tsd-signature-symbol"> = {}</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> settingData: <a href="../interfaces/builtindata.html" class="tsd-signature-type">BuiltinData</a><span class="tsd-signature-symbol"> = {}</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> integrations: <a href="../interfaces/settingintegrations.html" class="tsd-signature-type">SettingIntegrations</a><span class="tsd-signature-symbol"> = {}</span></h5>
+									<h5>defaultSettings: <a href="../interfaces/appsettings.html" class="tsd-signature-type">AppSettings</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="settingservice.html" class="tsd-signature-type">SettingService</a></h4>
@@ -329,24 +394,225 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="initializesettings" class="tsd-anchor"></a>
-					<h3>initialize<wbr>Settings</h3>
+					<a name="setinitiallocale" class="tsd-anchor"></a>
+					<h3>set<wbr>Initial<wbr>Locale</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">initialize<wbr>Settings<span class="tsd-signature-symbol">(</span>initialSettings<span class="tsd-signature-symbol">: </span><a href="../interfaces/appsettings.html" class="tsd-signature-type">AppSettings</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Initial<wbr>Locale<span class="tsd-signature-symbol">(</span>locale<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/setting/setting.service.ts#L123">projects/useful/src/lib/services/setting/setting.service.ts:123</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L181">projects/useful/src/lib/services/setting/setting.service.ts:181</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>initialSettings: <a href="../interfaces/appsettings.html" class="tsd-signature-type">AppSettings</a></h5>
+									<h5>locale: <span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setinitialpersona" class="tsd-anchor"></a>
+					<h3>set<wbr>Initial<wbr>Persona</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Initial<wbr>Persona<span class="tsd-signature-symbol">(</span>persona<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L173">projects/useful/src/lib/services/setting/setting.service.ts:173</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>persona: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setinitialtheme" class="tsd-anchor"></a>
+					<h3>set<wbr>Initial<wbr>Theme</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Initial<wbr>Theme<span class="tsd-signature-symbol">(</span>theme<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L165">projects/useful/src/lib/services/setting/setting.service.ts:165</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>theme: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setintegrations" class="tsd-anchor"></a>
+					<h3>set<wbr>Integrations</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Integrations<span class="tsd-signature-symbol">(</span>integrations<span class="tsd-signature-symbol">: </span><a href="../interfaces/settingintegrations.html" class="tsd-signature-type">SettingIntegrations</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="settingservice.html" class="tsd-signature-type">SettingService</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L96">projects/useful/src/lib/services/setting/setting.service.ts:96</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>integrations: <a href="../interfaces/settingintegrations.html" class="tsd-signature-type">SettingIntegrations</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="settingservice.html" class="tsd-signature-type">SettingService</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setlisting" class="tsd-anchor"></a>
+					<h3>set<wbr>Listing</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Listing<span class="tsd-signature-symbol">(</span>listing<span class="tsd-signature-symbol">: </span><a href="../interfaces/builtinlisting.html" class="tsd-signature-type">BuiltinListing</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="settingservice.html" class="tsd-signature-type">SettingService</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L101">projects/useful/src/lib/services/setting/setting.service.ts:101</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>listing: <a href="../interfaces/builtinlisting.html" class="tsd-signature-type">BuiltinListing</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="settingservice.html" class="tsd-signature-type">SettingService</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setoptions" class="tsd-anchor"></a>
+					<h3>set<wbr>Options</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Options<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><a href="../interfaces/settingoptions.html" class="tsd-signature-type">SettingOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="settingservice.html" class="tsd-signature-type">SettingService</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L91">projects/useful/src/lib/services/setting/setting.service.ts:91</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>options: <a href="../interfaces/settingoptions.html" class="tsd-signature-type">SettingOptions</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="settingservice.html" class="tsd-signature-type">SettingService</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setprioritizedlocale" class="tsd-anchor"></a>
+					<h3>set<wbr>Prioritized<wbr>Locale</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Prioritized<wbr>Locale<span class="tsd-signature-symbol">(</span>locale<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L185">projects/useful/src/lib/services/setting/setting.service.ts:185</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>locale: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setprioritizedpersona" class="tsd-anchor"></a>
+					<h3>set<wbr>Prioritized<wbr>Persona</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Prioritized<wbr>Persona<span class="tsd-signature-symbol">(</span>persona<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L177">projects/useful/src/lib/services/setting/setting.service.ts:177</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>persona: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setprioritizedtheme" class="tsd-anchor"></a>
+					<h3>set<wbr>Prioritized<wbr>Theme</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Prioritized<wbr>Theme<span class="tsd-signature-symbol">(</span>theme<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L169">projects/useful/src/lib/services/setting/setting.service.ts:169</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>theme: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="triggersettinginitilizer" class="tsd-anchor"></a>
+					<h3>trigger<wbr>Setting<wbr>Initilizer</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">trigger<wbr>Setting<wbr>Initilizer<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/setting/setting.service.ts#L161">projects/useful/src/lib/services/setting/setting.service.ts:161</a></li>
+								</ul>
+							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -370,6 +636,18 @@
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
 								<a href="settingservice.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="settingservice.html#defaultlocale" class="tsd-kind-icon">default<wbr>Locale</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="settingservice.html#defaultpersona" class="tsd-kind-icon">default<wbr>Persona</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="settingservice.html#defaulttheme" class="tsd-kind-icon">default<wbr>Theme</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="settingservice.html#isinitialized" class="tsd-kind-icon">is<wbr>Initialized</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="settingservice.html#locale" class="tsd-kind-icon">locale</a>
@@ -411,7 +689,37 @@
 								<a href="settingservice.html#init" class="tsd-kind-icon">init</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="settingservice.html#initializesettings" class="tsd-kind-icon">initialize<wbr>Settings</a>
+								<a href="settingservice.html#setdefaults" class="tsd-kind-icon">set<wbr>Defaults</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="settingservice.html#setinitiallocale" class="tsd-kind-icon">set<wbr>Initial<wbr>Locale</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="settingservice.html#setinitialpersona" class="tsd-kind-icon">set<wbr>Initial<wbr>Persona</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="settingservice.html#setinitialtheme" class="tsd-kind-icon">set<wbr>Initial<wbr>Theme</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="settingservice.html#setintegrations" class="tsd-kind-icon">set<wbr>Integrations</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="settingservice.html#setlisting" class="tsd-kind-icon">set<wbr>Listing</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="settingservice.html#setoptions" class="tsd-kind-icon">set<wbr>Options</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="settingservice.html#setprioritizedlocale" class="tsd-kind-icon">set<wbr>Prioritized<wbr>Locale</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="settingservice.html#setprioritizedpersona" class="tsd-kind-icon">set<wbr>Prioritized<wbr>Persona</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="settingservice.html#setprioritizedtheme" class="tsd-kind-icon">set<wbr>Prioritized<wbr>Theme</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="settingservice.html#triggersettinginitilizer" class="tsd-kind-icon">trigger<wbr>Setting<wbr>Initilizer</a>
 							</li>
 						</ul>
 					</li>

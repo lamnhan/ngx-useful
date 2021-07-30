@@ -105,11 +105,14 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="userservice.html#changeusername" class="tsd-kind-icon">change<wbr>Username</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="userservice.html#checkusernameexists" class="tsd-kind-icon">check<wbr>Username<wbr>Exists</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="userservice.html#init" class="tsd-kind-icon">init</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="userservice.html#removecoverphoto" class="tsd-kind-icon">remove<wbr>Cover<wbr>Photo</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="userservice.html#setoptions" class="tsd-kind-icon">set<wbr>Options</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="userservice.html#updateadditionaldata" class="tsd-kind-icon">update<wbr>Additional<wbr>Data</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="userservice.html#updateaddresses" class="tsd-kind-icon">update<wbr>Addresses</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="userservice.html#updateprofile" class="tsd-kind-icon">update<wbr>Profile</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="userservice.html#updatepublicly" class="tsd-kind-icon">update<wbr>Publicly</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="userservice.html#updatesettings" class="tsd-kind-icon">update<wbr>Settings</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="userservice.html#verifyemail" class="tsd-kind-icon">verify<wbr>Email</a></li>
 							</ul>
 						</section>
 					</div>
@@ -121,19 +124,22 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>User<wbr>Service<span class="tsd-signature-symbol">(</span>helperService<span class="tsd-signature-symbol">: </span><a href="helperservice.html" class="tsd-signature-type">HelperService</a>, authService<span class="tsd-signature-symbol">: </span><a href="authservice.html" class="tsd-signature-type">AuthService</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="userservice.html" class="tsd-signature-type">UserService</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>User<wbr>Service<span class="tsd-signature-symbol">(</span>helperService<span class="tsd-signature-symbol">: </span><a href="helperservice.html" class="tsd-signature-type">HelperService</a>, databaseService<span class="tsd-signature-symbol">: </span><a href="databaseservice.html" class="tsd-signature-type">DatabaseService</a>, authService<span class="tsd-signature-symbol">: </span><a href="authservice.html" class="tsd-signature-type">AuthService</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="userservice.html" class="tsd-signature-type">UserService</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L51">projects/useful/src/lib/services/user/user.service.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L47">projects/useful/src/lib/services/user/user.service.ts:47</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>helperService: <a href="helperservice.html" class="tsd-signature-type">HelperService</a></h5>
+								</li>
+								<li>
+									<h5>databaseService: <a href="databaseservice.html" class="tsd-signature-type">DatabaseService</a></h5>
 								</li>
 								<li>
 									<h5>authService: <a href="authservice.html" class="tsd-signature-type">AuthService</a></h5>
@@ -152,7 +158,7 @@
 					<div class="tsd-signature tsd-kind-icon">current<wbr>User<span class="tsd-signature-symbol">:</span> <a href="../globals.html#nativeuser" class="tsd-signature-type">NativeUser</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L43">projects/useful/src/lib/services/user/user.service.ts:43</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L38">projects/useful/src/lib/services/user/user.service.ts:38</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -162,7 +168,7 @@
 					<div class="tsd-signature tsd-kind-icon">data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">User</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L44">projects/useful/src/lib/services/user/user.service.ts:44</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L39">projects/useful/src/lib/services/user/user.service.ts:39</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -172,7 +178,7 @@
 					<div class="tsd-signature tsd-kind-icon">level<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 1</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L49">projects/useful/src/lib/services/user/user.service.ts:49</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L45">projects/useful/src/lib/services/user/user.service.ts:45</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -182,7 +188,7 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>User<wbr>Changed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ReplaySubject</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">User</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = new ReplaySubject&lt;undefined | User&gt;(1)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L51">projects/useful/src/lib/services/user/user.service.ts:51</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L47">projects/useful/src/lib/services/user/user.service.ts:47</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -192,7 +198,7 @@
 					<div class="tsd-signature tsd-kind-icon">public<wbr>Data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Profile</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L45">projects/useful/src/lib/services/user/user.service.ts:45</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L40">projects/useful/src/lib/services/user/user.service.ts:40</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -202,7 +208,7 @@
 					<div class="tsd-signature tsd-kind-icon">role<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">UserRoles</span><span class="tsd-signature-symbol"> = &quot;subscriber&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L48">projects/useful/src/lib/services/user/user.service.ts:48</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L44">projects/useful/src/lib/services/user/user.service.ts:44</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -212,7 +218,7 @@
 					<div class="tsd-signature tsd-kind-icon">uid<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L46">projects/useful/src/lib/services/user/user.service.ts:46</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L42">projects/useful/src/lib/services/user/user.service.ts:42</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -222,7 +228,7 @@
 					<div class="tsd-signature tsd-kind-icon">username<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L47">projects/useful/src/lib/services/user/user.service.ts:47</a></li>
+							<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L43">projects/useful/src/lib/services/user/user.service.ts:43</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -239,7 +245,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L106">projects/useful/src/lib/services/user/user.service.ts:106</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L113">projects/useful/src/lib/services/user/user.service.ts:113</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -262,7 +268,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L116">projects/useful/src/lib/services/user/user.service.ts:116</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L131">projects/useful/src/lib/services/user/user.service.ts:131</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -285,7 +291,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L121">projects/useful/src/lib/services/user/user.service.ts:121</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L136">projects/useful/src/lib/services/user/user.service.ts:136</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -302,13 +308,13 @@
 					<a name="changepublicity" class="tsd-anchor"></a>
 					<h3>change<wbr>Publicity</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">change<wbr>Publicity<span class="tsd-signature-symbol">(</span>toPublic<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">change<wbr>Publicity<span class="tsd-signature-symbol">(</span>toPublic<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L156">projects/useful/src/lib/services/user/user.service.ts:156</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L171">projects/useful/src/lib/services/user/user.service.ts:171</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -317,7 +323,7 @@
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> toPublic: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -331,7 +337,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L126">projects/useful/src/lib/services/user/user.service.ts:126</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L141">projects/useful/src/lib/services/user/user.service.ts:141</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -354,7 +360,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L110">projects/useful/src/lib/services/user/user.service.ts:110</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L117">projects/useful/src/lib/services/user/user.service.ts:117</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -371,13 +377,13 @@
 					<a name="init" class="tsd-anchor"></a>
 					<h3>init</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">init<span class="tsd-signature-symbol">(</span>userDataService<span class="tsd-signature-symbol">: </span><a href="../globals.html#userdataservice" class="tsd-signature-type">UserDataService</a>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/useroptions.html" class="tsd-signature-type">UserOptions</a>, integrations<span class="tsd-signature-symbol">?: </span><a href="../interfaces/userintegrations.html" class="tsd-signature-type">UserIntegrations</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="userservice.html" class="tsd-signature-type">UserService</a></li>
+						<li class="tsd-signature tsd-kind-icon">init<span class="tsd-signature-symbol">(</span>userDataService<span class="tsd-signature-symbol">: </span><a href="../globals.html#userdataservice" class="tsd-signature-type">UserDataService</a>, profileDataService<span class="tsd-signature-symbol">: </span><a href="../globals.html#profiledataservice" class="tsd-signature-type">ProfileDataService</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="userservice.html" class="tsd-signature-type">UserService</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L58">projects/useful/src/lib/services/user/user.service.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L60">projects/useful/src/lib/services/user/user.service.ts:60</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -386,10 +392,47 @@
 									<h5>userDataService: <a href="../globals.html#userdataservice" class="tsd-signature-type">UserDataService</a></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> options: <a href="../interfaces/useroptions.html" class="tsd-signature-type">UserOptions</a><span class="tsd-signature-symbol"> = {}</span></h5>
+									<h5>profileDataService: <a href="../globals.html#profiledataservice" class="tsd-signature-type">ProfileDataService</a></h5>
 								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="userservice.html" class="tsd-signature-type">UserService</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="removecoverphoto" class="tsd-anchor"></a>
+					<h3>remove<wbr>Cover<wbr>Photo</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">remove<wbr>Cover<wbr>Photo<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L368">projects/useful/src/lib/services/user/user.service.ts:368</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setoptions" class="tsd-anchor"></a>
+					<h3>set<wbr>Options</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Options<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><a href="../interfaces/useroptions.html" class="tsd-signature-type">UserOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="userservice.html" class="tsd-signature-type">UserService</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L55">projects/useful/src/lib/services/user/user.service.ts:55</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> integrations: <a href="../interfaces/userintegrations.html" class="tsd-signature-type">UserIntegrations</a><span class="tsd-signature-symbol"> = {}</span></h5>
+									<h5>options: <a href="../interfaces/useroptions.html" class="tsd-signature-type">UserOptions</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="userservice.html" class="tsd-signature-type">UserService</a></h4>
@@ -406,7 +449,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L265">projects/useful/src/lib/services/user/user.service.ts:265</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L291">projects/useful/src/lib/services/user/user.service.ts:291</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -432,7 +475,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L175">projects/useful/src/lib/services/user/user.service.ts:175</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L203">projects/useful/src/lib/services/user/user.service.ts:203</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -455,7 +498,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L285">projects/useful/src/lib/services/user/user.service.ts:285</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L311">projects/useful/src/lib/services/user/user.service.ts:311</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -478,7 +521,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L197">projects/useful/src/lib/services/user/user.service.ts:197</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L225">projects/useful/src/lib/services/user/user.service.ts:225</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -501,7 +544,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/00cfb51/projects/useful/src/lib/services/user/user.service.ts#L164">projects/useful/src/lib/services/user/user.service.ts:164</a></li>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L192">projects/useful/src/lib/services/user/user.service.ts:192</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -510,6 +553,23 @@
 									<h5>settings: <span class="tsd-signature-type">UserSettings</span></h5>
 								</li>
 							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="verifyemail" class="tsd-anchor"></a>
+					<h3>verify<wbr>Email</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">verify<wbr>Email<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lamnhan/ngx-useful/blob/b3f636e/projects/useful/src/lib/services/user/user.service.ts#L121">projects/useful/src/lib/services/user/user.service.ts:121</a></li>
+								</ul>
+							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
@@ -580,6 +640,12 @@
 								<a href="userservice.html#init" class="tsd-kind-icon">init</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="userservice.html#removecoverphoto" class="tsd-kind-icon">remove<wbr>Cover<wbr>Photo</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="userservice.html#setoptions" class="tsd-kind-icon">set<wbr>Options</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="userservice.html#updateadditionaldata" class="tsd-kind-icon">update<wbr>Additional<wbr>Data</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -593,6 +659,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="userservice.html#updatesettings" class="tsd-kind-icon">update<wbr>Settings</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="userservice.html#verifyemail" class="tsd-kind-icon">verify<wbr>Email</a>
 							</li>
 						</ul>
 					</li>

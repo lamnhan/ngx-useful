@@ -14,7 +14,7 @@
 | [flush()](#cacheservice-flush-0)                              | <code>Observable<void></code>                                                                                                      |             |
 | [flushExpired()](#cacheservice-flushexpired-0)                | <code>Observable<void></code>                                                                                                      |             |
 | [get(key, refresher?, cacheTime?)](#cacheservice-get-0)       | <code>Observable<null \| Data></code>                                                                                              |             |
-| [init(config?)](#cacheservice-init-0)                         | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/cacheservice.html" target="_blank">CacheService</a></code> |             |
+| [init(localForageOptions?)](#cacheservice-init-0)             | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/cacheservice.html" target="_blank">CacheService</a></code> |             |
 | [iterate(handler)](#cacheservice-iterate-0)                   | <code>Observable<Promise<unknown>></code>                                                                                          |             |
 | [iterateKeys(handler)](#cacheservice-iteratekeys-0)           | <code>Observable<void></code>                                                                                                      |             |
 | [remove(key, keepData?)](#cacheservice-remove-0)              | <code>Observable<void></code>                                                                                                      |             |
@@ -83,16 +83,16 @@
 
 ---
 
-<h4><a name="cacheservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/cacheservice.html#init"><p><code>init(config?)</code></p>
+<h4><a name="cacheservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/cacheservice.html#init"><p><code>init(localForageOptions?)</code></p>
 </a></h4>
 
 **The `init` call signature.**
 
 **Parameters**
 
-| Param  | Type                            | Description |
-| ------ | ------------------------------- | ----------- |
-| config | <code>LocalForageOptions</code> |             |
+| Param              | Type                            | Description |
+| ------------------ | ------------------------------- | ----------- |
+| localForageOptions | <code>LocalForageOptions</code> |             |
 
 **Returns**
 

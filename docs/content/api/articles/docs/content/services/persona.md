@@ -20,10 +20,14 @@
 <h3><a name="personaservice-methods"><p>PersonaService methods</p>
 </a></h3>
 
-| Function                                                                                      | Returns type                                                                                                                           | Description |
-| --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| [get(key, withPersona?)](#personaservice-get-0)                                               | <code>unknown</code>                                                                                                                   |             |
-| [init(data, options?, integrations?, menuRegistry?, personaActions?)](#personaservice-init-0) | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html" target="_blank">PersonaService</a></code> |             |
+| Function                                                           | Returns type                                                                                                                           | Description |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| [get(key, withPersona?)](#personaservice-get-0)                    | <code>unknown</code>                                                                                                                   |             |
+| [init(data)](#personaservice-init-0)                               | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html" target="_blank">PersonaService</a></code> |             |
+| [setActions(personaActions)](#personaservice-setactions-0)         | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html" target="_blank">PersonaService</a></code> |             |
+| [setIntegrations(integrations)](#personaservice-setintegrations-0) | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html" target="_blank">PersonaService</a></code> |             |
+| [setMenuRegistry(menuRegistry)](#personaservice-setmenuregistry-0) | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html" target="_blank">PersonaService</a></code> |             |
+| [setOptions(options)](#personaservice-setoptions-0)                | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html" target="_blank">PersonaService</a></code> |             |
 
 <h4><a name="personaservice-get-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html#get"><p><code>get(key, withPersona?)</code></p>
 </a></h4>
@@ -43,20 +47,84 @@
 
 ---
 
-<h4><a name="personaservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html#init"><p><code>init(data, options?, integrations?, menuRegistry?, personaActions?)</code></p>
+<h4><a name="personaservice-init-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html#init"><p><code>init(data)</code></p>
 </a></h4>
 
 **The `init` call signature.**
 
 **Parameters**
 
-| Param          | Type                                                                                                                                                | Description |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| **data**       | <code><a href="https://ngx-useful.lamnhan.com/content/reference/globals.html#personadata" target="_blank">PersonaData</a></code>                    |             |
-| options        | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/personaoptions.html" target="_blank">PersonaOptions</a></code>           |             |
-| integrations   | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/personaintegrations.html" target="_blank">PersonaIntegrations</a></code> |             |
-| menuRegistry   | <code>Record<string, MenuItem></code>                                                                                                               |             |
-| personaActions | <code>Record<string, PersonaAction></code>                                                                                                          |             |
+| Param    | Type                                                                                                                             | Description |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **data** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/globals.html#personadata" target="_blank">PersonaData</a></code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html" target="_blank">PersonaService</a></code>
+
+---
+
+<h4><a name="personaservice-setactions-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html#setactions"><p><code>setActions(personaActions)</code></p>
+</a></h4>
+
+**The `setActions` call signature.**
+
+**Parameters**
+
+| Param              | Type                                       | Description |
+| ------------------ | ------------------------------------------ | ----------- |
+| **personaActions** | <code>Record<string, PersonaAction></code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html" target="_blank">PersonaService</a></code>
+
+---
+
+<h4><a name="personaservice-setintegrations-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html#setintegrations"><p><code>setIntegrations(integrations)</code></p>
+</a></h4>
+
+**The `setIntegrations` call signature.**
+
+**Parameters**
+
+| Param            | Type                                                                                                                                                | Description |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **integrations** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/personaintegrations.html" target="_blank">PersonaIntegrations</a></code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html" target="_blank">PersonaService</a></code>
+
+---
+
+<h4><a name="personaservice-setmenuregistry-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html#setmenuregistry"><p><code>setMenuRegistry(menuRegistry)</code></p>
+</a></h4>
+
+**The `setMenuRegistry` call signature.**
+
+**Parameters**
+
+| Param            | Type                                  | Description |
+| ---------------- | ------------------------------------- | ----------- |
+| **menuRegistry** | <code>Record<string, MenuItem></code> |             |
+
+**Returns**
+
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html" target="_blank">PersonaService</a></code>
+
+---
+
+<h4><a name="personaservice-setoptions-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/personaservice.html#setoptions"><p><code>setOptions(options)</code></p>
+</a></h4>
+
+**The `setOptions` call signature.**
+
+**Parameters**
+
+| Param       | Type                                                                                                                                      | Description |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **options** | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/personaoptions.html" target="_blank">PersonaOptions</a></code> |             |
 
 **Returns**
 
