@@ -11,7 +11,8 @@
       "localforage": "localforage",
       "howler": "howler",
       "firebase/app": "firebase",
-      "@ngneat/transloco": "ng.transloco"
+      "@ngneat/transloco": "ng.transloco",
+      "compressorjs": "compressorjs"
     }
   },
   "allowedNonPeerDependencies": [
@@ -19,6 +20,7 @@
     "@ngneat/transloco",
     "firebase",
     "howler",
-    "localforage"
+    "localforage",
+    "compressorjs"
   ]
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
+import Compressor from 'compressorjs';
 
 export type VendorStorageService = AngularFireStorage;
 
@@ -18,7 +19,7 @@ export interface UploadCustom {
   customMetadata?: Record<string, any>;
 }
 
-export interface MediaItem {
+export interface StorageItem {
   ref: AngularFireStorageReference;
   name: string;
   type: 'image' | 'audio' | 'video' | 'document' | 'archive' | 'unknown';
@@ -77,13 +78,25 @@ export class StorageService {
     return this.upload(path, blob, custom);
   }
 
-  buildMediaItem(name: string, fullPath: string): MediaItem {
+  compressImage(input: File | Blob, options?: Compressor.Options) {
+    const compress = new Promise<Blob>((resolve, reject) => new Compressor(
+      input,
+      {
+        ...(options ? options : { quality: 0.6, mimeType: 'image/jpeg' }),
+        success: data => resolve(data),
+        error: err => reject(err),
+      }
+    ));
+    return from(compress);
+  }
+
+  buildStorageItem(fullPath: string): StorageItem {
     const ref = this.ref(fullPath);
     return {
       ref,
-      name,
-      type: this.getFileType(name),
+      name: this.getFileName(fullPath),
       fullPath,
+      type: this.getFileType(fullPath),
       downloadUrl$: ref.getDownloadURL(),
       metadata$: ref.getMetadata(),
     };
@@ -120,8 +133,12 @@ export class StorageService {
     return year + '/' + (month >= 10 ? month : `0${month}`);
   }
 
-  private getFileType(name: string) {
-    const ext = name.split('.').pop() as string;
+  private getFileName(fullPath: string) {
+    return fullPath.split('/').pop() as string;
+  }
+
+  private getFileType(fullPath: string) {
+    const ext = fullPath.split('.').pop() as string;
     const imageTypes = ['png', 'jpg', 'jpeg', 'gif'];
     const audioTypes = ['mp3', 'wav', 'ogg', 'wma', 'm4a'];
     const videoTypes = ['mp4', 'avi', 'mov', 'wmv', 'mpg', 'mpeg', '3gp', 'mkv'];

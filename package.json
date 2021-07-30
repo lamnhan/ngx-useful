@@ -45,6 +45,7 @@
     "@ngneat/transloco": "^2.21.0",
     "@unistylus/bootstrap": "0.0.2",
     "@unistylus/core": "0.0.1",
+    "compressorjs": "^1.0.7",
     "firebase": "8.6.1",
     "howler": "^2.2.1",
     "localforage": "^1.9.0",
