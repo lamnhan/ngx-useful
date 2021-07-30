@@ -66,8 +66,9 @@ export class StorageService {
 
   upload(path: string, data: File | Blob, custom: UploadCustom = {}) {
     const { fileName, fullPath, customMetadata } = this.extractUploadInputs(path, custom);
-    const task = this.ref(fullPath).put(data, { customMetadata });
-    return { name: fileName, fullPath, task };
+    const ref = this.ref(fullPath);
+    const task = ref.put(data, { customMetadata });
+    return { name: fileName, fullPath, ref, task };
   }
 
   uploadFile(path: string, file: File, custom: UploadCustom = {}) {
@@ -76,6 +77,17 @@ export class StorageService {
 
   uploadBlob(path: string, blob: Blob, custom: UploadCustom = {}) {
     return this.upload(path, blob, custom);
+  }
+
+  readFileDataUrl(file: File): Observable<string> {
+    return new Observable(observer => {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        observer.next(e.target.result);
+        observer.complete();
+      }
+      reader.readAsDataURL(file);
+    });
   }
 
   compressImage(input: File | Blob, options?: Compressor.Options) {
