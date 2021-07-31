@@ -200,7 +200,7 @@ export class SettingService {
       // set remote
       if (
         this.integrations.userService?.currentUser
-        && this.integrations.userService.data?.settings?.theme !== name
+        && this.integrations.userService.data?.setting?.theme !== name
       ) {
         this.integrations.userService.updateSettings({ theme: name });
       }
@@ -229,7 +229,7 @@ export class SettingService {
       // set remote
       if (
         this.integrations.userService?.currentUser
-        && this.integrations.userService.data?.settings?.persona !== name
+        && this.integrations.userService.data?.setting?.persona !== name
       ) {
         this.integrations.userService.updateSettings({ persona: name });
       }
@@ -257,7 +257,7 @@ export class SettingService {
       // set remote
       if (
         this.integrations.userService?.currentUser
-        && this.integrations.userService.data?.settings?.locale !== value
+        && this.integrations.userService.data?.setting?.locale !== value
       ) {
         this.integrations.userService.updateSettings({ locale: value });
       }
@@ -280,7 +280,7 @@ export class SettingService {
       ? of({} as AppSettings)
       : this.integrations.userService.onUserChanged.pipe(
         take(1),
-        switchMap(data => of(data?.settings ? data.settings : {})),
+        switchMap(data => of(data?.setting ? data.setting : {})),
       );
   }
 

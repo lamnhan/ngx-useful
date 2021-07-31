@@ -1,6 +1,6 @@
 {
   "name": "@lamnhan/ngx-useful",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "A collection of helpful Angular services, pipes, ....",
   "author": "Lam Nhan",
   "homepage": "https://ngx-useful.lamnhan.com",
@@ -22,7 +22,7 @@
     "@angular/common": "~12.0.3",
     "@angular/platform-browser": "~12.0.3",
     "@angular/router": "~12.0.3",
-    "@lamnhan/schemata": "^0.0.14"
+    "@lamnhan/schemata": "^0.0.18"
   },
   "dependencies": {
     "@angular/fire": "^6.1.5",

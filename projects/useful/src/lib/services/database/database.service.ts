@@ -295,13 +295,27 @@ export class DatabaseData<Type> {
     return this.databaseService.set(`${this.name}/${id}`, item);
   }
 
-  add(id: string, item: Type | NullableOptional<Type>) {
-    const createdAt = new Date().toISOString();
-    return this.set(id, {...item, createdAt, updatedAt: createdAt});
+  add<AutoTimingType extends Omit<Type, 'createdAt' | 'updatedAt'>>(
+    id: string,
+    item: Type | AutoTimingType | NullableOptional<Type | AutoTimingType>
+  ) {
+    const createdAt = (item as any).createdAt as string || new Date().toISOString();
+    const updatedAt = (item as any).updatedAt as string || createdAt;
+    return this.set(
+      id,
+      {
+        ...item,
+        createdAt,
+        updatedAt,
+      } as unknown as Type | NullableOptional<Type>
+    );
   }
 
-  update(id: string, item: Partial<Type> | NullableOptional<Partial<Type>>) {
-    const updatedAt = new Date().toISOString();
+  update<AutoTimingType extends Omit<Type, 'createdAt' | 'updatedAt'>>(
+    id: string,
+    item: Partial<AutoTimingType> | NullableOptional<Partial<AutoTimingType>>
+  ) {
+    const updatedAt = (item as any).updatedAt as string || new Date().toISOString();
     return this.databaseService.update(`${this.name}/${id}`, {...item, updatedAt});
   }
 

@@ -6,11 +6,11 @@ import {
   Profile,
   User,
   UserEditableProfile,
-  UserSettings,
+  UserSetting,
   UserAddress,
   UserPublicly,
-  UserClaims,
-  UserRoles,
+  UserClaim,
+  UserRole,
 } from '@lamnhan/schemata';
 
 import { HelperService } from '../helper/helper.service';
@@ -41,7 +41,7 @@ export class UserService {
 
   uid?: string;
   username?: string;
-  role: UserRoles = 'subscriber';
+  role: UserRole = 'subscriber';
   level = 1;
 
   public readonly onUserChanged = new ReplaySubject<undefined | User>(1);
@@ -79,7 +79,7 @@ export class UserService {
               ? this.profileDataService.flatDoc(
                 ref => ref
                   .where('uid', '==', nativeUser.uid)
-                  .where('type', '==', 'user')
+                  .where('type', '==', 'default')
               )
               : of(undefined)
           ])
@@ -101,7 +101,7 @@ export class UserService {
         this.publicData = publicData;
         this.uid = this.currentUser?.uid;
         this.username = this.data?.username;
-        this.role = this.getRole(this.data?.claims);
+        this.role = this.getRole(this.data?.claim);
         this.level = this.getLevel(this.role);
         // user changed
         this.onUserChanged.next(this.data);
@@ -189,18 +189,18 @@ export class UserService {
     return this.profileDataService.update(this.publicData.id, profileDoc);
   }
 
-  updateSettings(settings: UserSettings) {
+  updateSettings(settings: UserSetting) {
     if (!this.currentUser || !this.data) {
       return throwError('No user.');
     }
     const uid = this.currentUser.uid;
     // in service
-    this.data.settings = { ...this.data?.settings, ...settings };
+    this.data.setting = { ...this.data?.setting, ...settings };
     // remotely
-    return this.userDataService.update(uid, { settings: this.data.settings });
+    return this.userDataService.update(uid, { setting: this.data.setting });
   }
 
-  updateAddresses(addresses: Record<string, UserAddress>) {
+  updateAddresses(addresses: UserAddress[]) {
     if (!this.currentUser || !this.data) {
       return throwError('No user.');
     }
@@ -209,14 +209,10 @@ export class UserService {
     if (!this.data?.addresses || typeof this.data.addresses === 'string') {
       this.data.addresses = addresses;
     } else {
-      this.data.addresses = {
+      this.data.addresses = [
         ...this.data.addresses,
-        ...(
-          typeof addresses === 'string'
-            ? {[new Date().getTime()]: addresses}
-            : addresses
-        )
-      };
+        ...addresses
+      ];
     }
     // remotely
     return this.userDataService.update(uid, { addresses: this.data.addresses });
@@ -249,8 +245,8 @@ export class UserService {
               profileDoc = {...profileDoc, phoneNumber};
             } else if (additionalData?.[key]) {
               const data = additionalData[key];
-              this.publicData.props = {...this.publicData.props, [key]: data};
-              profileDoc = {...profileDoc, props: this.publicData.props};
+              this.publicData.prop = {...this.publicData.prop, [key]: data};
+              profileDoc = {...profileDoc, prop: this.publicData.prop};
             }
           }
         } else {
@@ -264,13 +260,13 @@ export class UserService {
             } else if (key === 'phoneNumber') {
               delete this.publicData.phoneNumber;
               profileDoc = {...profileDoc, phoneNumber: null};
-            } else if (this.publicData.props) {
-              delete this.publicData.props[key];
+            } else if (this.publicData.prop) {
+              delete this.publicData.prop[key];
               profileDoc = {
                 ...profileDoc,
-                props: (!this.publicData.props || !Object.keys(this.publicData.props).length)
+                prop: (!this.publicData.prop || !Object.keys(this.publicData.prop).length)
                   ? null
-                  : this.publicData.props
+                  : this.publicData.prop
               };
             }
           }
@@ -384,11 +380,11 @@ export class UserService {
     ]);
   }
 
-  private getRole(claims: UserClaims = {}) {
+  private getRole(claims: UserClaim = {}) {
     return claims.role || 'subscriber';
   }
 
-  private getLevel(role?: UserRoles) {
+  private getLevel(role?: UserRole) {
     return role === 'sadmin' ? 6
       :  role === 'admin' ? 5
       :  role === 'editor' ? 4
@@ -481,12 +477,15 @@ export class UserService {
     const displayName = userDoc.displayName as string;
     // basic fields
     const {profilePublished} = this.options;
+    const createdAt = new Date().toISOString();
     const profileDoc: Profile = {
       uid,
       id: username,
       title: profilePublished ? displayName : username,
+      type: 'default',
       status: profilePublished ? 'publish' : 'draft',
-      type: 'user',
+      createdAt,
+      updatedAt: createdAt,
       // custom fields
       ...(!profilePublished ? {} : this.getPublicProfileProperties(userDoc)),
     };
@@ -528,7 +527,7 @@ export class UserService {
       url,
       email,
       phoneNumber,
-      claims,
+      claim,
       additionalData,
       publicly,
     } = data;
@@ -560,13 +559,13 @@ export class UserService {
     if (phoneNumber && publicly?.phoneNumber) {
       result.phoneNumber = phoneNumber;
     }
-    // props
+    // prop
     if (additionalData) {
-      const props = {} as Record<string, unknown>;
+      const prop = {} as Record<string, unknown>;
       Object.keys(additionalData).forEach(key =>
-        publicly?.[key] ? !!(props[key] = additionalData[key]) : false  
+        publicly?.[key] ? !!(prop[key] = additionalData[key]) : false  
       );
-      result.props = props;
+      result.prop = prop;
     }
     // result
     return result;
@@ -590,7 +589,7 @@ export class UserService {
     // phone number
     result.phoneNumber = del;
     // props
-    result.props = del;
+    result.prop = del;
     // result
     return result;
   }
