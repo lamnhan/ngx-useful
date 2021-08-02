@@ -5,8 +5,8 @@ import { Injectable } from '@angular/core';
 })
 export class GuardService {
   authHandler: string | string[] = ['login'];
-  dashboardHandler: string | string[] = ['admin'];
-  adminHandler: string | string[] = ['login'];
+  dashboardHandler: string | string[] = ['login', 'guard', 'dashboard'];
+  adminHandler: string | string[] = ['login', 'guard', 'admin'];
 
   constructor() {}
 

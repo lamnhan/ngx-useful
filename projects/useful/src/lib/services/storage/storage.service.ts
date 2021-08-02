@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
+import firebase from 'firebase/app';
 import { from, Observable } from 'rxjs';
 import Compressor from 'compressorjs';
 
@@ -16,7 +17,7 @@ export interface UploadCustom {
   uploadFolder?: string;
   noDateGrouping?: boolean;
   noRandomSuffix?: boolean;
-  customMetadata?: Record<string, any>;
+  metadata?: firebase.storage.UploadMetadata;
 }
 
 export interface StorageItem {
@@ -65,9 +66,9 @@ export class StorageService {
   }
 
   upload(path: string, data: File | Blob, custom: UploadCustom = {}) {
-    const { fileName, fullPath, customMetadata } = this.extractUploadInputs(path, custom);
+    const { fileName, fullPath, metadata } = this.extractUploadInputs(path, custom);
     const ref = this.ref(fullPath);
-    const task = ref.put(data, { customMetadata });
+    const task = ref.put(data, metadata);
     return { name: fileName, fullPath, ref, task };
   }
 
@@ -115,7 +116,7 @@ export class StorageService {
   }
 
   private extractUploadInputs(path: string, custom: UploadCustom = {}) {
-    const {uploadFolder, noDateGrouping, noRandomSuffix, customMetadata = {} } = custom;
+    const {uploadFolder, noDateGrouping, noRandomSuffix } = custom;
     // add random suffix to avoid overwriting
     if (!noRandomSuffix && this.options.randomSuffix) {
       const randomSuffix = Math.random().toString(36).substring(7);
@@ -130,8 +131,13 @@ export class StorageService {
       (noDateGrouping || !this.options.dateGrouping ? '' : (this.getDateGroupingPath() + '/')) +
       path;
     const fileName = fullPath.split('/').pop() as string;
+    // default metadata
+    let metadata = custom.metadata || {
+      cacheControl: 'private, max-age=2628000',
+      customMetadata: {},
+    };
     // result
-    return { fileName, fullPath, customMetadata };
+    return { fileName, fullPath, metadata };
   }
 
   private getRootFolder(uploadFolder?: string) {

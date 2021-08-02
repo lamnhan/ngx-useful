@@ -41,7 +41,7 @@
     "@angular/platform-browser": "~12.0.3",
     "@angular/platform-browser-dynamic": "~12.0.3",
     "@angular/router": "~12.0.3",
-    "@lamnhan/schemata": "0.0.19",
+    "@lamnhan/schemata": "0.0.20",
     "@ngneat/transloco": "^2.21.0",
     "@unistylus/bootstrap": "0.0.2",
     "@unistylus/core": "0.0.1",

@@ -87,9 +87,6 @@ export class UserService {
         switchMap(([nativeUser, currentUserDoc, currentProfileDoc]) =>
           this.handleAuthChanged(nativeUser, currentUserDoc, currentProfileDoc)
         ),
-        switchMap(({nativeUser, data, publicData}) =>
-          this.publicProfilePatcher(nativeUser, data, publicData)
-        ),
         catchError(() =>
           of({nativeUser: undefined, data: undefined, publicData: undefined})
         ),
@@ -304,14 +301,19 @@ export class UserService {
     );
   }
 
-  updateProfile(data: UserEditableProfile) {
+  updateProfile(
+    data:
+      UserEditableProfile &
+      { thumbnails?: Record<string, {name: string, src: string}> } &
+      { images?: Record<string, {name: string, src: string}> }
+  ) {
     if (!this.currentUser || !this.data) {
       return throwError('No user.');
     }
     const uid = this.currentUser.uid;
     const username = this.data.username as string;
     // extract data
-    const { displayName, photoURL, coverPhoto, intro, detail, url } = data;
+    const { displayName, photoURL, thumbnails, coverPhoto, images, intro, detail, url } = data;
     let userDoc: undefined | UserEditableProfile;
     let profileDoc: undefined | Partial<Profile>;
     let nativeProfile: undefined | {displayName?: string; photoURL?: string};
@@ -320,14 +322,26 @@ export class UserService {
       profileDoc = {...profileDoc, title: displayName};
       nativeProfile = {...nativeProfile, displayName};
     }
-    if (photoURL) {
+    if (photoURL && thumbnails) {
       userDoc = {...userDoc, photoURL};
-      profileDoc = {...profileDoc, thumbnail: photoURL};
+      profileDoc = {
+        ...profileDoc,
+        thumbnails: {
+          ...thumbnails,
+          default: { name: 'default', src: photoURL },
+        },
+      };
       nativeProfile = {...nativeProfile, photoURL};
     }
-    if (coverPhoto) {
+    if (coverPhoto && images) {
       userDoc = {...userDoc, coverPhoto};
-      profileDoc = {...profileDoc, image: coverPhoto};
+      profileDoc = {
+        ...profileDoc,
+        images: {
+          ...images,
+          default: { name: 'default', src: coverPhoto },
+        },
+      };
     }
     if (intro) {
       userDoc = {...userDoc, intro};
@@ -370,13 +384,13 @@ export class UserService {
     const del = this.databaseService.getValueDelete() as any;
     // in service
     delete this.data.coverPhoto;
-    delete this.publicData.image;
+    delete this.publicData.images;
     // remotely
     return combineLatest([
       // update user doc
       this.userDataService.update(uid, {coverPhoto: del}),
       // update profile doc
-      this.profileDataService.update(username, {image: del}),
+      this.profileDataService.update(username, {images: del}),
     ]);
   }
 
@@ -391,36 +405,6 @@ export class UserService {
       :  role === 'author' ? 3
       :  role === 'contributor' ? 2
       : 1;
-  }
-
-  private publicProfilePatcher(nativeUser?: NativeUser, data?: User, publicData?: Profile) {
-    // signed up or signed in
-    if (nativeUser && data && publicData) {
-      const { displayName, photoURL } = data;
-      const { id, title, status, thumbnail } = publicData;
-      let profileUpdates: undefined | Partial<Profile>;
-      // title
-      if (displayName && (!title || title !== displayName)) {
-        profileUpdates = {...profileUpdates, title: displayName};
-      }
-      // publish only
-      if (status === 'publish') {
-        // thumbnail
-        if (photoURL && (!thumbnail || thumbnail !== photoURL)) {
-          profileUpdates = {...profileUpdates, thumbnail: photoURL};
-        }
-      }
-      // patch
-      return !profileUpdates
-        ? of({nativeUser, data, publicData})
-        : this.profileDataService.update(id, profileUpdates).pipe(
-          map(() => ({nativeUser, data, publicData: {...publicData, ...profileUpdates}}))
-        );
-    }
-    // no user or signed out
-    else {
-      return of({nativeUser, data, publicData});
-    }
   }
 
   private handleAuthChanged(
@@ -532,11 +516,15 @@ export class UserService {
     } = data;
     // thumbnail
     if (photoURL) {
-      result.thumbnail = photoURL;
+      result.thumbnails = {
+        default: { name: 'default', src: photoURL },
+      };
     }
     // 
     if (coverPhoto) {
-      result.image = coverPhoto;
+      result.images = {
+        default: { name: 'default', src: coverPhoto },
+      };
     }
     // description
     if (intro) {
@@ -574,9 +562,9 @@ export class UserService {
     const result: NullableOptional<Partial<Profile>> = {};
     const del = this.databaseService.getValueDelete() as any;
     // thumbnail
-    result.thumbnail = del;
+    result.thumbnails = del;
     // image
-    result.image = del;
+    result.images = del;
     // description
     result.description = del;
     // content
