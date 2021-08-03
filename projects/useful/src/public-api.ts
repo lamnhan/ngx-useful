@@ -29,6 +29,7 @@ export * from './lib/directives/router-external-active/router-external-active.mo
 export * from './lib/guards/auth/auth.guard';
 export * from './lib/guards/dashboard/dashboard.guard';
 export * from './lib/guards/admin/admin.guard';
+export * from './lib/guards/online/online.guard';
 
 export * from './lib/services/helper/helper.service';
 export * from './lib/services/error/error.service';

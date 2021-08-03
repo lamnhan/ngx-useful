@@ -7,6 +7,7 @@ export class GuardService {
   authHandler: string | string[] = ['login'];
   dashboardHandler: string | string[] = ['login', 'guard', 'dashboard'];
   adminHandler: string | string[] = ['login', 'guard', 'admin'];
+  onlineHandler: string | string[] = [''];
 
   constructor() {}
 
@@ -19,6 +20,9 @@ export class GuardService {
     }
     if (values.admin) {
       this.adminHandler = values.admin;
+    }
+    if (values.online) {
+      this.onlineHandler = values.online;
     }
     return this as GuardService;
   }

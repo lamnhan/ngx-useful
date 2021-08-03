@@ -29,6 +29,11 @@ export interface StorageItem {
   metadata$: Observable<any>;
 }
 
+export interface ResourceAlike {
+  name: string;
+  src: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
