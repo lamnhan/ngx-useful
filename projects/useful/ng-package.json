@@ -12,7 +12,8 @@
       "howler": "howler",
       "firebase/app": "firebase",
       "@ngneat/transloco": "ng.transloco",
-      "compressorjs": "compressorjs"
+      "compressorjs": "compressorjs",
+      "basiclightbox": "basiclightbox"
     }
   },
   "allowedNonPeerDependencies": [
@@ -21,6 +22,7 @@
     "firebase",
     "howler",
     "localforage",
-    "compressorjs"
+    "compressorjs",
+    "basiclightbox"
   ]
 }

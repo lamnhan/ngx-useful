@@ -34,6 +34,8 @@ import {UserService} from './services/user/user.service';
 import {DatabaseService} from './services/database/database.service';
 import {StorageService} from './services/storage/storage.service';
 import {GuardService} from './services/guard/guard.service';
+import {ModalService} from './services/modal/modal.service';
+import {AlertService} from './services/alert/alert.service';
 
 @NgModule({
   declarations: [],
@@ -74,6 +76,8 @@ import {GuardService} from './services/guard/guard.service';
     DatabaseService,
     StorageService,
     GuardService,
+    AlertService,
+    ModalService,
   ],
   exports: [
     // directives

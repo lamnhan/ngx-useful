@@ -53,3 +53,5 @@ export * from './lib/services/user/user.service';
 export * from './lib/services/database/database.service';
 export * from './lib/services/storage/storage.service';
 export * from './lib/services/guard/guard.service';
+export * from './lib/services/alert/alert.service';
+export * from './lib/services/modal/modal.service';
