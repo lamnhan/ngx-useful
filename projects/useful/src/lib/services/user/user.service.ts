@@ -174,6 +174,7 @@ export class UserService {
       : { ...this.getPublicProfileProperties(this.data), status: 'publish' };
     // in service
     if (!toPublic) {
+      this.publicData.status = 'draft';
       Object.keys(profileDoc).forEach(key => {
         if (this.databaseService.isTypeDelete((profileDoc as any)[key])) {
           delete (this.publicData as any)?.[key];
