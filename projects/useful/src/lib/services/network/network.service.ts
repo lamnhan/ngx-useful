@@ -6,7 +6,7 @@ import { ReplaySubject } from 'rxjs';
 })
 export class NetworkService {
   private readonly onChanged = new ReplaySubject<boolean>(1);
-  isOnline!: boolean;
+  isOnline = false;
 
   constructor() {}
 

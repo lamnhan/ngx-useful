@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
+import { ProfileLite } from '@lamnhan/schemata';
 
 import { SettingService } from '../setting/setting.service';
+import { ResourceAlike } from '../storage/storage.service';
 
 export interface MetaOptions {
   suffixSeparator?: string;
+  authorUrlSegment?: string;
 }
 
 export interface MetaIntegrations {
@@ -35,6 +38,11 @@ export interface AppMetas extends AppCustomMetas {
 
 export interface MetaTranslations {
   [locale: string]: AppMetas;
+}
+
+export interface PageMetas extends AppCustomMetas {
+  images?: Record<string, ResourceAlike>;
+  authors?: Record<string, ProfileLite>;
 }
 
 @Injectable({
@@ -107,10 +115,31 @@ export class MetaService {
   }
 
   changePageMetas(
-    customMetas: AppCustomMetas = {},
+    pageMetas: PageMetas = {},
     withSuffix = false,
     forLocale?: string
   ) {
+    const customMetas: AppCustomMetas = pageMetas;
+    // image
+    if (!customMetas.image && pageMetas.images) {
+      customMetas.image = (pageMetas.images.xl || pageMetas.images.default).src;
+    }
+    // author name and url
+    if ((!customMetas.authorName || !customMetas.authorUrl) && pageMetas.authors) {
+      const firstAuthorId = Object.keys(pageMetas.authors)[0];
+      if (firstAuthorId) {
+        const author = pageMetas.authors[firstAuthorId];
+        // authorName
+        if (!customMetas.authorName) {
+          customMetas.authorName = author.title;
+        }
+        // authorUrl
+        if (!customMetas.authorUrl) {
+          customMetas.authorUrl = `${location.origin}/${this.options.authorUrlSegment || 'member'}/${author.id}`;
+        }
+      }
+    }
+    // apply metas
     const metas = this.processMetaData(customMetas, withSuffix, forLocale);
     this.changePageTitle(metas.title || 'App');
     this.changePageLang(metas.lang || 'en');
