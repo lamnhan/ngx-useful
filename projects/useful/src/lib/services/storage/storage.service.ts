@@ -96,11 +96,15 @@ export class StorageService {
     });
   }
 
-  compressImage(input: File | Blob, options?: Compressor.Options) {
+  compressImage(input: File | Blob, options: Compressor.Options = {}) {
     const compress = new Promise<Blob>((resolve, reject) => new Compressor(
       input,
       {
-        ...(options ? options : { quality: 0.6, mimeType: 'image/jpeg' }),
+        ...({
+          quality: 0.6,
+          mimeType: 'auto',
+          ...options,
+        }),
         success: data => resolve(data),
         error: err => reject(err),
       }
@@ -137,9 +141,10 @@ export class StorageService {
       path;
     const fileName = fullPath.split('/').pop() as string;
     // default metadata
-    let metadata = custom.metadata || {
+    let metadata = {
       cacheControl: 'private, max-age=2628000',
       customMetadata: {},
+      ...(custom.metadata || {}),
     };
     // result
     return { fileName, fullPath, metadata };
@@ -162,7 +167,7 @@ export class StorageService {
 
   private getFileType(fullPath: string) {
     const ext = fullPath.split('.').pop() as string;
-    const imageTypes = ['png', 'jpg', 'jpeg', 'gif'];
+    const imageTypes = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
     const audioTypes = ['mp3', 'wav', 'ogg', 'wma', 'm4a'];
     const videoTypes = ['mp4', 'avi', 'mov', 'wmv', 'mpg', 'mpeg', '3gp', 'mkv'];
     const documentTypes = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'html', 'csv', 'xml', 'json'];
