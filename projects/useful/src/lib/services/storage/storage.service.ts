@@ -63,7 +63,7 @@ export class StorageService {
   }
 
   list(folder?: string) {
-    return this.ref(this.getRootFolder(folder)).listAll();
+    return this.ref(this.getUploadFolder(folder)).listAll();
   }
 
   delete(fullPath: string) {
@@ -83,6 +83,22 @@ export class StorageService {
 
   uploadBlob(path: string, blob: Blob, custom: UploadCustom = {}) {
     return this.upload(path, blob, custom);
+  }
+
+  getUploadFolder(customFolder?: string) {
+    return customFolder || this.options.uploadFolder || this.defaultFolder;
+  }
+
+  buildStorageItem(fullPath: string): StorageItem {
+    const ref = this.ref(fullPath);
+    return {
+      ref,
+      name: this.getFileName(fullPath),
+      fullPath,
+      type: this.getFileType(fullPath),
+      downloadUrl$: ref.getDownloadURL(),
+      metadata$: ref.getMetadata(),
+    };
   }
 
   readFileDataUrl(file: File): Observable<string> {
@@ -112,18 +128,6 @@ export class StorageService {
     return from(compress);
   }
 
-  buildStorageItem(fullPath: string): StorageItem {
-    const ref = this.ref(fullPath);
-    return {
-      ref,
-      name: this.getFileName(fullPath),
-      fullPath,
-      type: this.getFileType(fullPath),
-      downloadUrl$: ref.getDownloadURL(),
-      metadata$: ref.getMetadata(),
-    };
-  }
-
   private extractUploadInputs(path: string, custom: UploadCustom = {}) {
     const {uploadFolder, noDateGrouping, noRandomSuffix } = custom;
     // add random suffix to avoid overwriting
@@ -136,7 +140,7 @@ export class StorageService {
     }
     // upload file to firebase storage
     const fullPath =
-      (this.getRootFolder(uploadFolder)) + '/' +
+      (this.getUploadFolder(uploadFolder)) + '/' +
       (noDateGrouping || !this.options.dateGrouping ? '' : (this.getDateGroupingPath() + '/')) +
       path;
     const fileName = fullPath.split('/').pop() as string;
@@ -148,10 +152,6 @@ export class StorageService {
     };
     // result
     return { fileName, fullPath, metadata };
-  }
-
-  private getRootFolder(uploadFolder?: string) {
-    return uploadFolder || this.options.uploadFolder || this.defaultFolder;
   }
 
   private getDateGroupingPath() {
