@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
-import { from, of, Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { from, of, Observable, combineLatest } from 'rxjs';
+import { map, take, tap, timeout, catchError } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
+import { Meta } from '@lamnhan/schemata';
+
+// @ts-ignore
+import Index from 'flexsearch/dist/module/index.js';
 
 import { HelperService } from '../helper/helper.service';
 import { CacheService, CacheConfig, Caching } from '../cache/cache.service';
@@ -23,6 +27,17 @@ export interface DatabaseOptions {
 
 export interface DatabaseIntegrations {
   cacheService?: CacheService;
+}
+
+export interface DatabaseCollectionOptions {
+  advancedMode?: boolean;
+  metaCaching?: false | CacheConfig;
+  autoloadSearching?: boolean;
+  searchingCaching?: false | CacheConfig;
+}
+
+export interface DatabaseCollectionMetas {
+  count?: number;
 }
 
 @Injectable({
@@ -136,7 +151,7 @@ export class DatabaseService {
     );
   }
 
-  flatDoc<Type>(path: string, queryFn?: QueryFn) {
+  flatDoc<Type>(path: string, queryFn?: QueryFn): Observable<null | Type> {
     // try to get item from prerender data
     const docId = queryFn ? null : path.split('/').pop() as string;
     const prerenderStringifiedData =
@@ -148,24 +163,25 @@ export class DatabaseService {
       ? of(JSON.parse(prerenderStringifiedData))
       : !queryFn
       ? this.doc<Type>(path).get().pipe(
+        take(1),
         map(doc => doc.data() || null),
-        take(1)
       )
       : this.collection<Type>(path, queryFn).get().pipe(
+        take(1),
         map(collection => collection.docs.length === 1 ? collection.docs[0].data() : null),
-        take(1)
       );
   }
 
   flatCollection<Type>(path: string, queryFn?: QueryFn) {
     return this.collection<Type>(path, queryFn).get().pipe(
+      take(1),
       map(collection => collection.docs.map(doc => doc.data())),
-      take(1)
     );
   }
 
   flatRecord<Type>(path: string, queryFn?: QueryFn) {
     return this.collection<Type>(path, queryFn).get().pipe(
+      take(1),
       map(collection => {
         const record = {} as Record<string, Type>;
         collection.docs.forEach(doc => {
@@ -174,7 +190,6 @@ export class DatabaseService {
         });
         return record;
       }),
-      take(1)
     );
   }
 
@@ -272,10 +287,73 @@ export class DatabaseService {
 }
 
 export class DatabaseData<Type> {
+  options: DatabaseCollectionOptions = {};
+  metas?: DatabaseCollectionMetas = {};
+  searchIndexing?: any;
+
   constructor(
     public readonly databaseService: DatabaseService,
     public readonly name: string
   ) {}
+
+  setOptions(options: DatabaseCollectionOptions = {}) {
+    this.options = options;
+    return this as DatabaseData<Type>;
+  }
+
+  init() {
+    const { advancedMode, autoloadSearching } = this.options;
+    if (advancedMode) {
+      // load metas
+      this.loadMetas();
+      // load search indexing
+      if (autoloadSearching) {
+        this.loadSearchIndexing();
+      }
+    }
+    return this as DatabaseData<Type>;
+  }
+
+  loadMetas() {
+    return this.databaseService
+      .getDoc<Meta>(`metas/${this.name}`, undefined, this.options.metaCaching)
+      .pipe(
+        tap(metaDoc => this.metas = !metaDoc ? {} : metaDoc.value),
+      );
+  }
+
+  loadSearchIndexing() {
+    if (this.searchIndexing) {
+      return of(this.searchIndexing);
+    }
+    return this.databaseService
+      .getCollection<Meta>(
+        'metas',
+        ref => ref
+          .where('master', '==', this.name)
+          .where('group', '==', 'search_index')
+          .orderBy('createdAt', 'desc'),
+        this.options.searchingCaching,
+      ).pipe(
+        map(items => {
+          // all items
+          const recordItems = items.reduce(
+            (result, item) => {
+              result = {
+                ...result,
+                ...item.value,
+              };
+              return result;
+            },
+            {} as Record<string, any>,
+          );
+          // search indexing
+          const index = new Index();
+          return index;
+        }),
+        tap(index => this.searchIndexing = index),
+      );
+  }
 
   exists(idOrQuery: string | QueryFn) {
     return typeof idOrQuery === 'string'
@@ -386,6 +464,28 @@ export class DatabaseData<Type> {
   cachingRecord(queryFn?: QueryFn, caching?: CacheConfig) {
     return this.databaseService.cachingRecord<Type>(this.name, queryFn, caching);
   }
+
+  getItems(ids: string[], itemTimeout = 5000, caching?: false | CacheConfig) {
+    return combineLatest(
+      ids.map(id =>
+        this.getDoc(id, caching).pipe(
+          timeout(itemTimeout),
+          catchError(() => of(null)),
+        )
+      )
+    )
+    .pipe(map(items => items.filter(item => !!item)));
+  }
+
+  lookup(keyword: string, limit = 10, caching: false | CacheConfig = false) {
+    return this.getCollection(ref =>
+      ref
+        .where('keywords', 'array-contains', keyword)
+        .limit(limit),
+      caching,
+    );
+  }
+
 }
 
 type RequiredKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? never : K }[keyof T];
