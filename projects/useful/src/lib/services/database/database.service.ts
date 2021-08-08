@@ -6,7 +6,7 @@ import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection,
 import { Meta } from '@lamnhan/schemata';
 
 // @ts-ignore
-import Index from 'flexsearch/dist/module/index.js';
+import { Document } from 'flexsearch';
 
 import { HelperService } from '../helper/helper.service';
 import { CacheService, CacheConfig, Caching } from '../cache/cache.service';
@@ -29,16 +29,34 @@ export interface DatabaseIntegrations {
   cacheService?: CacheService;
 }
 
-export interface DatabaseCollectionOptions {
+export interface DatabaseDataOptions {
   advancedMode?: boolean;
   metaCaching?: false | CacheConfig;
   autoloadSearching?: boolean;
   searchingCaching?: false | CacheConfig;
+  flexsearchOptions?: any;
+  predefinedContextuals?: Array<{ name: string, picker: DatabaseDataContextualPicker }>;
 }
 
-export interface DatabaseCollectionMetas {
+export interface DatabaseDataMetas {
   count?: number;
 }
+
+export interface DatabaseDataSearchIndexItem {
+  content: string;
+  [prop: string]: any;
+}
+
+export interface DatabaseDataSearchIndexLocalItem extends DatabaseDataSearchIndexItem {
+  id: number;
+  docId: string;
+}
+
+export interface DatabaseDataSearchIndex {
+  items?: Record<string, DatabaseDataSearchIndexItem>;
+}
+
+export type DatabaseDataContextualPicker = (localIndexItem?: DatabaseDataSearchIndexLocalItem) => boolean;
 
 @Injectable({
   providedIn: 'root'
@@ -287,16 +305,21 @@ export class DatabaseService {
 }
 
 export class DatabaseData<Type> {
-  options: DatabaseCollectionOptions = {};
-  metas?: DatabaseCollectionMetas = {};
-  searchIndexing?: any;
+  private options: DatabaseDataOptions = {};
+  private metas: DatabaseDataMetas = {};
+
+  private searchIndexingKeys: string[] = [];
+  private searchIndexing: Record<string, DatabaseDataSearchIndexLocalItem> = {};
+
+  private defaultIndex?: any;
+  private contextualIndexes: Record<string, any> = {};
 
   constructor(
     public readonly databaseService: DatabaseService,
     public readonly name: string
   ) {}
 
-  setOptions(options: DatabaseCollectionOptions = {}) {
+  setOptions(options: DatabaseDataOptions = {}) {
     this.options = options;
     return this as DatabaseData<Type>;
   }
@@ -308,7 +331,7 @@ export class DatabaseData<Type> {
       this.loadMetas();
       // load search indexing
       if (autoloadSearching) {
-        this.loadSearchIndexing();
+        this.loadSearching();
       }
     }
     return this as DatabaseData<Type>;
@@ -318,13 +341,13 @@ export class DatabaseData<Type> {
     return this.databaseService
       .getDoc<Meta>(`metas/${this.name}`, undefined, this.options.metaCaching)
       .pipe(
-        tap(metaDoc => this.metas = !metaDoc ? {} : metaDoc.value),
+        tap(metaDoc => this.metas = (!metaDoc ? {} : metaDoc.value) as DatabaseDataMetas),
       );
   }
 
-  loadSearchIndexing() {
-    if (this.searchIndexing) {
-      return of(this.searchIndexing);
+  loadSearching() {
+    if (this.defaultIndex) {
+      return of(this.defaultIndex);
     }
     return this.databaseService
       .getCollection<Meta>(
@@ -335,24 +358,65 @@ export class DatabaseData<Type> {
           .orderBy('createdAt', 'desc'),
         this.options.searchingCaching,
       ).pipe(
-        map(items => {
-          // all items
-          const recordItems = items.reduce(
-            (result, item) => {
-              result = {
-                ...result,
-                ...item.value,
-              };
-              return result;
-            },
-            {} as Record<string, any>,
-          );
-          // search indexing
-          const index = new Index();
-          return index;
+        map(metaItems => {
+          const defaultIndex = new Document({
+            document: { index: 'content' },
+            ...this.options.flexsearchOptions,
+          });
+          let indexId = 0;
+          metaItems.forEach(metaItem => {
+            const { items = {} } = metaItem.value as DatabaseDataSearchIndex;
+            Object.keys(items).forEach(key => {
+              // save key
+              this.searchIndexingKeys.push(key);
+              // save item
+              this.searchIndexing[key] = {
+                id: ++indexId,
+                docId: key,
+                ...items[key],
+              } as DatabaseDataSearchIndexLocalItem;
+              // register default index
+              defaultIndex.add(this.searchIndexing[key]);
+              // register contextual indexes
+              if (this.options.predefinedContextuals) {
+                this.options.predefinedContextuals.forEach(({name, picker}) =>
+                  this.loadContextualSearching(name, picker, this.searchIndexing[key])
+                );
+              }
+            });
+          });
+          return defaultIndex;
         }),
-        tap(index => this.searchIndexing = index),
+        tap(defaultIndex => this.defaultIndex = defaultIndex),
       );
+  }
+
+  loadContextualSearching(
+    name: string,
+    picker: DatabaseDataContextualPicker,
+    localIndexItem?: DatabaseDataSearchIndexLocalItem
+  ) {
+    // no index, create new
+    if (!this.contextualIndexes[name]) {
+      this.contextualIndexes[name] = new Document({
+        document: { index: 'content' },
+        ...this.options.flexsearchOptions,
+      });
+    }
+    // add item/items
+    if (localIndexItem) {
+      if (picker(localIndexItem)) {
+        this.contextualIndexes[name].add(localIndexItem);
+      }
+    } else {
+      this.searchIndexingKeys.forEach(key => {
+        if (picker(this.searchIndexing[key])) {
+          this.contextualIndexes[name].add(this.searchIndexing[key]);
+        }
+      });
+    }
+    // result
+    return this.contextualIndexes[name];
   }
 
   exists(idOrQuery: string | QueryFn) {
@@ -477,15 +541,29 @@ export class DatabaseData<Type> {
     .pipe(map(items => items.filter(item => !!item)));
   }
 
-  lookup(keyword: string, limit = 10, caching: false | CacheConfig = false) {
+  lookup(keyword: string, limit = 10, lastItem?: Type, caching: false | CacheConfig = false) {
     return this.getCollection(ref =>
-      ref
-        .where('keywords', 'array-contains', keyword)
-        .limit(limit),
+      {
+        let query = ref
+          .where('keywords', 'array-contains', keyword)
+          .orderBy('createdAt', 'desc');
+        if (lastItem) {
+          query = query.startAfter((lastItem as any).createdAt);
+        }
+        return query.limit(limit);
+      },
       caching,
     );
   }
 
+  search(query: string, context?: string, limit = 10, caching?: false | CacheConfig) {
+    const index = context ? this.contextualIndexes[context] : this.defaultIndex;
+    if (!index) {
+      throw new Error('No index found.');
+    }
+    const searchResult = index.search(query);
+    return searchResult;
+  }
 }
 
 type RequiredKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? never : K }[keyof T];

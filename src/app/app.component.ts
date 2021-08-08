@@ -20,34 +20,31 @@ export class AppComponent {
 
   private initialize() {
     this.localstorageService.init();
-    this.appService.init({ splashScreen: true });
-    this.settingService.init(
-      {
+    this.appService
+      .setOptions({ splashScreen: true })
+      .init();
+    this.settingService
+      .setOptions({
         browserColor: true,
         onReady: () => this.appService.hideSplashScreen(),
-      },
-      {},
-      {
+      })
+      .setIntegrations({
         localstorageService: this.localstorageService,
-      },
-    );
-    this.navService.init(
-      {
-        settingInitializing: true,
-      },
-      { settingService: this.settingService },
-    );
-    this.metaService.init(
-      {
-        title: 'Angular Useful',
-        description: 'A collection of useful Angular services, pipes, ...',
-        image: 'https://ngx-useful.lamnhan.com/assets/images/featured.jpg',
-        url: 'https://ngx-useful.lamnhan.com/',
-        lang: 'en',
-        ogLocale: 'en-US'
-      },
-      {},
-      { settingService: this.settingService },
-    );
+      })
+      .init();
+    this.navService
+      .setIntegrations({ settingService: this.settingService })
+      .init();
+    this.metaService
+      .setIntegrations({ settingService: this.settingService })
+      .init(
+        {
+          title: 'Angular Useful',
+          description: 'A collection of useful Angular services, pipes, ...',
+          image: 'https://ngx-useful.lamnhan.com/assets/images/featured.jpg',
+          url: 'https://ngx-useful.lamnhan.com/',
+          locale: 'en-US'
+        },
+      );
   }
 }
