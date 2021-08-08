@@ -58,6 +58,11 @@ export interface DatabaseDataSearchIndex {
 
 export type DatabaseDataContextualPicker = (localIndexItem?: DatabaseDataSearchIndexLocalItem) => boolean;
 
+export interface FlexsearchDocumentIndex {
+  add: (doc: any) => any;
+  search: (query: string, ...args: any[]) => Array<{result: number[]}>;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -85,6 +90,10 @@ export class DatabaseService {
   init(vendorService: VendorDatabaseService) {
     this.service = vendorService;
     return this as DatabaseService;
+  }
+
+  isGlobalCachingEnabled() {
+    return !!this.options.cacheTime;
   }
 
   getValueIncrement(by = 1) {
@@ -309,10 +318,10 @@ export class DatabaseData<Type> {
   private metas: DatabaseDataMetas = {};
 
   private searchIndexingKeys: string[] = [];
-  private searchIndexing: Record<string, DatabaseDataSearchIndexLocalItem> = {};
+  private searchIndexingItems: Record<string, DatabaseDataSearchIndexLocalItem> = {};
 
-  private defaultIndex?: any;
-  private contextualIndexes: Record<string, any> = {};
+  private defaultIndex?: FlexsearchDocumentIndex;
+  private contextualIndexes: Record<string, FlexsearchDocumentIndex> = {};
 
   constructor(
     public readonly databaseService: DatabaseService,
@@ -337,12 +346,25 @@ export class DatabaseData<Type> {
     return this as DatabaseData<Type>;
   }
 
-  loadMetas() {
+  private loadMetas() {
     return this.databaseService
       .getDoc<Meta>(`metas/${this.name}`, undefined, this.options.metaCaching)
       .pipe(
         tap(metaDoc => this.metas = (!metaDoc ? {} : metaDoc.value) as DatabaseDataMetas),
       );
+  }
+
+  getMetas() {
+    return this.metas;
+  }
+
+  getSearchingData() {
+    return {
+      indexingKeys: this.searchIndexingKeys,
+      indexingItems: this.searchIndexingItems,
+      defaultIndex: this.defaultIndex,
+      contextualIndexes: this.contextualIndexes,
+    };
   }
 
   loadSearching() {
@@ -356,31 +378,36 @@ export class DatabaseData<Type> {
           .where('master', '==', this.name)
           .where('group', '==', 'search_index')
           .orderBy('createdAt', 'desc'),
-        this.options.searchingCaching,
+        this.options.searchingCaching !== undefined
+          ? this.options.searchingCaching
+          : !this.databaseService.isGlobalCachingEnabled()
+          ? false
+          : { name: 'All search indexes' },
       ).pipe(
         map(metaItems => {
           const defaultIndex = new Document({
             document: { index: 'content' },
             ...this.options.flexsearchOptions,
-          });
+          }) as FlexsearchDocumentIndex;
           let indexId = 0;
           metaItems.forEach(metaItem => {
             const { items = {} } = metaItem.value as DatabaseDataSearchIndex;
-            Object.keys(items).forEach(key => {
+            Object.keys(items).forEach(docId => {
+              const id = indexId++;
               // save key
-              this.searchIndexingKeys.push(key);
+              this.searchIndexingKeys[id] = docId;
               // save item
-              this.searchIndexing[key] = {
-                id: ++indexId,
-                docId: key,
-                ...items[key],
+              this.searchIndexingItems[docId] = {
+                id,
+                docId,
+                ...items[docId],
               } as DatabaseDataSearchIndexLocalItem;
               // register default index
-              defaultIndex.add(this.searchIndexing[key]);
+              defaultIndex.add(this.searchIndexingItems[docId]);
               // register contextual indexes
               if (this.options.predefinedContextuals) {
                 this.options.predefinedContextuals.forEach(({name, picker}) =>
-                  this.loadContextualSearching(name, picker, this.searchIndexing[key])
+                  this.loadContextualSearching(name, picker, this.searchIndexingItems[docId])
                 );
               }
             });
@@ -401,7 +428,7 @@ export class DatabaseData<Type> {
       this.contextualIndexes[name] = new Document({
         document: { index: 'content' },
         ...this.options.flexsearchOptions,
-      });
+      }) as FlexsearchDocumentIndex;
     }
     // add item/items
     if (localIndexItem) {
@@ -409,9 +436,9 @@ export class DatabaseData<Type> {
         this.contextualIndexes[name].add(localIndexItem);
       }
     } else {
-      this.searchIndexingKeys.forEach(key => {
-        if (picker(this.searchIndexing[key])) {
-          this.contextualIndexes[name].add(this.searchIndexing[key]);
+      this.searchIndexingKeys.forEach(docId => {
+        if (picker(this.searchIndexingItems[docId])) {
+          this.contextualIndexes[name].add(this.searchIndexingItems[docId]);
         }
       });
     }
@@ -529,7 +556,7 @@ export class DatabaseData<Type> {
     return this.databaseService.cachingRecord<Type>(this.name, queryFn, caching);
   }
 
-  getItems(ids: string[], itemTimeout = 5000, caching?: false | CacheConfig) {
+  getItems(ids: string[], caching?: false | CacheConfig, itemTimeout = 7000) {
     return combineLatest(
       ids.map(id =>
         this.getDoc(id, caching).pipe(
@@ -556,13 +583,37 @@ export class DatabaseData<Type> {
     );
   }
 
-  search(query: string, context?: string, limit = 10, caching?: false | CacheConfig) {
+  search(query: string, limit = 10, context?: string) {
     const index = context ? this.contextualIndexes[context] : this.defaultIndex;
     if (!index) {
       throw new Error('No index found.');
     }
-    const searchResult = index.search(query);
-    return searchResult;
+    const [{ result: searchResult }] = index.search(query);
+    return new DatabaseDataSearchResult<Type>(this, index, limit, searchResult);
+  }
+}
+
+export class DatabaseDataSearchResult<Type> {
+  private indexingKeys: string[];
+
+  constructor(
+    private dataService: DatabaseData<Type>,
+    private index: FlexsearchDocumentIndex,
+    private limit: number,
+    private searchResult: number[],
+  ) {
+    const { indexingKeys } = this.dataService.getSearchingData();
+    this.indexingKeys = indexingKeys;
+  }
+
+  count() {
+    return this.searchResult.length;
+  }
+
+  list(page = 1, itemCaching?: false | CacheConfig, itemTimeout = 7000) {
+    const offset = (page - 1) * this.limit;
+    const ids = this.searchResult.slice(offset, offset + this.limit);
+    return this.dataService.getItems(ids.map(id => this.indexingKeys[id]), itemCaching, itemTimeout);
   }
 }
 
