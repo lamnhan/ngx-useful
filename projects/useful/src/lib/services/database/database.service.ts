@@ -1,15 +1,27 @@
+// @ts-ignore
+import { Document } from 'flexsearch';
 import { Injectable } from '@angular/core';
 import { from, of, Observable, combineLatest } from 'rxjs';
-import { map, take, tap, timeout, catchError } from 'rxjs/operators';
+import { map, switchMap, take, tap, timeout, catchError } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
 import { Meta } from '@lamnhan/schemata';
 
-// @ts-ignore
-import { Document } from 'flexsearch';
-
 import { HelperService } from '../helper/helper.service';
 import { CacheService, CacheConfig, Caching } from '../cache/cache.service';
+import { UserService } from '../user/user.service';
+
+/*
+ * ====================================================================================
+ * ============================== DATABASE SERVICE ====================================
+ * ==================================================================================== 
+ */
+
+type RequiredKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? never : K }[keyof T];
+type OptionalKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? K : never }[keyof T];
+type PickRequired<T> = Pick<T, RequiredKeys<T>>;
+type PickOptional<T> = Pick<T, OptionalKeys<T>>;
+type Nullable<T> = { [P in keyof T]: T[P] | null };
 
 export type NullableOptional<T> = PickRequired<T> & Nullable<PickOptional<T>>;
 
@@ -27,40 +39,7 @@ export interface DatabaseOptions {
 
 export interface DatabaseIntegrations {
   cacheService?: CacheService;
-}
-
-export interface DatabaseDataOptions {
-  advancedMode?: boolean;
-  metaCaching?: false | CacheConfig;
-  autoloadSearching?: boolean;
-  searchingCaching?: false | CacheConfig;
-  flexsearchOptions?: any;
-  predefinedContextuals?: Array<{ name: string, picker: DatabaseDataContextualPicker }>;
-}
-
-export interface DatabaseDataMetas {
-  count?: number;
-}
-
-export interface DatabaseDataSearchIndexItem {
-  content: string;
-  [prop: string]: any;
-}
-
-export interface DatabaseDataSearchIndexLocalItem extends DatabaseDataSearchIndexItem {
-  id: number;
-  docId: string;
-}
-
-export interface DatabaseDataSearchIndex {
-  items?: Record<string, DatabaseDataSearchIndexItem>;
-}
-
-export type DatabaseDataContextualPicker = (localIndexItem?: DatabaseDataSearchIndexLocalItem) => boolean;
-
-export interface FlexsearchDocumentIndex {
-  add: (doc: any) => any;
-  search: (query: string, ...args: any[]) => Array<{result: number[]}>;
+  userService?: UserService;
 }
 
 @Injectable({
@@ -92,16 +71,20 @@ export class DatabaseService {
     return this as DatabaseService;
   }
 
-  isGlobalCachingEnabled() {
-    return !!this.options.cacheTime;
+  getOptions() {
+    return this.options;
+  }
+
+  getIntegrations() {
+    return this.integrations;
+  }
+
+  getVendorService() {
+    return this.service;
   }
 
   getValueIncrement(by = 1) {
     return firebase.firestore.FieldValue.increment(by);
-  }
-
-  getValueDelete() {
-    return firebase.firestore.FieldValue.delete();
   }
 
   isTypeIncrement(value: any) {
@@ -109,9 +92,21 @@ export class DatabaseService {
       && value.isEqual(this.getValueIncrement());
   }
 
+  getValueDelete() {
+    return firebase.firestore.FieldValue.delete();
+  }
+
   isTypeDelete(value: any) {
     return value instanceof firebase.firestore.FieldValue
       && value.isEqual(this.getValueDelete());
+  }
+
+  isGlobalCachingEnabled() {
+    return !!this.options.cacheTime;
+  }
+
+  createId() {
+    return this.service.createId();
   }
 
   exists(path: string, queryFn?: QueryFn) {
@@ -313,12 +308,61 @@ export class DatabaseService {
   }
 }
 
+/*
+ * ====================================================================================
+ * ============================ DATABASE DATA SERVICE =================================
+ * ==================================================================================== 
+ */
+
+export interface DatabaseDataOptions {
+  advancedMode?: boolean;
+  metaCaching?: false | CacheConfig;
+  searchingCaching?: false | CacheConfig;
+  searchIndexingItemBuilder?: DatabaseDataSearchIndexingItemBuilder;
+  searchIndexingUpdateChecker?: DatabaseDataSearchIndexingUpdateChecker;
+  predefinedContextuals?: Array<{ name: string, picker: DatabaseDataContextualIndexPicker }>;
+  flexsearchOptions?: any;
+}
+
+export type DatabaseDataSearchIndexingItemBuilder = (data: any) => DatabaseDataSearchIndexingItem;
+export type DatabaseDataSearchIndexingUpdateChecker = (data: any) => boolean;
+
+export interface DatabaseDataCollectionMetas {
+  documentCount?: number;
+  currentSearchIndexingId?: string;
+}
+
+export interface DatabaseDataSearchIndexingItem {
+  content: string;
+  createdAt: string;
+  type: string;
+  status: string;
+  locale?: string;
+  [prop: string]: any;
+}
+
+export interface DatabaseDataSearchIndexingLocalItem extends DatabaseDataSearchIndexingItem {
+  id: number;
+  docId: string;
+}
+
+export interface DatabaseDataSearchIndexing {
+  items?: Record<string, DatabaseDataSearchIndexingItem>;
+}
+
+export type DatabaseDataContextualIndexPicker = (localIndexingItem?: DatabaseDataSearchIndexingLocalItem) => boolean;
+
+export interface FlexsearchDocumentIndex {
+  add: (doc: any) => any;
+  search: (query: string, ...args: any[]) => Array<{result: number[]}>;
+}
+
 export class DatabaseData<Type> {
   private options: DatabaseDataOptions = {};
-  private metas: DatabaseDataMetas = {};
+  private metas: DatabaseDataCollectionMetas = {};
 
   private searchIndexingKeys: string[] = [];
-  private searchIndexingItems: Record<string, DatabaseDataSearchIndexLocalItem> = {};
+  private searchIndexingItems: Record<string, DatabaseDataSearchIndexingLocalItem> = {};
 
   private defaultIndex?: FlexsearchDocumentIndex;
   private contextualIndexes: Record<string, FlexsearchDocumentIndex> = {};
@@ -334,26 +378,12 @@ export class DatabaseData<Type> {
   }
 
   init() {
-    const { advancedMode, autoloadSearching } = this.options;
-    if (advancedMode) {
-      // load metas
+    if (this.options.advancedMode) {
       this.loadMetas();
-      // load search indexing
-      if (autoloadSearching) {
-        this.loadSearching();
-      }
     }
     return this as DatabaseData<Type>;
   }
-
-  private loadMetas() {
-    return this.databaseService
-      .getDoc<Meta>(`metas/${this.name}`, undefined, this.options.metaCaching)
-      .pipe(
-        tap(metaDoc => this.metas = (!metaDoc ? {} : metaDoc.value) as DatabaseDataMetas),
-      );
-  }
-
+  
   getMetas() {
     return this.metas;
   }
@@ -367,83 +397,73 @@ export class DatabaseData<Type> {
     };
   }
 
-  loadSearching() {
+  private loadMetas() {
+    this.databaseService
+    .getDoc<Meta>(`metas/${this.name}`, undefined, this.options.metaCaching)
+    .subscribe(metaDoc =>
+      this.metas = (!metaDoc ? {} : metaDoc.value) as DatabaseDataCollectionMetas
+    );
+  }
+
+  setupSearching(noDefaultIndexing = false) {
     if (this.defaultIndex) {
-      return of(this.defaultIndex);
+      return of(this.getSearchingData());
     }
-    return this.databaseService
-      .getCollection<Meta>(
-        'metas',
-        ref => ref
-          .where('master', '==', this.name)
-          .where('group', '==', 'search_index')
-          .orderBy('createdAt', 'desc'),
-        this.options.searchingCaching !== undefined
-          ? this.options.searchingCaching
-          : !this.databaseService.isGlobalCachingEnabled()
-          ? false
-          : { name: 'All search indexes' },
-      ).pipe(
-        map(metaItems => {
-          const defaultIndex = new Document({
+    return this.databaseService.getCollection<Meta>(
+      'metas',
+      ref => ref
+        .where('master', '==', this.name)
+        .where('group', '==', 'search_index')
+        .orderBy('createdAt', 'desc'),
+      this.options.searchingCaching !== undefined
+        ? this.options.searchingCaching
+        : !this.databaseService.isGlobalCachingEnabled()
+        ? false
+        : { name: 'All search indexes' },
+    )
+    .pipe(
+      map(metaItems => {
+        // create the default index
+        this.defaultIndex = new Document({
+          document: { index: 'content' },
+          ...this.options.flexsearchOptions,
+        }) as FlexsearchDocumentIndex;
+        // create the contextual indexes
+        (this.options.predefinedContextuals || []).forEach(({name}) => {
+          this.contextualIndexes[name] = new Document({
             document: { index: 'content' },
             ...this.options.flexsearchOptions,
           }) as FlexsearchDocumentIndex;
-          let indexId = 0;
-          metaItems.forEach(metaItem => {
-            const { items = {} } = metaItem.value as DatabaseDataSearchIndex;
-            Object.keys(items).forEach(docId => {
-              const id = indexId++;
-              // save key
-              this.searchIndexingKeys[id] = docId;
-              // save item
-              this.searchIndexingItems[docId] = {
-                id,
-                docId,
-                ...items[docId],
-              } as DatabaseDataSearchIndexLocalItem;
-              // register default index
-              defaultIndex.add(this.searchIndexingItems[docId]);
-              // register contextual indexes
-              if (this.options.predefinedContextuals) {
-                this.options.predefinedContextuals.forEach(({name, picker}) =>
-                  this.loadContextualSearching(name, picker, this.searchIndexingItems[docId])
-                );
+        });
+        // process indexing items
+        let indexId = 0;
+        metaItems.forEach(metaItem => {
+          const { items = {} } = metaItem.value as DatabaseDataSearchIndexing;
+          Object.keys(items).forEach(docId => {
+            const id = indexId++;
+            // save key
+            this.searchIndexingKeys[id] = docId;
+            // save item
+            this.searchIndexingItems[docId] =
+              { id, docId, ...items[docId] } as DatabaseDataSearchIndexingLocalItem;
+            // register default index
+            if (!noDefaultIndexing && this.searchIndexingItems[docId].status === 'publish') {
+              (this.defaultIndex as FlexsearchDocumentIndex)
+                .add(this.searchIndexingItems[docId]);
+            }
+            // register contextual indexes
+            (this.options.predefinedContextuals || []).forEach(({name, picker}) => {
+              if (picker(this.searchIndexingItems[docId])) {
+                (this.contextualIndexes[name] as FlexsearchDocumentIndex)
+                  .add(this.searchIndexingItems[docId]);
               }
             });
           });
-          return defaultIndex;
-        }),
-        tap(defaultIndex => this.defaultIndex = defaultIndex),
-      );
-  }
-
-  loadContextualSearching(
-    name: string,
-    picker: DatabaseDataContextualPicker,
-    localIndexItem?: DatabaseDataSearchIndexLocalItem
-  ) {
-    // no index, create new
-    if (!this.contextualIndexes[name]) {
-      this.contextualIndexes[name] = new Document({
-        document: { index: 'content' },
-        ...this.options.flexsearchOptions,
-      }) as FlexsearchDocumentIndex;
-    }
-    // add item/items
-    if (localIndexItem) {
-      if (picker(localIndexItem)) {
-        this.contextualIndexes[name].add(localIndexItem);
-      }
-    } else {
-      this.searchIndexingKeys.forEach(docId => {
-        if (picker(this.searchIndexingItems[docId])) {
-          this.contextualIndexes[name].add(this.searchIndexingItems[docId]);
-        }
-      });
-    }
-    // result
-    return this.contextualIndexes[name];
+        });
+        // result
+        return this.getSearchingData();
+      })
+    )
   }
 
   exists(idOrQuery: string | QueryFn) {
@@ -460,36 +480,64 @@ export class DatabaseData<Type> {
     return this.databaseService.collection<Type>(this.name, queryFn);
   }
 
-  set(id: string, item: Type | NullableOptional<Type>) {
-    return this.databaseService.set(`${this.name}/${id}`, item);
-  }
-
-  add<AutoTimingType extends Omit<Type, 'createdAt' | 'updatedAt'>>(
+  add<AutoType extends Omit<Type, 'uid' | 'id' | 'title' | 'status' | 'type' | 'createdAt' | 'updatedAt'>>(
     id: string,
-    item: Type | AutoTimingType | NullableOptional<Type | AutoTimingType>
+    item: Type | AutoType | NullableOptional<Type | AutoType>
   ) {
+    const actions: Array<Observable<any>> = [];
+    // main action
+    const { userService } = this.databaseService.getIntegrations();
+    const uid = (item as any).uid as string || ((!userService || !userService.uid) ? '' : userService.uid);
+    const title = (item as any).title as string || id;
+    const status = (item as any).status as string || 'draft';
+    const type = (item as any).type as string || 'default';
     const createdAt = (item as any).createdAt as string || new Date().toISOString();
     const updatedAt = (item as any).updatedAt as string || createdAt;
-    return this.set(
+    const data = {
+      ...item,
+      uid,
       id,
-      {
-        ...item,
-        createdAt,
-        updatedAt,
-      } as unknown as Type | NullableOptional<Type>
+      title,
+      status,
+      type,
+      createdAt,
+      updatedAt,
+    } as Type | NullableOptional<Type>;
+    actions.push(
+      this.databaseService.set(`${this.name}/${id}`, data)
     );
+    // update collection meta document count
+    actions.push(
+      this.databaseService.update(
+        `metas/${this.name}`,
+        { 'value.documentCount': this.databaseService.getValueIncrement() }
+      )
+      .pipe(
+        tap(() => this.metas.documentCount = (this.metas.documentCount || 0) + 1)
+      )
+    );
+    // add search indexing item
+    if (this.options.advancedMode) {
+      actions.push(this.addSearchIndexingItem(data));
+    }
+    // run actions
+    return combineLatest(actions);
   }
 
-  update<AutoTimingType extends Omit<Type, 'createdAt' | 'updatedAt'>>(
-    id: string,
-    item: Partial<AutoTimingType> | NullableOptional<Partial<AutoTimingType>>
-  ) {
+  update(id: string, item: Partial<Type> | NullableOptional<Partial<Type>>) {
+    const actions: Array<Observable<any>> = [];
+    // main action
     const updatedAt = (item as any).updatedAt as string || new Date().toISOString();
-    return this.databaseService.update(`${this.name}/${id}`, {...item, updatedAt});
-  }
-
-  increment(id: string, data: Record<string, number>) {
-    return this.databaseService.increment(`${this.name}/${id}`, data);
+    const data = { ...item, updatedAt } as Partial<Type> | NullableOptional<Partial<Type>>;
+    actions.push(
+      this.databaseService.update(`${this.name}/${id}`, data)
+    );
+    // update search indexing item
+    if (this.options.advancedMode) {
+      actions.push(this.updateSearchIndexingItem(id, data));
+    }
+    // run actions
+    return combineLatest(actions);
   }
 
   trash(id: string) {
@@ -497,7 +545,31 @@ export class DatabaseData<Type> {
   }
 
   delete(id: string) {
-    return this.databaseService.delete(`${this.name}/${id}`);
+    const actions: Array<Observable<any>> = [];
+    // main action
+    actions.push(
+      this.databaseService.delete(`${this.name}/${id}`)
+    );
+    // update collection meta document count
+    actions.push(
+      this.databaseService.update(
+        `metas/${this.name}`,
+        { 'value.documentCount': this.databaseService.getValueIncrement(-1) }
+      )
+      .pipe(
+        tap(() => this.metas.documentCount = (this.metas.documentCount || 1) - 1)
+      )
+    );
+    // delete search indexing item
+    if (this.options.advancedMode) {
+      actions.push(this.removeSearchIndexingItem(id));
+    }
+    // run actions
+    return combineLatest(actions);
+  }
+
+  increment(id: string, data: Record<string, number>) {
+    return this.databaseService.increment(`${this.name}/${id}`, data);
   }
 
   streamDoc(idOrQuery: string | QueryFn) {
@@ -591,7 +663,185 @@ export class DatabaseData<Type> {
     const [{ result: searchResult }] = index.search(query);
     return new DatabaseDataSearchResult<Type>(this, index, limit, searchResult);
   }
+
+  private buildSearchIndexingItem(data: Type | NullableOptional<Type>) {
+    const builder: DatabaseDataSearchIndexingItemBuilder =
+      this.options.searchIndexingItemBuilder ||
+      (_data => {
+        const createdAt = _data.createdAt as string;
+        const type = _data.type as string;
+        const status = _data.status as string;
+        const locale = _data.locale as (undefined | string);
+        const content = (
+          ([
+            _data.id,
+            ...(_data.keywords || []),
+            ...(Object.keys(_data.authors || {})),
+            ...(Object.keys(_data.categories || {})),
+            ...(Object.keys(_data.tags || {})),
+          ] as string[])
+          .join(' ')
+        )
+        .replace(/\-|\_/g, ' ')
+        .toLowerCase();
+        return { content, createdAt, type, status, ...(!locale ? {} : {locale}) };
+      });
+    return builder(data);
+  }
+
+  private createSearchIndexing(
+    indexingItemId: string,
+    indexingItem: DatabaseDataSearchIndexingItem,
+    currentSearchIndexingId?: string,
+  ) {
+    const { userService } = this.databaseService.getIntegrations();
+    const uid = (!userService || !userService.uid) ? '' : userService.uid;
+    const indexingName = !currentSearchIndexingId
+      ? 'search-index-000'
+      : 'search-index-' +
+        ('000' + (+(currentSearchIndexingId.split('-').pop() as string) + 1)).substr(-3);
+    const id = `${this.name}:${indexingName}`;
+    const indexingItemCreatedAt = indexingItem.createdAt;
+    const data = {
+      uid,
+      id: id,
+      title: id,
+      status: 'publish',
+      type: 'default',
+      createdAt: indexingItemCreatedAt,
+      updatedAt: indexingItemCreatedAt,
+      group: 'search_index',
+      master: this.name,
+      value: {
+        items: {
+          [indexingItemId]: indexingItem,
+        }
+      }
+    } as Meta;
+    return combineLatest([
+      this.databaseService.set(`metas/${id}`, data),
+      this.databaseService
+        .update(`metas/${this.name}`, { 'value.currentSearchIndexingId': id })
+        .pipe(tap(() => this.metas.currentSearchIndexingId = id))
+    ]);
+  }
+
+  private addSearchIndexingItem(data: Type | NullableOptional<Type>) {
+    const { currentSearchIndexingId } = this.metas;
+    const indexingItemId = (data as any).id as string;
+    const indexingItem = this.buildSearchIndexingItem(data);
+    return (!currentSearchIndexingId
+      // first item
+      ? this.createSearchIndexing(
+          indexingItemId,
+          indexingItem,
+        )
+      // add item
+      : this.databaseService.update(
+          `metas/${currentSearchIndexingId}`,
+          {
+            updatedAt: indexingItem.createdAt,
+            [`value.items.${indexingItemId}`]: indexingItem,
+          }
+        )
+        .pipe(
+          // error: 1MB exceeded or something else
+          catchError(() =>
+            this.createSearchIndexing(
+              indexingItemId,
+              indexingItem,
+              currentSearchIndexingId,
+            )
+          ),
+        )
+    );
+  }
+
+  private updateSearchIndexingItem(
+    id: string,
+    data: Partial<Type> | NullableOptional<Partial<Type>>
+  ) {
+    const updateChecker: DatabaseDataSearchIndexingUpdateChecker =
+      this.options.searchIndexingUpdateChecker || (_data => !!_data.status);
+    // no update necessary
+    if (!updateChecker(data)) {
+      return of(null);
+    }
+    // update
+    return this.getDoc(id) // load the updated doc
+    .pipe(
+      // load the search index meta doc
+      switchMap(item => !item
+        ? of([])
+        : combineLatest([
+          of(item),
+          this.databaseService.getDoc<Meta>(
+            'metas',
+            ref => ref
+              .where('createdAt', '<=', (item as any).createdAt as string)
+              .where('updatedAt', '>=', (item as any).createdAt as string),
+            false
+          )
+        ])
+      ),
+      // update the item
+      switchMap(([item, metaDoc]) => {
+        if (!metaDoc) {
+          return of(null);
+        } else {
+          const indexingItem = this.buildSearchIndexingItem(item);
+          return this.databaseService.update(
+            `metas/${metaDoc.id}`,
+            { [`value.items.${id}`]: indexingItem }
+          )
+          .pipe(
+            // error: 1MB exceeded or something else (do nothing)
+            catchError(() => of(null)),
+          );
+        }
+      }),
+    );
+  }
+
+  private removeSearchIndexingItem(id: string) {
+    return this.getDoc(id) // load the updated doc (retrieve createdAt)
+    .pipe(
+      // load the search index meta doc
+      switchMap(item => !item
+        ? of([])
+        : combineLatest([
+          of(item),
+          this.databaseService.getDoc<Meta>(
+            'metas',
+            ref => ref
+              .where('createdAt', '<=', (item as any).createdAt as string)
+              .where('updatedAt', '>=', (item as any).createdAt as string),
+            false
+          )
+        ])
+      ),
+      // update the item
+      switchMap(([item, metaDoc]) => {
+        if (!metaDoc) {
+          return of(null);
+        } else {
+          return this.databaseService.update(
+            `metas/${metaDoc.id}`,
+            {
+              [`value.items.${id}`]: this.databaseService.getValueDelete()
+            }
+          );
+        }
+      }),
+    );
+  }
 }
+
+/*
+ * ====================================================================================
+ * ========================= DATABASE DATA SEARCH RESULT ==============================
+ * ==================================================================================== 
+ */
 
 export class DatabaseDataSearchResult<Type> {
   private indexingKeys: string[];
@@ -616,9 +866,3 @@ export class DatabaseDataSearchResult<Type> {
     return this.dataService.getItems(ids.map(id => this.indexingKeys[id]), itemCaching, itemTimeout);
   }
 }
-
-type RequiredKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? never : K }[keyof T];
-type OptionalKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } ? K : never }[keyof T];
-type PickRequired<T> = Pick<T, RequiredKeys<T>>;
-type PickOptional<T> = Pick<T, OptionalKeys<T>>;
-type Nullable<T> = { [P in keyof T]: T[P] | null };
