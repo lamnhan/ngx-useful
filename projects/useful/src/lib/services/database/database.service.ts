@@ -9,6 +9,7 @@ import { Meta } from '@lamnhan/schemata';
 
 import { HelperService } from '../helper/helper.service';
 import { CacheService, CacheConfig, Caching } from '../cache/cache.service';
+import { SettingService } from '../setting/setting.service';
 import { UserService } from '../user/user.service';
 
 /*
@@ -39,6 +40,7 @@ export interface DatabaseOptions {
 
 export interface DatabaseIntegrations {
   cacheService?: CacheService;
+  settingService?: SettingService;
   userService?: UserService;
 }
 
@@ -330,6 +332,7 @@ export type DatabaseDataSearchIndexingUpdateChecker = (data: any) => boolean;
 export interface DatabaseDataCollectionMetas {
   documentCount?: number;
   currentSearchIndexingId?: string;
+  currentSearchIndexingCount?: number;
 }
 
 export interface DatabaseDataSearchIndexingItem {
@@ -447,7 +450,14 @@ export class DatabaseData<Type> {
             this.searchIndexingItems[docId] =
               { id, docId, ...items[docId] } as DatabaseDataSearchIndexingLocalItem;
             // register default index
-            if (!noDefaultIndexing && this.searchIndexingItems[docId].status === 'publish') {
+            const { status, type, locale } =  this.searchIndexingItems[docId];
+            const { settingService } = this.databaseService.getIntegrations();
+            if (
+              !noDefaultIndexing &&
+              type === 'default' &&
+              status === 'publish' &&
+              (!locale || !settingService || locale === settingService.locale)
+            ) {
               (this.defaultIndex as FlexsearchDocumentIndex)
                 .add(this.searchIndexingItems[docId]);
             }
@@ -658,7 +668,7 @@ export class DatabaseData<Type> {
   search(query: string, limit = 10, context?: string) {
     const index = context ? this.contextualIndexes[context] : this.defaultIndex;
     if (!index) {
-      throw new Error('No index found.');
+      throw new Error('No index found, please run "setupSearching()" first.');
     }
     const [{ result: searchResult }] = index.search(query);
     return new DatabaseDataSearchResult<Type>(this, index, limit, searchResult);
@@ -684,7 +694,15 @@ export class DatabaseData<Type> {
         )
         .replace(/\-|\_/g, ' ')
         .toLowerCase();
-        return { content, createdAt, type, status, ...(!locale ? {} : {locale}) };
+        const indexingItem = { content, createdAt, type, status, ...(!locale ? {} : {locale}) };
+        // check for size
+        const objectLength = JSON.stringify(indexingItem).length;
+        if (objectLength < 1000) {
+          return indexingItem;
+        } else {
+          const truncateContent = content.substr(0, content.length - (objectLength - 1000));
+          return { ...indexingItem, content: truncateContent };
+        }
       });
     return builder(data);
   }
@@ -701,15 +719,16 @@ export class DatabaseData<Type> {
       : 'search-index-' +
         ('000' + (+(currentSearchIndexingId.split('-').pop() as string) + 1)).substr(-3);
     const id = `${this.name}:${indexingName}`;
-    const indexingItemCreatedAt = indexingItem.createdAt;
+    const createdAt = new Date().toISOString();
+    const updatedAt = createdAt;
     const data = {
       uid,
-      id: id,
+      id,
       title: id,
       status: 'publish',
       type: 'default',
-      createdAt: indexingItemCreatedAt,
-      updatedAt: indexingItemCreatedAt,
+      createdAt,
+      updatedAt,
       group: 'search_index',
       master: this.name,
       value: {
@@ -721,40 +740,63 @@ export class DatabaseData<Type> {
     return combineLatest([
       this.databaseService.set(`metas/${id}`, data),
       this.databaseService
-        .update(`metas/${this.name}`, { 'value.currentSearchIndexingId': id })
-        .pipe(tap(() => this.metas.currentSearchIndexingId = id))
+        .update(
+          `metas/${this.name}`,
+          {
+            'value.currentSearchIndexingId': id,
+            'value.currentSearchIndexingCount': 1
+          }
+        )
+        .pipe(
+          tap(() => {
+            this.metas.currentSearchIndexingId = id;
+            this.metas.currentSearchIndexingCount = 1;
+          })
+        )
     ]);
   }
 
   private addSearchIndexingItem(data: Type | NullableOptional<Type>) {
-    const { currentSearchIndexingId } = this.metas;
+    const { currentSearchIndexingId, currentSearchIndexingCount } = this.metas;
     const indexingItemId = (data as any).id as string;
     const indexingItem = this.buildSearchIndexingItem(data);
-    return (!currentSearchIndexingId
-      // first item
-      ? this.createSearchIndexing(
+    // first item
+    if (!currentSearchIndexingId || !currentSearchIndexingCount) {
+      return this.createSearchIndexing(
+        indexingItemId,
+        indexingItem,
+      );
+    }
+    // add item
+    else {
+      // to current indexing
+      if (currentSearchIndexingCount < 1000) {
+        return combineLatest([
+          this.databaseService.update(
+            `metas/${currentSearchIndexingId}`,
+            {
+              updatedAt: new Date().toISOString(),
+              [`value.items.${indexingItemId}`]: indexingItem,
+            }
+          ),
+          this.databaseService.update(
+            `metas/${this.name}`,
+            {
+              'value.currentSearchIndexingCount': this.databaseService.getValueIncrement(),
+            }
+          )
+          .pipe(tap(() => (this.metas.currentSearchIndexingCount as number)++))
+        ]);
+      }
+      // new indexing
+      else {
+        return this.createSearchIndexing(
           indexingItemId,
           indexingItem,
-        )
-      // add item
-      : this.databaseService.update(
-          `metas/${currentSearchIndexingId}`,
-          {
-            updatedAt: indexingItem.createdAt,
-            [`value.items.${indexingItemId}`]: indexingItem,
-          }
-        )
-        .pipe(
-          // error: 1MB exceeded or something else
-          catchError(() =>
-            this.createSearchIndexing(
-              indexingItemId,
-              indexingItem,
-              currentSearchIndexingId,
-            )
-          ),
-        )
-    );
+          currentSearchIndexingId,
+        );
+      }
+    }
   }
 
   private updateSearchIndexingItem(
@@ -762,77 +804,60 @@ export class DatabaseData<Type> {
     data: Partial<Type> | NullableOptional<Partial<Type>>
   ) {
     const updateChecker: DatabaseDataSearchIndexingUpdateChecker =
-      this.options.searchIndexingUpdateChecker || (_data => !!_data.status);
+      this.options.searchIndexingUpdateChecker ||
+      (_data => (_data.status || _data.keywords));
     // no update necessary
     if (!updateChecker(data)) {
       return of(null);
     }
     // update
-    return this.getDoc(id) // load the updated doc
-    .pipe(
-      // load the search index meta doc
-      switchMap(item => !item
-        ? of([])
-        : combineLatest([
-          of(item),
-          this.databaseService.getDoc<Meta>(
-            'metas',
-            ref => ref
-              .where('createdAt', '<=', (item as any).createdAt as string)
-              .where('updatedAt', '>=', (item as any).createdAt as string),
-            false
-          )
-        ])
+    return combineLatest([
+      // load the updated doc
+      this.getDoc(id),
+      // load the indexing
+      this.databaseService.getDoc<Meta>(
+        'metas',
+        ref => ref
+          .where('master', '==', this.name)
+          .where('group', '==', 'search_index')
+          .where(`value.items.${id}.content`, '>', "''"),
+        false
       ),
-      // update the item
-      switchMap(([item, metaDoc]) => {
-        if (!metaDoc) {
-          return of(null);
-        } else {
-          const indexingItem = this.buildSearchIndexingItem(item);
-          return this.databaseService.update(
+    ])
+    .pipe(
+      switchMap(([item, metaDoc]) => !item || !metaDoc
+        ? of(null) // something went wrong
+        : this.databaseService.update(
             `metas/${metaDoc.id}`,
-            { [`value.items.${id}`]: indexingItem }
+            {
+              updatedAt: new Date().toISOString(),
+              [`value.items.${id}`]: this.buildSearchIndexingItem(item),
+            }
           )
-          .pipe(
-            // error: 1MB exceeded or something else (do nothing)
-            catchError(() => of(null)),
-          );
-        }
-      }),
+      )
     );
   }
 
   private removeSearchIndexingItem(id: string) {
-    return this.getDoc(id) // load the updated doc (retrieve createdAt)
+    return this.databaseService.getDoc<Meta>(
+      'metas',
+      ref => ref
+        .where('master', '==', this.name)
+        .where('group', '==', 'search_index')
+        .where(`value.items.${id}.content`, '>', "''"),
+      false
+    )
     .pipe(
-      // load the search index meta doc
-      switchMap(item => !item
-        ? of([])
-        : combineLatest([
-          of(item),
-          this.databaseService.getDoc<Meta>(
-            'metas',
-            ref => ref
-              .where('createdAt', '<=', (item as any).createdAt as string)
-              .where('updatedAt', '>=', (item as any).createdAt as string),
-            false
-          )
-        ])
-      ),
-      // update the item
-      switchMap(([item, metaDoc]) => {
-        if (!metaDoc) {
-          return of(null);
-        } else {
-          return this.databaseService.update(
+      switchMap(metaDoc => !metaDoc
+        ? of(null) // something went wrong
+        : this.databaseService.update(
             `metas/${metaDoc.id}`,
             {
-              [`value.items.${id}`]: this.databaseService.getValueDelete()
+              updatedAt: new Date().toISOString(),
+              [`value.items.${id}`]: this.databaseService.getValueDelete(),
             }
-          );
-        }
-      }),
+          )
+      ),
     );
   }
 }
