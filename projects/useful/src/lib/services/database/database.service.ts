@@ -417,12 +417,13 @@ export class DatabaseData<Type> {
       ref => ref
         .where('master', '==', this.name)
         .where('group', '==', 'search_index')
-        .orderBy('createdAt', 'desc'),
+        .orderBy('createdAt', 'desc')
+        .limit(100),
       this.options.searchingCaching !== undefined
         ? this.options.searchingCaching
         : !this.databaseService.isGlobalCachingEnabled()
-        ? false
-        : { name: 'All search indexes' },
+          ? false
+          : { name: 'All search indexes' },
     )
     .pipe(
       map(metaItems => {
@@ -441,14 +442,19 @@ export class DatabaseData<Type> {
         // process indexing items
         let indexId = 0;
         metaItems.forEach(metaItem => {
-          const { items = {} } = metaItem.value as DatabaseDataSearchIndexing;
-          Object.keys(items).forEach(docId => {
+          const { items: recordItems = {} } = metaItem.value as DatabaseDataSearchIndexing;
+          // sort items (createdAt - desc)
+          const items = Object.keys(recordItems)
+            .map(docId => ({docId, item: recordItems[docId]}))
+            .sort((a, b) => a.item.createdAt < b.item.createdAt ? 1 : -1);
+          // continue
+          items.forEach(({docId, item}) => {
             const id = indexId++;
             // save key
             this.searchIndexingKeys[id] = docId;
             // save item
             this.searchIndexingItems[docId] =
-              { id, docId, ...items[docId] } as DatabaseDataSearchIndexingLocalItem;
+              { id, docId, ...item } as DatabaseDataSearchIndexingLocalItem;
             // register default index
             const { status, type, locale } =  this.searchIndexingItems[docId];
             const { settingService } = this.databaseService.getIntegrations();
