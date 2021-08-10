@@ -318,12 +318,18 @@ export class DatabaseService {
 
 export interface DatabaseDataOptions {
   advancedMode?: boolean;
+  // meta
   metaCaching?: false | CacheConfig;
+  // searching
   searchingCaching?: false | CacheConfig;
   searchIndexingItemBuilder?: DatabaseDataSearchIndexingItemBuilder;
   searchIndexingUpdateChecker?: DatabaseDataSearchIndexingUpdateChecker;
   predefinedContextuals?: Array<{ name: string, picker: DatabaseDataContextualIndexPicker }>;
   flexsearchOptions?: any;
+  // linking and effect
+  updateEffects?: DatabaseDataUpdateEffect[];
+  linkingFields?: string[];
+  effectDataPickers?: Record<string, (data: any, prop: string) => any>;
 }
 
 export type DatabaseDataSearchIndexingItemBuilder = (data: any) => DatabaseDataSearchIndexingItem;
@@ -360,8 +366,12 @@ export interface FlexsearchDocumentIndex {
   search: (query: string, ...args: any[]) => Array<{result: number[]}>;
 }
 
+export interface DatabaseDataUpdateEffect {
+  collection: string;
+  key: string;
+}
+
 export class DatabaseData<Type> {
-  private options: DatabaseDataOptions = {};
   private metas: DatabaseDataCollectionMetas = {};
 
   private searchIndexingKeys: string[] = [];
@@ -370,15 +380,13 @@ export class DatabaseData<Type> {
   private defaultIndex?: FlexsearchDocumentIndex;
   private contextualIndexes: Record<string, FlexsearchDocumentIndex> = {};
 
+  private readonly minimumLinkingFields = ['id', 'title', 'type'];
+
   constructor(
     public readonly databaseService: DatabaseService,
-    public readonly name: string
+    public readonly name: string,
+    private readonly options: DatabaseDataOptions = {},
   ) {}
-
-  setOptions(options: DatabaseDataOptions = {}) {
-    this.options = options;
-    return this as DatabaseData<Type>;
-  }
 
   init() {
     if (this.options.advancedMode) {
@@ -398,6 +406,10 @@ export class DatabaseData<Type> {
       defaultIndex: this.defaultIndex,
       contextualIndexes: this.contextualIndexes,
     };
+  }
+
+  getLinkingFields() {
+    return [...(this.options.linkingFields || []), ...this.minimumLinkingFields];
   }
 
   private loadMetas() {
@@ -552,6 +564,10 @@ export class DatabaseData<Type> {
     if (this.options.advancedMode) {
       actions.push(this.updateSearchIndexingItem(id, data));
     }
+    // update effected
+    if (this.options.updateEffects) {
+      actions.push(this.updateEffected(id, data));
+    }
     // run actions
     return combineLatest(actions);
   }
@@ -579,6 +595,11 @@ export class DatabaseData<Type> {
     // delete search indexing item
     if (this.options.advancedMode) {
       actions.push(this.removeSearchIndexingItem(id));
+    }
+    // update effected
+    if (this.options.updateEffects) {
+      // NOTE: use the hack, status = 'trash', also remove the effected
+      actions.push(this.updateEffected(id, {status: 'trash'}  as unknown as Partial<Type>));
     }
     // run actions
     return combineLatest(actions);
@@ -864,6 +885,54 @@ export class DatabaseData<Type> {
             }
           )
       ),
+    );
+  }
+
+  private updateEffected(
+    id: string,
+    data: Partial<Type> | NullableOptional<Partial<Type>>
+  ) {
+    // check effected
+    const effectedProps = this.getLinkingFields().filter(prop => !!(data as any)[prop]);
+    if (!effectedProps.length) {
+      return of(null);
+    }
+    // get data
+    const dataPickers = this.options.effectDataPickers || {};
+    const effectedData = effectedProps.reduce(
+      (result, prop) => {
+        result[prop] = !dataPickers[prop]
+          ? (data as any)[prop]
+          : dataPickers[prop]((data as any)[prop], prop);
+        return result;
+      },
+      {} as Record<string, any>,
+    );
+    const effectedStatus = effectedData.status as string;
+    // update all effected
+    return combineLatest(
+      (this.options.updateEffects || []).map(({ collection: collectionName, key: effectedKey }) => 
+        this.databaseService.collection<firebase.firestore.DocumentData>(
+          collectionName,
+          ref => ref.where(`${effectedKey}.${id}.id`, '==', id)
+        )
+        .get()
+        .pipe(
+          catchError(() => of({docs: [] as firebase.firestore.QueryDocumentSnapshot[]})),
+          switchMap(result =>
+            combineLatest(
+              result.docs.map(doc =>
+                doc.ref.update({
+                  [`${effectedKey}.${id}`]:
+                    (effectedStatus && effectedStatus !== 'publish')
+                      ? this.databaseService.getValueDelete()
+                      : effectedData,
+                })
+              )
+            )
+          ),
+        )
+      )
     );
   }
 }
