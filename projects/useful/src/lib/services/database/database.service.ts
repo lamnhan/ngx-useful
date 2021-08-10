@@ -1,7 +1,7 @@
 // @ts-ignore
 import { Document } from 'flexsearch';
 import { Injectable } from '@angular/core';
-import { from, of, Observable, combineLatest } from 'rxjs';
+import { from, of, Observable, combineLatest, BehaviorSubject } from 'rxjs';
 import { map, switchMap, take, tap, timeout, catchError } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
@@ -371,6 +371,11 @@ export interface DatabaseDataUpdateEffect {
   key: string;
 }
 
+export interface DatabaseDataEffectedTask {
+  count: number;
+  percentage$: Observable<number>;
+}
+
 export class DatabaseData<Type> {
   private metas: DatabaseDataCollectionMetas = {};
 
@@ -549,31 +554,101 @@ export class DatabaseData<Type> {
       actions.push(this.addSearchIndexingItem(data));
     }
     // run actions
-    return combineLatest(actions);
+    return combineLatest(actions).pipe(map(() => true));
   }
 
-  update(id: string, item: Partial<Type> | NullableOptional<Partial<Type>>) {
+  update(id: string, data: Partial<Type> | NullableOptional<Partial<Type>>) {
     const actions: Array<Observable<any>> = [];
     // main action
-    const updatedAt = (item as any).updatedAt as string || new Date().toISOString();
-    const data = { ...item, updatedAt } as Partial<Type> | NullableOptional<Partial<Type>>;
+    const updatedAt = (data as any).updatedAt as string || new Date().toISOString();
+    const updateData = { ...data, updatedAt } as Partial<Type> | NullableOptional<Partial<Type>>;
     actions.push(
-      this.databaseService.update(`${this.name}/${id}`, data)
+      this.databaseService.update(`${this.name}/${id}`, updateData)
     );
     // update search indexing item
     if (this.options.advancedMode) {
-      actions.push(this.updateSearchIndexingItem(id, data));
-    }
-    // update effected
-    if (this.options.updateEffects) {
-      actions.push(this.updateEffected(id, data));
+      actions.push(this.updateSearchIndexingItem(id, updateData));
     }
     // run actions
-    return combineLatest(actions);
+    return combineLatest(actions).pipe(map(() => true));
+  }
+
+  updateEffects(
+    id: string,
+    data: Partial<Type> | NullableOptional<Partial<Type>>
+  ): Observable<DatabaseDataEffectedTask> {
+    // check effected
+    const effectedProps = this.getLinkingFields().filter(prop => !!(data as any)[prop]);
+    if (!effectedProps.length) {
+      return of({ count: 0, percentage$: of(100) });
+    }
+    // get data
+    const dataPickers = this.options.effectDataPickers || {};
+    const effectedStatus = (data as any).status as string;
+    const effectedData = effectedProps.reduce(
+      (result, prop) => {
+        result[prop] = !dataPickers[prop]
+          ? (data as any)[prop]
+          : dataPickers[prop]((data as any)[prop], prop);
+        return result;
+      },
+      {} as Record<string, any>,
+    );
+    // update all effected
+    const allEffects = [] as Observable<any>[];
+    return combineLatest(
+      (this.options.updateEffects || []).map(({ collection: collectionName, key: effectedKey }, i) =>
+        this.databaseService.collection<firebase.firestore.DocumentData>(
+          collectionName,
+          ref => ref.where(`${effectedKey}.${id}.id`, '==', id)
+        )
+        .get()
+        .pipe(
+          catchError(() => of({docs: [] as firebase.firestore.QueryDocumentSnapshot[]})),
+          tap(result => {
+            allEffects.push(
+              ...result.docs.map(doc =>
+                from(
+                  doc.ref.update({
+                    [`${effectedKey}.${id}`]:
+                      (effectedStatus && effectedStatus !== 'publish')
+                        ? this.databaseService.getValueDelete()
+                        : effectedData,
+                  })
+                )
+              )
+            );
+          }),
+        )
+      )
+    )
+    .pipe(
+      map(() => {
+        const count = allEffects.length;
+        const percentage$ = new BehaviorSubject<number>(0);
+        // run actions
+        let resolvedCount = 0;
+        allEffects.forEach(effected => {
+          effected.pipe(
+            tap(() => {
+              resolvedCount++;
+              percentage$.next(resolvedCount / count * 100);
+            }),
+          )
+          .subscribe()
+        });
+        // return task
+        return { count, percentage$ };
+      }),
+    );
   }
 
   trash(id: string) {
     return this.update(id, {status: 'trash'} as unknown as Partial<Type>);
+  }
+
+  trashEffects(id: string) {
+    return this.updateEffects(id, {status: 'trash'} as unknown as Partial<Type>);
   }
 
   delete(id: string) {
@@ -596,13 +671,12 @@ export class DatabaseData<Type> {
     if (this.options.advancedMode) {
       actions.push(this.removeSearchIndexingItem(id));
     }
-    // update effected
-    if (this.options.updateEffects) {
-      // NOTE: use the hack, status = 'trash', also remove the effected
-      actions.push(this.updateEffected(id, {status: 'trash'}  as unknown as Partial<Type>));
-    }
     // run actions
-    return combineLatest(actions);
+    return combineLatest(actions).pipe(map(() => true));
+  }
+
+  deleteEffects(id: string) {
+    return this.trashEffects(id);
   }
 
   increment(id: string, data: Record<string, number>) {
@@ -885,54 +959,6 @@ export class DatabaseData<Type> {
             }
           )
       ),
-    );
-  }
-
-  private updateEffected(
-    id: string,
-    data: Partial<Type> | NullableOptional<Partial<Type>>
-  ) {
-    // check effected
-    const effectedProps = this.getLinkingFields().filter(prop => !!(data as any)[prop]);
-    if (!effectedProps.length) {
-      return of(null);
-    }
-    // get data
-    const dataPickers = this.options.effectDataPickers || {};
-    const effectedData = effectedProps.reduce(
-      (result, prop) => {
-        result[prop] = !dataPickers[prop]
-          ? (data as any)[prop]
-          : dataPickers[prop]((data as any)[prop], prop);
-        return result;
-      },
-      {} as Record<string, any>,
-    );
-    const effectedStatus = effectedData.status as string;
-    // update all effected
-    return combineLatest(
-      (this.options.updateEffects || []).map(({ collection: collectionName, key: effectedKey }) => 
-        this.databaseService.collection<firebase.firestore.DocumentData>(
-          collectionName,
-          ref => ref.where(`${effectedKey}.${id}.id`, '==', id)
-        )
-        .get()
-        .pipe(
-          catchError(() => of({docs: [] as firebase.firestore.QueryDocumentSnapshot[]})),
-          switchMap(result =>
-            combineLatest(
-              result.docs.map(doc =>
-                doc.ref.update({
-                  [`${effectedKey}.${id}`]:
-                    (effectedStatus && effectedStatus !== 'publish')
-                      ? this.databaseService.getValueDelete()
-                      : effectedData,
-                })
-              )
-            )
-          ),
-        )
-      )
     );
   }
 }

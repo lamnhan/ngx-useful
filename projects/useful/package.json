@@ -22,7 +22,7 @@
     "@angular/common": "~12.0.3",
     "@angular/platform-browser": "~12.0.3",
     "@angular/router": "~12.0.3",
-    "@lamnhan/schemata": "^0.0.21"
+    "@lamnhan/schemata": "file:../../../schemata/dist/schemata/lamnhan-schemata-0.0.22.tgz"
   },
   "dependencies": {
     "@angular/fire": "^6.1.5",
