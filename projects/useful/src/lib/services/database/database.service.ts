@@ -390,8 +390,13 @@ export class DatabaseData<Type> {
   constructor(
     public readonly databaseService: DatabaseService,
     public readonly name: string,
-    private readonly options: DatabaseDataOptions = {},
+    private options: DatabaseDataOptions = {},
   ) {}
+
+  setOptions(options: DatabaseDataOptions) {
+    this.options = { ...this.options, ...options };
+    return this as DatabaseData<Type>;
+  }
 
   init() {
     if (this.options.advancedMode) {
