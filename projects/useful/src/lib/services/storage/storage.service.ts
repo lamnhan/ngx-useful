@@ -1,3 +1,5 @@
+// @ts-ignore
+import { Index } from 'flexsearch';
 import { Injectable } from '@angular/core';
 import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
 import firebase from 'firebase/app';
@@ -5,7 +7,8 @@ import { from, Observable, combineLatest } from 'rxjs';
 import { tap, map, switchMap } from 'rxjs/operators';
 import Compressor from 'compressorjs';
 
-import { CacheService, CacheConfig, Caching } from '../cache/cache.service';
+import { HelperService } from '../helper/helper.service';
+import { CacheService, CacheConfig } from '../cache/cache.service';
 
 export type VendorStorageService = AngularFireStorage;
 
@@ -16,6 +19,7 @@ export interface StorageOptions {
   dateGrouping?: boolean;
   randomSuffix?: boolean;
   ignoreEmptyFolder?: boolean;
+  flexsearchOptions?: any;
 }
 
 export interface StorageIntegrations {
@@ -49,6 +53,16 @@ export interface StorageListResult {
   files: string[];
 }
 
+export interface FlexsearchIndex {
+  add: (id: number, content: string) => any;
+  search: (query: string, ...args: any[]) => Array<{result: number[]}>;
+}
+
+export interface StorageSearchingData {
+  index: FlexsearchIndex;
+  indexingKeys: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -57,9 +71,10 @@ export class StorageService {
   private integrations: StorageIntegrations = {};
   private service!: VendorStorageService;
   driver = 'firebase';
-  defaultFolder = 'app-content/uploads';
 
-  constructor() {}
+  public readonly defaultFolder = 'app-content/uploads';
+
+  constructor(private helperService: HelperService) {}
 
   setOptions(options: StorageOptions) {
     this.options = options;
@@ -79,16 +94,31 @@ export class StorageService {
     return this as StorageService;
   }
 
-  getDefaultFolder() {
-    return this.defaultFolder;
-  }
-
   getUploadFolder(customFolder?: string) {
-    return customFolder || this.options.uploadFolder || this.getDefaultFolder();
+    return customFolder || this.options.uploadFolder || this.defaultFolder;
   }
 
   ref(fullPath: string) {
     return this.service.ref(fullPath);
+  }
+  
+  delete(fullPath: string) {
+    return this.ref(fullPath).delete();
+  }
+
+  upload(path: string, data: File | Blob, custom: UploadCustom = {}) {
+    const { fileName, fullPath, metadata } = this.extractUploadInputs(path, custom);
+    const ref = this.ref(fullPath);
+    const task = ref.put(data, metadata);
+    return { name: fileName, fullPath, ref, task };
+  }
+
+  uploadFile(path: string, file: File, custom: UploadCustom = {}) {
+    return this.upload(path, file, custom);
+  }
+
+  uploadBlob(path: string, blob: Blob, custom: UploadCustom = {}) {
+    return this.upload(path, blob, custom);
   }
 
   vendorList(customFolder?: string) {
@@ -97,6 +127,7 @@ export class StorageService {
 
   list(caching?: false | CacheConfig, customFolder?: string): Observable<StorageListResult> {
     const topFolder = this.getUploadFolder(customFolder);
+    // action
     const action = this.vendorList(topFolder).pipe(
       map(listResult =>
         ({
@@ -105,10 +136,11 @@ export class StorageService {
         })
       ),
     );
+    // result
     const isCaching = caching === false ||
       (!caching && !this.options.cacheTime) ||
       !this.integrations.cacheService;
-    const cacheKey = `storage/list/${topFolder}`;
+    const cacheKey = `storage/list/${this.helperService.md5(topFolder)}`;
     return !isCaching
       ? action
       : (this.integrations.cacheService as CacheService).get(
@@ -120,6 +152,7 @@ export class StorageService {
 
   listDeep(caching?: false | CacheConfig, customFolder?: string) {
     const topFolder = this.getUploadFolder(customFolder);
+    // action
     const action = new Observable<StorageListResult>(observer => {
       const allFolders = [] as string[];
       const allFiles = [] as string[];
@@ -149,10 +182,11 @@ export class StorageService {
       // run action
       deepLister(topFolder);
     });
+    // result
     const isCaching = caching === false ||
       (!caching && !this.options.cacheTime) ||
       !this.integrations.cacheService;
-    const cacheKey = `storage/list-deep/${topFolder}`;
+    const cacheKey = `storage/list/${this.helperService.md5(`deep:${topFolder}`)}`;
     return !isCaching
       ? action
       : (this.integrations.cacheService as CacheService).get(
@@ -189,24 +223,48 @@ export class StorageService {
       ),
     );
   }
-
-  delete(fullPath: string) {
-    return this.ref(fullPath).delete();
+  
+  getFiles(fullPaths: string[], caching?: false | CacheConfig) {
+    // action
+    const action = combineLatest(fullPaths.map(fullPath => this.buildStorageItem(fullPath)));
+    // result
+    const isCaching = caching === false ||
+      (!caching && !this.options.cacheTime) ||
+      !this.integrations.cacheService;
+    const cacheKey = `storage/list/${this.helperService.md5(fullPaths.join(','))}`;
+    return !isCaching
+      ? action
+      : (this.integrations.cacheService as CacheService).get(
+        cacheKey,
+        action,
+        (caching as CacheConfig).time || this.options.cacheTime,
+      ) as Observable<StorageItem[]>;
   }
 
-  upload(path: string, data: File | Blob, custom: UploadCustom = {}) {
-    const { fileName, fullPath, metadata } = this.extractUploadInputs(path, custom);
-    const ref = this.ref(fullPath);
-    const task = ref.put(data, metadata);
-    return { name: fileName, fullPath, ref, task };
+  getSearching(caching?: false | CacheConfig, customFolder?: string): Observable<StorageSearchingData> {
+    return this.listDeep(caching, customFolder).pipe(
+      map(({ files }) => {
+        const index = new Index(this.options.flexsearchOptions) as FlexsearchIndex;
+        files.forEach((fullPath, id) => {
+          const content =
+            ((fullPath.split('/').pop() as string).split('.').shift() as string)
+            .replace(/\-|\_/g, ' ');
+          index.add(id, content);
+        });
+        return { index, indexingKeys: files };
+      }),
+    );
   }
 
-  uploadFile(path: string, file: File, custom: UploadCustom = {}) {
-    return this.upload(path, file, custom);
-  }
-
-  uploadBlob(path: string, blob: Blob, custom: UploadCustom = {}) {
-    return this.upload(path, blob, custom);
+  search(searchingData: StorageSearchingData, query: string, limit = 10) {
+    const [{ result: searchResult }] = searchingData.index.search(query);
+    return new StorageSearchResult(
+      this,
+      searchingData.index,
+      limit,
+      searchResult,
+      searchingData.indexingKeys
+    );
   }
 
   buildStorageItem(fullPath: string): Observable<StorageItem> {
@@ -308,5 +366,21 @@ export class StorageService {
 }
 
 export class StorageSearchResult {
+  constructor(
+    private storageService: StorageService,
+    private index: FlexsearchIndex,
+    private limit: number,
+    private searchResult: number[],
+    private indexingKeys: string[],
+  ) {}
 
+  count() {
+    return this.searchResult.length;
+  }
+
+  list(page = 1) {
+    const offset = (page - 1) * this.limit;
+    const ids = this.searchResult.slice(offset, offset + this.limit);
+    return this.storageService.getFiles(ids.map(id => this.indexingKeys[id]));
+  }
 }

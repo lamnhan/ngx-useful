@@ -440,7 +440,7 @@ export class DatabaseData<Type> {
         .where('master', '==', this.name)
         .where('group', '==', 'search_index')
         .orderBy('createdAt', 'desc')
-        .limit(100),
+        .limit(3),
       this.options.searchingCaching !== undefined
         ? this.options.searchingCaching
         : !this.databaseService.isGlobalCachingEnabled()
