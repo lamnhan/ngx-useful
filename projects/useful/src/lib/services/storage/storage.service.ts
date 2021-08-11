@@ -3,7 +3,7 @@ import { Index } from 'flexsearch';
 import { Injectable } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/storage';
 import firebase from 'firebase/app';
-import { from, Observable, combineLatest } from 'rxjs';
+import { from, Observable, combineLatest, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import Compressor from 'compressorjs';
 
@@ -57,7 +57,7 @@ export interface StorageListResult {
 
 export interface FlexsearchIndex {
   add: (id: number, content: string) => any;
-  search: (query: string, ...args: any[]) => Array<{result: number[]}>;
+  search: (query: string, ...args: any[]) => number[];
 }
 
 export interface StorageSearchingData {
@@ -207,7 +207,9 @@ export class StorageService {
   listFiles(caching?: false | CacheConfig, customFolder?: string) {
     return this.list(caching, customFolder).pipe(
       switchMap(result =>
-        combineLatest(result.files.map(item => this.buildStorageItem(item)))
+        !result.files.length
+          ? of([] as StorageItem[])
+          : combineLatest(result.files.map(item => this.buildStorageItem(item)))
       ),
     );
   }
@@ -215,14 +217,18 @@ export class StorageService {
   listDeepFiles(caching?: false | CacheConfig, customFolder?: string) {
     return this.listDeep(caching, customFolder).pipe(
       switchMap(result =>
-        combineLatest(result.files.map(item => this.buildStorageItem(item)))
+        !result.files.length
+          ? of([] as StorageItem[])
+          : combineLatest(result.files.map(item => this.buildStorageItem(item)))
       ),
     );
   }
-  
+
   getFiles(fullPaths: string[], caching?: false | CacheConfig) {
     // action
-    const action = combineLatest(fullPaths.map(fullPath => this.buildStorageItem(fullPath)));
+    const action = !fullPaths.length
+      ? of([])
+      : combineLatest(fullPaths.map(fullPath => this.buildStorageItem(fullPath)));
     // result
     const cacheTime = this.getCacheTime(caching);
     return !cacheTime
@@ -232,6 +238,23 @@ export class StorageService {
         action,
         cacheTime,
       ) as Observable<StorageItem[]>;
+  }
+
+  searchFiles(
+    searchingData: StorageSearchingData,
+    query: string,
+    limit = 10,
+    caching: false | CacheConfig = false
+  ) {
+    const searchResult = searchingData.index.search(query);
+    return new StorageSearchResult(
+      this,
+      searchingData.index,
+      limit,
+      searchResult,
+      searchingData.indexingKeys,
+      caching,
+    );
   }
 
   getSearching(caching?: false | CacheConfig, customFolder?: string): Observable<StorageSearchingData> {
@@ -246,17 +269,6 @@ export class StorageService {
         });
         return { index, indexingKeys: files };
       }),
-    );
-  }
-
-  search(searchingData: StorageSearchingData, query: string, limit = 10) {
-    const [{ result: searchResult }] = searchingData.index.search(query);
-    return new StorageSearchResult(
-      this,
-      searchingData.index,
-      limit,
-      searchResult,
-      searchingData.indexingKeys
     );
   }
 
@@ -371,6 +383,7 @@ export class StorageSearchResult {
     private limit: number,
     private searchResult: number[],
     private indexingKeys: string[],
+    private caching: false | CacheConfig,
   ) {}
 
   count() {
@@ -380,6 +393,6 @@ export class StorageSearchResult {
   list(page = 1) {
     const offset = (page - 1) * this.limit;
     const ids = this.searchResult.slice(offset, offset + this.limit);
-    return this.storageService.getFiles(ids.map(id => this.indexingKeys[id]));
+    return this.storageService.getFiles(ids.map(id => this.indexingKeys[id]), this.caching);
   }
 }
