@@ -1,10 +1,10 @@
 // @ts-ignore
 import { Index } from 'flexsearch';
 import { Injectable } from '@angular/core';
-import { AngularFireStorage, AngularFireStorageReference } from '@angular/fire/storage';
+import { AngularFireStorage } from '@angular/fire/storage';
 import firebase from 'firebase/app';
 import { from, Observable, combineLatest } from 'rxjs';
-import { tap, map, switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import Compressor from 'compressorjs';
 
 import { HelperService } from '../helper/helper.service';
@@ -14,11 +14,13 @@ export type VendorStorageService = AngularFireStorage;
 
 export interface StorageOptions {
   driver?: string;
-  cacheTime?: number;
   uploadFolder?: string;
+  cacheControl?: string;
+  customMetadata?: Record<string, any>;
   dateGrouping?: boolean;
   randomSuffix?: boolean;
-  ignoreEmptyFolder?: boolean;
+  listingCacheTime?: number;
+  listingIgnoreEmptyFolder?: boolean;
   flexsearchOptions?: any;
 }
 
@@ -137,16 +139,13 @@ export class StorageService {
       ),
     );
     // result
-    const isCaching = caching === false ||
-      (!caching && !this.options.cacheTime) ||
-      !this.integrations.cacheService;
-    const cacheKey = `storage/list/${this.helperService.md5(topFolder)}`;
-    return !isCaching
+    const cacheTime = this.getCacheTime(caching);
+    return !cacheTime
       ? action
       : (this.integrations.cacheService as CacheService).get(
-        cacheKey,
+        `storage/list/${this.helperService.md5(topFolder)}`,
         action,
-        (caching as CacheConfig).time || this.options.cacheTime,
+        cacheTime,
       ) as Observable<StorageListResult>;
   }
 
@@ -168,7 +167,7 @@ export class StorageService {
           // resolve tracker
           delete tracker[path];
           // save the folder and its files
-          if (childFiles.length || (!childFiles.length && !this.options.ignoreEmptyFolder)) {
+          if (childFiles.length || (!childFiles.length && !this.options.listingIgnoreEmptyFolder)) {
             allFolders.push(path);
           }
           allFiles.push(...childFiles);
@@ -183,16 +182,13 @@ export class StorageService {
       deepLister(topFolder);
     });
     // result
-    const isCaching = caching === false ||
-      (!caching && !this.options.cacheTime) ||
-      !this.integrations.cacheService;
-    const cacheKey = `storage/list/${this.helperService.md5(`deep:${topFolder}`)}`;
-    return !isCaching
+    const cacheTime = this.getCacheTime(caching);
+    return !cacheTime
       ? action
       : (this.integrations.cacheService as CacheService).get(
-        cacheKey,
+        `storage/list/${this.helperService.md5(`deep:${topFolder}`)}`,
         action,
-        (caching as CacheConfig).time || this.options.cacheTime,
+        cacheTime,
       ) as Observable<StorageListResult>;
   }
 
@@ -228,16 +224,13 @@ export class StorageService {
     // action
     const action = combineLatest(fullPaths.map(fullPath => this.buildStorageItem(fullPath)));
     // result
-    const isCaching = caching === false ||
-      (!caching && !this.options.cacheTime) ||
-      !this.integrations.cacheService;
-    const cacheKey = `storage/list/${this.helperService.md5(fullPaths.join(','))}`;
-    return !isCaching
+    const cacheTime = this.getCacheTime(caching);
+    return !cacheTime
       ? action
       : (this.integrations.cacheService as CacheService).get(
-        cacheKey,
+        `storage/list/${this.helperService.md5(fullPaths.join(','))}`,
         action,
-        (caching as CacheConfig).time || this.options.cacheTime,
+        cacheTime,
       ) as Observable<StorageItem[]>;
   }
 
@@ -330,8 +323,8 @@ export class StorageService {
     const fileName = fullPath.split('/').pop() as string;
     // default metadata
     let metadata = {
-      cacheControl: 'private, max-age=2628000',
-      customMetadata: {},
+      cacheControl: this.options.cacheControl || 'private, max-age=2628000',
+      customMetadata: this.options.customMetadata || {},
       ...(custom.metadata || {}),
     };
     // result
@@ -362,6 +355,12 @@ export class StorageService {
       (documentTypes.indexOf(ext) > -1) ? 'document' :
       (archiveTypes.indexOf(ext) > -1) ? 'archive' :
       'unknown';
+  }
+
+  private getCacheTime(caching?: false | CacheConfig) {
+    return (!this.integrations.cacheService || caching === false)
+      ? 0
+      : caching?.time || this.options.listingCacheTime || 0;
   }
 }
 
