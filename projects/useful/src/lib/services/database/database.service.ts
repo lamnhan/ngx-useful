@@ -329,11 +329,19 @@ export interface DatabaseDataOptions {
   // linking and effect
   updateEffects?: DatabaseDataUpdateEffect[];
   linkingFields?: string[];
-  effectDataPickers?: Record<string, (data: any, prop: string) => any>;
+  effectDataPickers?: Record<string, (propData: any, fullData: any) => any>;
+  // doc meta
+  docMetaRegistry?: Record<string, DatabaseDataItemMetaRegistry>;
 }
 
 export type DatabaseDataSearchIndexingItemBuilder = (data: any) => DatabaseDataSearchIndexingItem;
 export type DatabaseDataSearchIndexingUpdateChecker = (data: any) => boolean;
+export type DatabaseDataContextualIndexPicker = (localIndexingItem?: DatabaseDataSearchIndexingLocalItem) => boolean;
+
+export interface DatabaseDataItemMetaRegistry {
+  group: string;
+  value: any;
+}
 
 export interface DatabaseDataCollectionMetas {
   documentCounting?: DatabaseDataCollectionMetaDocumentCouting;
@@ -378,8 +386,6 @@ export interface DatabaseDataSearchIndexingLocalItem extends DatabaseDataSearchI
 export interface DatabaseDataSearchIndexing {
   items?: Record<string, DatabaseDataSearchIndexingItem>;
 }
-
-export type DatabaseDataContextualIndexPicker = (localIndexingItem?: DatabaseDataSearchIndexingLocalItem) => boolean;
 
 export interface FlexsearchDocumentIndex {
   add: (doc: Record<string, any>) => any;
@@ -618,6 +624,12 @@ export class DatabaseData<Type> {
     actions.push(
       this.databaseService.set(`${this.name}/${id}`, data)
     );
+    // create metas
+    if (this.options.advancedMode && this.options.docMetaRegistry) {
+      actions.push(
+        this.addDocMetas(id, this.options.docMetaRegistry)
+      );
+    }
     // update document count
     if (this.options.advancedMode && this.metas.documentCounting) {
       const locale = (item as any).locale as string || settingService?.locale || 'en-US';
@@ -700,7 +712,7 @@ export class DatabaseData<Type> {
       (result, prop) => {
         result[prop] = !dataPickers[prop]
           ? (data as any)[prop]
-          : dataPickers[prop]((data as any)[prop], prop);
+          : dataPickers[prop]((data as any)[prop], data);
         return result;
       },
       {} as Record<string, any>,
@@ -1011,16 +1023,51 @@ export class DatabaseData<Type> {
     .pipe(
       switchMap(metaDoc => !metaDoc
         ? of(null) // something went wrong
-        : this.databaseService.update(
+        : combineLatest([
+          this.databaseService.update(
             `metas/${metaDoc.id}`,
             {
               updatedAt: new Date().toISOString(),
               [`value.items.${id}`]: this.databaseService.getValueDelete(),
             }
-          )
+          ),
+          this.databaseService.update(`metas/$${this.name}`, {
+            [`value.searchIndexing.map.${metaDoc.id}.count`]: this.databaseService.getValueIncrement(-1),
+          })
+          .pipe(
+            tap(() => {
+              --((this.metas.searchIndexing as DatabaseDataCollectionMetaSearchIndexing).map[metaDoc.id].count);
+            }),
+          ),
+        ])
       ),
     );
   }
+
+  private addDocMetas(id: string, registry: Record<string, DatabaseDataItemMetaRegistry>) {
+    const actions: Array<Observable<any>> = Object.keys(registry).map(metaName => {
+      const { userService } = this.databaseService.getIntegrations();
+      const uid = ((!userService || !userService.uid) ? '' : userService.uid);
+      const metaId = `${id}_${this.name}_${metaName}`;
+      const createdAt = new Date().toISOString();
+      const updatedAt = createdAt;
+      const data: Meta = {
+        uid,
+        id: metaId,
+        title: id,
+        type: 'default',
+        status: 'publish',
+        createdAt,
+        updatedAt,
+        master: `${this.name}#${id}`,
+        group: registry[metaName].group,
+        value: registry[metaName].value,
+      };
+      return this.databaseService.set(`metas/${id}`, data);
+    });
+    return combineLatest(actions);
+  }
+
 }
 
 /*
