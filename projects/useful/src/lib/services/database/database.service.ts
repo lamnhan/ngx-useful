@@ -551,48 +551,34 @@ export class DatabaseData<Type> {
     actions.push(
       this.databaseService.set(`${this.name}/${id}`, data)
     );
-    // update collection meta document count
-    if (this.options.advancedMode) {
-      if (this.metas.documentCount === undefined) {
-        const { userService } = this.databaseService.getIntegrations();
-        const uid = (!userService || !userService.uid) ? '' : userService.uid;
-        const id = this.name;
-        const createdAt = new Date().toISOString();
-        const updatedAt = createdAt;
-        const data = {
-          uid,
-          id,
-          title: id,
-          status: 'publish',
-          type: 'default',
-          createdAt,
-          updatedAt,
-          group: 'collection_meta',
-          master: this.name,
-          value: {
-            documentCount: 1,
-          }
-        } as Meta;
-        actions.push(
-          this.databaseService.set(`metas/${id}`, data).pipe(
-            tap(() => this.metas = data.value)
-          )
-        );
-      } else {
-        actions.push(
-          this.databaseService.update(
-            `metas/${this.name}`,
-            { 'value.documentCount': this.databaseService.getValueIncrement() }
-          )
-          .pipe(
-            tap(() => this.metas.documentCount = (this.metas.documentCount || 0) + 1)
-          )
-        );
-      }
+    // update document count
+    if (
+      this.options.advancedMode
+      && this.metas.documentCount !== undefined
+    ) {
+      actions.push(
+        this.databaseService.update(
+          `metas/${this.name}`,
+          { 'value.documentCount': this.databaseService.getValueIncrement() }
+        )
+        .pipe(
+          tap(() => ++(this.metas.documentCount as number))
+        )
+      );
     }
     // add search indexing item
-    if (this.options.advancedMode) {
-      actions.push(this.addSearchIndexingItem(data));
+    if (
+      this.options.advancedMode &&
+      this.metas.currentSearchIndexingId &&
+      this.metas.currentSearchIndexingCount !== undefined
+    ) {
+      actions.push(
+        this.addSearchIndexingItem(
+          data,
+          this.metas.currentSearchIndexingId,
+          this.metas.currentSearchIndexingCount
+        )
+      );
     }
     // run actions
     return combineLatest(actions).pipe(map(() => true));
@@ -900,46 +886,39 @@ export class DatabaseData<Type> {
     ]);
   }
 
-  private addSearchIndexingItem(data: Type | NullableOptional<Type>) {
-    const { currentSearchIndexingId, currentSearchIndexingCount } = this.metas;
+  private addSearchIndexingItem(
+    data: Type | NullableOptional<Type>,
+    currentSearchIndexingId: string,
+    currentSearchIndexingCount: number,
+  ) {
     const indexingItemId = (data as any).id as string;
     const indexingItem = this.buildSearchIndexingItem(data);
-    // first item
-    if (!currentSearchIndexingId || !currentSearchIndexingCount) {
+    // add to current indexing
+    if (currentSearchIndexingCount < 1000) {
+      return combineLatest([
+        this.databaseService.update(
+          `metas/${currentSearchIndexingId}`,
+          {
+            updatedAt: new Date().toISOString(),
+            [`value.items.${indexingItemId}`]: indexingItem,
+          }
+        ),
+        this.databaseService.update(
+          `metas/${this.name}`,
+          {
+            'value.currentSearchIndexingCount': this.databaseService.getValueIncrement(),
+          }
+        )
+        .pipe(tap(() => (this.metas.currentSearchIndexingCount as number)++))
+      ]);
+    }
+    // create new indexing adnd add item
+    else {
       return this.createSearchIndexing(
         indexingItemId,
         indexingItem,
+        currentSearchIndexingId,
       );
-    }
-    // add item
-    else {
-      // to current indexing
-      if (currentSearchIndexingCount < 1000) {
-        return combineLatest([
-          this.databaseService.update(
-            `metas/${currentSearchIndexingId}`,
-            {
-              updatedAt: new Date().toISOString(),
-              [`value.items.${indexingItemId}`]: indexingItem,
-            }
-          ),
-          this.databaseService.update(
-            `metas/${this.name}`,
-            {
-              'value.currentSearchIndexingCount': this.databaseService.getValueIncrement(),
-            }
-          )
-          .pipe(tap(() => (this.metas.currentSearchIndexingCount as number)++))
-        ]);
-      }
-      // new indexing
-      else {
-        return this.createSearchIndexing(
-          indexingItemId,
-          indexingItem,
-          currentSearchIndexingId,
-        );
-      }
     }
   }
 
