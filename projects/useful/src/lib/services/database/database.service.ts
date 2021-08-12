@@ -336,9 +336,25 @@ export type DatabaseDataSearchIndexingItemBuilder = (data: any) => DatabaseDataS
 export type DatabaseDataSearchIndexingUpdateChecker = (data: any) => boolean;
 
 export interface DatabaseDataCollectionMetas {
-  documentCount?: number;
-  currentSearchIndexingId?: string;
-  currentSearchIndexingCount?: number;
+  documentCounting?: {
+    // group by type
+    [type: string]: {
+      // group by locale
+      [locale: string]: {
+        // count by status
+        [status: string]: number;
+      };
+    };
+  };
+  searchIndexing?: {
+    currentId: string;
+    map: {
+      [id: string]: {
+        count: number;
+        nextId?: string;
+      };
+    };
+  };
 }
 
 export interface DatabaseDataSearchIndexingItem {
@@ -414,7 +430,7 @@ export class DatabaseData<Type> {
 
   private loadMetas() {
     this.databaseService
-    .getDoc<Meta>(`metas/${this.name}`, undefined, this.options.metaCaching)
+    .getDoc<Meta>(`metas/$${this.name}`, undefined, this.options.metaCaching)
     .subscribe(metaDoc =>
       this.metas = (!metaDoc ? {} : metaDoc.value) as DatabaseDataCollectionMetas
     );
@@ -511,6 +527,53 @@ export class DatabaseData<Type> {
     )
   }
 
+  count(type?: string, locale?: string, status?: string) {
+    if (!this.options.advancedMode || !this.metas.documentCounting) {
+      throw new Error('Counting only work when enabling "advancedMode" option with a proper setup.');
+    }
+    const { documentCounting } = this.metas;
+    // all
+    if (!type) {
+      let count = 0;
+      Object.keys(documentCounting).forEach(type =>
+        Object.keys(documentCounting[type]).forEach(locale =>
+          Object.keys(documentCounting[type][locale]).forEach(status =>
+            count += documentCounting[type][locale][status]
+          )
+        )
+      );
+      return count;
+    }
+    // by type
+    else {
+      // all locales
+      if (!locale) {
+        let count = 0;
+        Object.keys(documentCounting[type]).forEach(locale =>
+          Object.keys(documentCounting[type][locale]).forEach(status =>
+            count += documentCounting[type][locale][status]
+          )
+        );
+        return count;
+      }
+      // by locale
+      else {
+        // all statuses
+        if (!status) {
+          let count = 0;
+          Object.keys(documentCounting[type][locale]).forEach(status =>
+            count += documentCounting[type][locale][status]
+          );
+          return count;
+        }
+        // by status
+        else {
+          return documentCounting[type][locale][status];
+        }
+      }
+    }
+  }
+
   exists(idOrQuery: string | QueryFn) {
     return typeof idOrQuery === 'string'
       ? this.databaseService.exists(`${this.name}/${idOrQuery}`)
@@ -531,7 +594,7 @@ export class DatabaseData<Type> {
   ) {
     const actions: Array<Observable<any>> = [];
     // main action
-    const { userService } = this.databaseService.getIntegrations();
+    const { settingService, userService } = this.databaseService.getIntegrations();
     const uid = (item as any).uid as string || ((!userService || !userService.uid) ? '' : userService.uid);
     const title = (item as any).title as string || id;
     const status = (item as any).status as string || 'draft';
@@ -552,48 +615,65 @@ export class DatabaseData<Type> {
       this.databaseService.set(`${this.name}/${id}`, data)
     );
     // update document count
-    if (
-      this.options.advancedMode
-      && this.metas.documentCount !== undefined
-    ) {
+    if (this.options.advancedMode && this.metas.documentCounting) {
+      const locale = (item as any).locale as string || settingService?.locale || 'en-US';
       actions.push(
-        this.databaseService.update(
-          `metas/${this.name}`,
-          { 'value.documentCount': this.databaseService.getValueIncrement() }
-        )
+        this.databaseService.update(`metas/$${this.name}`, {
+          [`value.documentCounting.${type}.${locale}.${status}`]:
+            this.databaseService.getValueIncrement()
+        })
         .pipe(
-          tap(() => ++(this.metas.documentCount as number))
+          tap(() => ++((this.metas.documentCounting as any)[type][locale][status]))
         )
       );
     }
     // add search indexing item
-    if (
-      this.options.advancedMode &&
-      this.metas.currentSearchIndexingId &&
-      this.metas.currentSearchIndexingCount !== undefined
-    ) {
+    if (this.options.advancedMode && this.metas.searchIndexing) {
       actions.push(
-        this.addSearchIndexingItem(
-          data,
-          this.metas.currentSearchIndexingId,
-          this.metas.currentSearchIndexingCount
-        )
+        this.addSearchIndexingItem(data)
       );
     }
     // run actions
     return combineLatest(actions).pipe(map(() => true));
   }
 
-  update(id: string, data: Partial<Type> | NullableOptional<Partial<Type>>) {
+  update(
+    id: string,
+    data: Partial<Type> | NullableOptional<Partial<Type>>,
+    currentData?: Type,
+  ) {
     const actions: Array<Observable<any>> = [];
     // main action
-    const updatedAt = (data as any).updatedAt as string || new Date().toISOString();
+    const updatedAt = (data as any).updatedAt as undefined | string || new Date().toISOString();
     const updateData = { ...data, updatedAt } as Partial<Type> | NullableOptional<Partial<Type>>;
     actions.push(
       this.databaseService.update(`${this.name}/${id}`, updateData)
     );
+    // update count
+    const newStatus = (data as any).status as undefined | string;
+    if (this.options.advancedMode && this.metas.documentCounting && newStatus && currentData) {
+      const type = (currentData as any).type as string;
+      const locale = (currentData as any).locale as string;
+      const status = (currentData as any).status as string;
+      if (newStatus !== status) {
+        actions.push(
+          this.databaseService.update(`metas/$${this.name}`, {
+            [`value.documentCounting.${type}.${locale}.${newStatus}`]:
+              this.databaseService.getValueIncrement(),
+            [`value.documentCounting.${type}.${locale}.${status}`]:
+              this.databaseService.getValueIncrement(-1)
+          })
+          .pipe(
+            tap(() =>
+              ++((this.metas.documentCounting as any)[type][locale][newStatus]) &&
+              --((this.metas.documentCounting as any)[type][locale][status])
+            )
+          )
+        );
+      }
+    }
     // update search indexing item
-    if (this.options.advancedMode) {
+    if (this.options.advancedMode && this.metas.searchIndexing) {
       actions.push(this.updateSearchIndexingItem(id, updateData));
     }
     // run actions
@@ -670,32 +750,39 @@ export class DatabaseData<Type> {
     );
   }
 
-  trash(id: string) {
-    return this.update(id, {status: 'trash'} as unknown as Partial<Type>);
+  trash(id: string, currentData?: Type) {
+    return this.update(id, {status: 'trash'} as unknown as Partial<Type>, currentData);
   }
 
   trashEffects(id: string) {
     return this.updateEffects(id, {status: 'trash'} as unknown as Partial<Type>);
   }
 
-  delete(id: string) {
+  delete(id: string, currentData?: Type) {
     const actions: Array<Observable<any>> = [];
     // main action
     actions.push(
       this.databaseService.delete(`${this.name}/${id}`)
     );
-    // update collection meta document count
-    actions.push(
-      this.databaseService.update(
-        `metas/${this.name}`,
-        { 'value.documentCount': this.databaseService.getValueIncrement(-1) }
-      )
-      .pipe(
-        tap(() => this.metas.documentCount = (this.metas.documentCount || 1) - 1)
-      )
-    );
+    // update count
+    if (this.options.advancedMode && this.metas.documentCounting && currentData) {
+      const type = (currentData as any).type as string;
+      const locale = (currentData as any).locale as string;
+      const status = (currentData as any).status as string;
+      actions.push(
+        this.databaseService.update(`metas/$${this.name}`, {
+          [`value.documentCounting.${type}.${locale}.${status}`]:
+            this.databaseService.getValueIncrement(-1)
+        })
+        .pipe(
+          tap(() =>
+            --((this.metas.documentCounting as any)[type][locale][status])
+          ),
+        )
+      );
+    }
     // delete search indexing item
-    if (this.options.advancedMode) {
+    if (this.options.advancedMode && this.metas.searchIndexing) {
       actions.push(this.removeSearchIndexingItem(id));
     }
     // run actions
@@ -837,89 +924,27 @@ export class DatabaseData<Type> {
     return builder(data);
   }
 
-  private createSearchIndexing(
-    indexingItemId: string,
-    indexingItem: DatabaseDataSearchIndexingItem,
-    currentSearchIndexingId?: string,
-  ) {
-    const { userService } = this.databaseService.getIntegrations();
-    const uid = (!userService || !userService.uid) ? '' : userService.uid;
-    const indexingName = !currentSearchIndexingId
-      ? 'search-index-000'
-      : 'search-index-' +
-        ('000' + (+(currentSearchIndexingId.split('-').pop() as string) + 1)).substr(-3);
-    const id = `${this.name}:${indexingName}`;
-    const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
-    const data = {
-      uid,
-      id,
-      title: id,
-      status: 'publish',
-      type: 'default',
-      createdAt,
-      updatedAt,
-      group: 'search_index',
-      master: this.name,
-      value: {
-        items: {
-          [indexingItemId]: indexingItem,
-        }
-      }
-    } as Meta;
-    return combineLatest([
-      this.databaseService.set(`metas/${id}`, data),
-      this.databaseService
-        .update(
-          `metas/${this.name}`,
-          {
-            'value.currentSearchIndexingId': id,
-            'value.currentSearchIndexingCount': 1
-          }
-        )
-        .pipe(
-          tap(() => {
-            this.metas.currentSearchIndexingId = id;
-            this.metas.currentSearchIndexingCount = 1;
-          })
-        )
-    ]);
-  }
-
-  private addSearchIndexingItem(
-    data: Type | NullableOptional<Type>,
-    currentSearchIndexingId: string,
-    currentSearchIndexingCount: number,
-  ) {
+  private addSearchIndexingItem(data: Type | NullableOptional<Type>) {
     const indexingItemId = (data as any).id as string;
     const indexingItem = this.buildSearchIndexingItem(data);
-    // add to current indexing
-    if (currentSearchIndexingCount < 1000) {
-      return combineLatest([
-        this.databaseService.update(
-          `metas/${currentSearchIndexingId}`,
-          {
-            updatedAt: new Date().toISOString(),
-            [`value.items.${indexingItemId}`]: indexingItem,
-          }
-        ),
-        this.databaseService.update(
-          `metas/${this.name}`,
-          {
-            'value.currentSearchIndexingCount': this.databaseService.getValueIncrement(),
-          }
-        )
-        .pipe(tap(() => (this.metas.currentSearchIndexingCount as number)++))
-      ]);
+    // next indexing
+    if (currentSearchIndexingCount >= 1000) {
+      currentSearchIndexingId = `${this.name}:search-index-` + ('0000000' + (+(currentSearchIndexingId.split('-').pop() as string) + 1)).substr(-7);
+      this.metas.currentSearchIndexingId = currentSearchIndexingId;
+      this.metas.currentSearchIndexingCount = 0;
     }
-    // create new indexing adnd add item
-    else {
-      return this.createSearchIndexing(
-        indexingItemId,
-        indexingItem,
-        currentSearchIndexingId,
-      );
-    }
+    // save item and increase the count
+    return combineLatest([
+      this.databaseService.update(`metas/${currentSearchIndexingId}`, {
+        updatedAt: new Date().toISOString(),
+        [`value.items.${indexingItemId}`]: indexingItem,
+      }),
+      this.databaseService.update(`metas/$${this.name}`, {
+        'value.currentSearchIndexingCount': currentSearchIndexingCount >= 1000
+          ? 1
+          : this.databaseService.getValueIncrement(),
+      }).pipe(tap(() => (this.metas.currentSearchIndexingCount as number)++)),
+    ]);
   }
 
   private updateSearchIndexingItem(
