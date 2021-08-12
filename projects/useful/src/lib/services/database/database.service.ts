@@ -362,8 +362,15 @@ export interface DatabaseDataSearchIndexing {
 export type DatabaseDataContextualIndexPicker = (localIndexingItem?: DatabaseDataSearchIndexingLocalItem) => boolean;
 
 export interface FlexsearchDocumentIndex {
-  add: (doc: any) => any;
+  add: (doc: Record<string, any>) => any;
   search: (query: string, ...args: any[]) => Array<{result: number[]}>;
+}
+
+export interface DatabaseDataSearchingData {
+  indexingKeys: string[];
+  indexingItems: Record<string, DatabaseDataSearchIndexingLocalItem>;
+  defaultIndex: FlexsearchDocumentIndex;
+  contextualIndexes: Record<string, FlexsearchDocumentIndex>;
 }
 
 export interface DatabaseDataUpdateEffect {
@@ -404,6 +411,14 @@ export class DatabaseData<Type> {
     }
     return this as DatabaseData<Type>;
   }
+
+  private loadMetas() {
+    this.databaseService
+    .getDoc<Meta>(`metas/${this.name}`, undefined, this.options.metaCaching)
+    .subscribe(metaDoc =>
+      this.metas = (!metaDoc ? {} : metaDoc.value) as DatabaseDataCollectionMetas
+    );
+  }
   
   getMetas() {
     return this.metas;
@@ -415,19 +430,11 @@ export class DatabaseData<Type> {
       indexingItems: this.searchIndexingItems,
       defaultIndex: this.defaultIndex,
       contextualIndexes: this.contextualIndexes,
-    };
+    } as DatabaseDataSearchingData;
   }
 
   getLinkingFields() {
     return [...(this.options.linkingFields || []), ...this.minimumLinkingFields];
-  }
-
-  private loadMetas() {
-    this.databaseService
-    .getDoc<Meta>(`metas/${this.name}`, undefined, this.options.metaCaching)
-    .subscribe(metaDoc =>
-      this.metas = (!metaDoc ? {} : metaDoc.value) as DatabaseDataCollectionMetas
-    );
   }
 
   setupSearching(noDefaultIndexing = false) {
@@ -545,15 +552,44 @@ export class DatabaseData<Type> {
       this.databaseService.set(`${this.name}/${id}`, data)
     );
     // update collection meta document count
-    actions.push(
-      this.databaseService.update(
-        `metas/${this.name}`,
-        { 'value.documentCount': this.databaseService.getValueIncrement() }
-      )
-      .pipe(
-        tap(() => this.metas.documentCount = (this.metas.documentCount || 0) + 1)
-      )
-    );
+    if (this.options.advancedMode) {
+      if (this.metas.documentCount === undefined) {
+        const { userService } = this.databaseService.getIntegrations();
+        const uid = (!userService || !userService.uid) ? '' : userService.uid;
+        const id = this.name;
+        const createdAt = new Date().toISOString();
+        const updatedAt = createdAt;
+        const data = {
+          uid,
+          id,
+          title: id,
+          status: 'publish',
+          type: 'default',
+          createdAt,
+          updatedAt,
+          group: 'collection_meta',
+          master: this.name,
+          value: {
+            documentCount: 1,
+          }
+        } as Meta;
+        actions.push(
+          this.databaseService.set(`metas/${id}`, data).pipe(
+            tap(() => this.metas = data.value)
+          )
+        );
+      } else {
+        actions.push(
+          this.databaseService.update(
+            `metas/${this.name}`,
+            { 'value.documentCount': this.databaseService.getValueIncrement() }
+          )
+          .pipe(
+            tap(() => this.metas.documentCount = (this.metas.documentCount || 0) + 1)
+          )
+        );
+      }
+    }
     // add search indexing item
     if (this.options.advancedMode) {
       actions.push(this.addSearchIndexingItem(data));
@@ -584,7 +620,7 @@ export class DatabaseData<Type> {
   ): Observable<DatabaseDataEffectedTask> {
     // check effected
     const effectedProps = this.getLinkingFields().filter(prop => !!(data as any)[prop]);
-    if (!effectedProps.length) {
+    if (!effectedProps.length || !this.options.updateEffects?.length) {
       return of({ count: 0, percentage$: of(100) });
     }
     // get data
@@ -602,7 +638,7 @@ export class DatabaseData<Type> {
     // update all effected
     const allEffects = [] as Observable<any>[];
     return combineLatest(
-      (this.options.updateEffects || []).map(({ collection: collectionName, key: effectedKey }, i) =>
+      this.options.updateEffects.map(({ collection: collectionName, key: effectedKey }, i) =>
         this.databaseService.collection<firebase.firestore.DocumentData>(
           collectionName,
           ref => ref.where(`${effectedKey}.${id}.id`, '==', id)
@@ -745,15 +781,17 @@ export class DatabaseData<Type> {
   }
 
   getItems(ids: string[], caching?: false | CacheConfig, itemTimeout = 7000) {
-    return combineLatest(
-      ids.map(id =>
-        this.getDoc(id, caching).pipe(
-          timeout(itemTimeout),
-          catchError(() => of(null)),
+    return !ids.length
+      ? of([])
+      : combineLatest(
+        ids.map(id =>
+          this.getDoc(id, caching).pipe(
+            timeout(itemTimeout),
+            catchError(() => of(null)),
+          )
         )
       )
-    )
-    .pipe(map(items => items.filter(item => !!item)));
+      .pipe(map(items => items.filter(item => !!item)));
   }
 
   lookup(keyword: string, limit = 10, lastItem?: Type, caching: false | CacheConfig = false) {
