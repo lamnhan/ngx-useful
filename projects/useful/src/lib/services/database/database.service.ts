@@ -336,28 +336,32 @@ export type DatabaseDataSearchIndexingItemBuilder = (data: any) => DatabaseDataS
 export type DatabaseDataSearchIndexingUpdateChecker = (data: any) => boolean;
 
 export interface DatabaseDataCollectionMetas {
-  documentCounting?: {
-    // group by type
-    [type: string]: {
-      // group by locale
-      [locale: string]: {
-        // count by status
-        [status: string]: number;
-      };
-    };
-  };
-  searchIndexing?: {
-    currentId: string;
-    map: {
-      [id: string]: {
-        count: number;
-        nextId?: string;
-      };
+  documentCounting?: DatabaseDataCollectionMetaDocumentCouting;
+  searchIndexing?: DatabaseDataCollectionMetaSearchIndexing;
+}
+
+export interface DatabaseDataCollectionMetaDocumentCouting {
+  // group by type
+  [type: string]: {
+    // group by locale
+    [locale: string]: {
+      // count by status
+      [status: string]: number;
     };
   };
 }
 
-export interface DatabaseDataSearchIndexingItem {
+export interface DatabaseDataCollectionMetaSearchIndexing {
+  currentId: string;
+  map: {
+    [id: string]: {
+      count: number;
+      nextId?: string;
+    };
+  };
+}
+
+  export interface DatabaseDataSearchIndexingItem {
   content: string;
   createdAt: string;
   type: string;
@@ -630,7 +634,7 @@ export class DatabaseData<Type> {
     // add search indexing item
     if (this.options.advancedMode && this.metas.searchIndexing) {
       actions.push(
-        this.addSearchIndexingItem(data)
+        this.addSearchIndexingItem(data, this.metas.searchIndexing)
       );
     }
     // run actions
@@ -924,26 +928,35 @@ export class DatabaseData<Type> {
     return builder(data);
   }
 
-  private addSearchIndexingItem(data: Type | NullableOptional<Type>) {
-    const indexingItemId = (data as any).id as string;
-    const indexingItem = this.buildSearchIndexingItem(data);
-    // next indexing
-    if (currentSearchIndexingCount >= 1000) {
-      currentSearchIndexingId = `${this.name}:search-index-` + ('0000000' + (+(currentSearchIndexingId.split('-').pop() as string) + 1)).substr(-7);
-      this.metas.currentSearchIndexingId = currentSearchIndexingId;
-      this.metas.currentSearchIndexingCount = 0;
+  private addSearchIndexingItem(
+    data: Type | NullableOptional<Type>,
+    searchIndexing: DatabaseDataCollectionMetaSearchIndexing,
+  ) {
+    // get the current indexing id
+    const { currentId, map } = searchIndexing;
+    const { count, nextId } = map[currentId];
+    const indexingId = count < 1000 ? currentId : nextId ? nextId: undefined; 
+    // maximum reached and no next indexing found
+    if (!indexingId) {
+      return of([] as unknown as [void, void]);
     }
     // save item and increase the count
+    const indexingItemId = (data as any).id as string;
+    const indexingItem = this.buildSearchIndexingItem(data);
     return combineLatest([
-      this.databaseService.update(`metas/${currentSearchIndexingId}`, {
+      this.databaseService.update(`metas/${indexingId}`, {
         updatedAt: new Date().toISOString(),
         [`value.items.${indexingItemId}`]: indexingItem,
       }),
       this.databaseService.update(`metas/$${this.name}`, {
-        'value.currentSearchIndexingCount': currentSearchIndexingCount >= 1000
-          ? 1
-          : this.databaseService.getValueIncrement(),
-      }).pipe(tap(() => (this.metas.currentSearchIndexingCount as number)++)),
+        [`value.searchIndexing.map.${indexingId}.count`]: this.databaseService.getValueIncrement(),
+      })
+      .pipe(
+        tap(() => {
+          (this.metas.searchIndexing as DatabaseDataCollectionMetaSearchIndexing).currentId = indexingId;
+          ++((this.metas.searchIndexing as DatabaseDataCollectionMetaSearchIndexing).map[indexingId].count);
+        }),
+      ),
     ]);
   }
 
