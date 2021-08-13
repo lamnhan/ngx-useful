@@ -340,7 +340,7 @@ export type DatabaseDataContextualIndexPicker = (localIndexingItem?: DatabaseDat
 
 export interface DatabaseDataItemMetaRegistry {
   group: string;
-  value: any;
+  valueBuilder: (id: string, docData: any, selfData: Meta) => Observable<any>;
 }
 
 export interface DatabaseDataCollectionMetas {
@@ -450,6 +450,28 @@ export class DatabaseData<Type> {
     return this.metas;
   }
 
+  getCounting(type?: string, locale?: string) {
+    if (!this.options.advancedMode || !this.metas.documentCounting) {
+      throw new Error('Counting only work when enabling "advancedMode" option with a proper setup.');
+    }
+    const { documentCounting } = this.metas;
+    // all
+    if (!type) {
+      return documentCounting;
+    }
+    // by type
+    else {
+      // all locales
+      if (!locale) {
+        return documentCounting[type];
+      }
+      // by locale
+      else {
+        return documentCounting[type][locale];
+      }
+    }
+  }
+
   getSearchingData() {
     return {
       indexingKeys: this.searchIndexingKeys,
@@ -538,10 +560,7 @@ export class DatabaseData<Type> {
   }
 
   count(type?: string, locale?: string, status?: string) {
-    if (!this.options.advancedMode || !this.metas.documentCounting) {
-      throw new Error('Counting only work when enabling "advancedMode" option with a proper setup.');
-    }
-    const { documentCounting } = this.metas;
+    const documentCounting = this.getCounting() as DatabaseDataCollectionMetaDocumentCouting;
     // all
     if (!type) {
       let count = 0;
@@ -627,7 +646,7 @@ export class DatabaseData<Type> {
     // create metas
     if (this.options.advancedMode && this.options.docMetaRegistry) {
       actions.push(
-        this.addDocMetas(id, this.options.docMetaRegistry)
+        this.addDocMetas(id, data, this.options.docMetaRegistry)
       );
     }
     // update document count
@@ -1044,14 +1063,22 @@ export class DatabaseData<Type> {
     );
   }
 
-  private addDocMetas(id: string, registry: Record<string, DatabaseDataItemMetaRegistry>) {
-    const actions: Array<Observable<any>> = Object.keys(registry).map(metaName => {
+  private addDocMetas(
+    id: string,
+    docData: Type | NullableOptional<Type>,
+    docMetaRegistry: Record<string, DatabaseDataItemMetaRegistry>
+  ) {
+    const actions: Array<Observable<any>> = Object.keys(docMetaRegistry).map(metaName => {
+      const {
+        group: metaGroup,
+        valueBuilder: metaValueBuilder,
+      } = docMetaRegistry[metaName];
       const { userService } = this.databaseService.getIntegrations();
       const uid = ((!userService || !userService.uid) ? '' : userService.uid);
       const metaId = `${id}_${this.name}_${metaName}`;
       const createdAt = new Date().toISOString();
       const updatedAt = createdAt;
-      const data: Meta = {
+      const selfData: Meta = {
         uid,
         id: metaId,
         title: id,
@@ -1060,10 +1087,14 @@ export class DatabaseData<Type> {
         createdAt,
         updatedAt,
         master: `${this.name}#${id}`,
-        group: registry[metaName].group,
-        value: registry[metaName].value,
+        group: metaGroup,
+        value: null,
       };
-      return this.databaseService.set(`metas/${id}`, data);
+      return metaValueBuilder(id, docData, selfData).pipe(
+        switchMap(metaValue => {
+          return this.databaseService.set(`metas/${id}`, { ...selfData, value: metaValue });
+        }),
+      );
     });
     return combineLatest(actions);
   }
