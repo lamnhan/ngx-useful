@@ -433,20 +433,23 @@ export class DatabaseData<Type> {
 
   init() {
     if (this.options.advancedMode) {
-      this.loadMetas();
+      this.databaseService
+      .getDoc<Meta>(`metas/$${this.name}`, undefined, this.options.metaCaching)
+      .subscribe(metaDoc =>
+        this.metas = (!metaDoc ? {} : metaDoc.value) as DatabaseDataCollectionMetas
+      );
     }
     return this as DatabaseData<Type>;
   }
 
-  private loadMetas() {
-    this.databaseService
-    .getDoc<Meta>(`metas/$${this.name}`, undefined, this.options.metaCaching)
-    .subscribe(metaDoc =>
-      this.metas = (!metaDoc ? {} : metaDoc.value) as DatabaseDataCollectionMetas
-    );
+  getLinkingFields() {
+    return [...(this.options.linkingFields || []), ...this.minimumLinkingFields];
   }
-  
+
   getMetas() {
+    if (!this.options.advancedMode || !Object.keys(this.metas).length) {
+      throw new Error('Metas only available when enabling "advancedMode" option with a proper setup.');
+    }
     return this.metas;
   }
 
@@ -473,16 +476,15 @@ export class DatabaseData<Type> {
   }
 
   getSearchingData() {
+    if (!this.options.advancedMode || !this.defaultIndex) {
+      throw new Error('Searching only available when enabling "advancedMode" option with a proper setup.');
+    }
     return {
       indexingKeys: this.searchIndexingKeys,
       indexingItems: this.searchIndexingItems,
       defaultIndex: this.defaultIndex,
       contextualIndexes: this.contextualIndexes,
     } as DatabaseDataSearchingData;
-  }
-
-  getLinkingFields() {
-    return [...(this.options.linkingFields || []), ...this.minimumLinkingFields];
   }
 
   setupSearching(noDefaultIndexing = false) {
