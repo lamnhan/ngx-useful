@@ -389,7 +389,7 @@ export interface DatabaseDataSearchIndexing {
 
 export interface FlexsearchDocumentIndex {
   add: (doc: Record<string, any>) => any;
-  search: (query: string, ...args: any[]) => Array<{result: number[]}>;
+  search: (query: string, ...args: any[]) => Array<undefined | {result: number[]}>;
 }
 
 export interface DatabaseDataSearchingData {
@@ -495,6 +495,7 @@ export class DatabaseData<Type> {
       'metas',
       ref => ref
         .where('master', '==', this.name)
+        .where('type', '==', 'default')
         .where('group', '==', 'search_index')
         .orderBy('createdAt', 'desc')
         .limit(3),
@@ -901,7 +902,9 @@ export class DatabaseData<Type> {
           )
         )
       )
-      .pipe(map(items => items.filter(item => !!item)));
+      .pipe(
+        map(items => items.filter(item => !!item) as Type[])
+      );
   }
 
   lookup(keyword: string, limit = 10, lastItem?: Type, caching: false | CacheConfig = false) {
@@ -924,8 +927,13 @@ export class DatabaseData<Type> {
     if (!index) {
       throw new Error('No index found, please run "setupSearching()" first.');
     }
-    const [{ result: searchResult }] = index.search(query);
-    return new DatabaseDataSearchResult<Type>(this, index, limit, searchResult);
+    const [contentFound] = index.search(query);
+    return new DatabaseDataSearchResult<Type>(
+      this,
+      index,
+      limit,
+      !contentFound ? [] : contentFound.result,
+    );
   }
 
   private buildSearchIndexingItem(data: Type | NullableOptional<Type>) {
@@ -1013,6 +1021,7 @@ export class DatabaseData<Type> {
         'metas',
         ref => ref
           .where('master', '==', this.name)
+          .where('type', '==', 'default')
           .where('group', '==', 'search_index')
           .where(`value.items.${id}.content`, '>', "''"),
         false
@@ -1037,6 +1046,7 @@ export class DatabaseData<Type> {
       'metas',
       ref => ref
         .where('master', '==', this.name)
+        .where('type', '==', 'default')
         .where('group', '==', 'search_index')
         .where(`value.items.${id}.content`, '>', "''"),
       false
