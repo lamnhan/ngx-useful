@@ -1013,21 +1013,28 @@ export class DatabaseData<Type> {
       return of(null);
     }
     // update
-    return combineLatest([
-      // load the updated doc
-      this.getDoc(id),
-      // load the indexing
-      this.databaseService.getDoc<Meta>(
-        'metas',
-        ref => ref
-          .where('master', '==', this.name)
-          .where('type', '==', 'default')
-          .where('group', '==', 'search_index')
-          .where(`value.items.${id}.content`, '>', "''"),
-        false
-      ),
-    ])
+    return this.getDoc(id)
     .pipe(
+      switchMap(item => !item
+        ? of([])
+        : combineLatest([
+          of(item),
+          this.databaseService.getCollection<Meta>(
+            'metas',
+            ref => ref
+              .where('master', '==', this.name)
+              .where('type', '==', 'default')
+              .where('group', '==', 'search_index')
+              .where('createdAt', '<=', (item as any).createdAt)
+              .orderBy('createdAt', 'desc')
+              .limit(1),
+            false
+          )
+          .pipe(
+            map(metaDocs => metaDocs[0]),
+          )
+        ])
+      ),
       switchMap(([item, metaDoc]) => !item || !metaDoc
         ? of(null) // something went wrong
         : this.databaseService.update(
@@ -1042,16 +1049,25 @@ export class DatabaseData<Type> {
   }
 
   private removeSearchIndexingItem(id: string) {
-    return this.databaseService.getDoc<Meta>(
-      'metas',
-      ref => ref
-        .where('master', '==', this.name)
-        .where('type', '==', 'default')
-        .where('group', '==', 'search_index')
-        .where(`value.items.${id}.content`, '>', "''"),
-      false
-    )
+    return this.getDoc(id)
     .pipe(
+      switchMap(item => !item
+        ? of(undefined)
+        : this.databaseService.getCollection<Meta>(
+          'metas',
+          ref => ref
+            .where('master', '==', this.name)
+            .where('type', '==', 'default')
+            .where('group', '==', 'search_index')
+            .where('createdAt', '<=', (item as any).createdAt)
+            .orderBy('createdAt', 'desc')
+            .limit(1),
+          false
+        )
+        .pipe(
+          map(metaDocs => metaDocs[0]),
+        )
+      ),
       switchMap(metaDoc => !metaDoc
         ? of(null) // something went wrong
         : combineLatest([
