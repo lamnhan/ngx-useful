@@ -691,7 +691,11 @@ export class DatabaseData<Type> {
     const newStatus = (data as any).status as undefined | string;
     if (this.options.advancedMode && this.metas.documentCounting && newStatus && currentData) {
       const type = (currentData as any).type as string;
-      const locale = (currentData as any).locale as string;
+      const locale = (
+        (currentData as any).locale ||
+        this.databaseService.getIntegrations().settingService?.defaultLocale ||
+        'en-US'
+      ) as string;
       const status = (currentData as any).status as string;
       if (newStatus !== status) {
         actions.push(
@@ -805,7 +809,11 @@ export class DatabaseData<Type> {
     // update count
     if (this.options.advancedMode && this.metas.documentCounting && currentData) {
       const type = (currentData as any).type as string;
-      const locale = (currentData as any).locale as string;
+      const locale = (
+        (currentData as any).locale ||
+        this.databaseService.getIntegrations().settingService?.defaultLocale ||
+        'en-US'
+      ) as string;
       const status = (currentData as any).status as string;
       actions.push(
         this.databaseService.update(`metas/$${this.name}`, {
