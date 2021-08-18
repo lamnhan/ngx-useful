@@ -326,6 +326,7 @@ export interface DatabaseDataOptions {
   searchIndexingUpdateChecker?: DatabaseDataSearchIndexingUpdateChecker;
   predefinedContextuals?: Array<{ name: string, picker: DatabaseDataContextualIndexPicker }>;
   flexsearchOptions?: any;
+  maxSearchIndexes?: number;
   // linking and effect
   updateEffects?: DatabaseDataUpdateEffect[];
   linkingFields?: string[];
@@ -433,17 +434,27 @@ export class DatabaseData<Type> {
 
   init() {
     if (this.options.advancedMode) {
-      this.databaseService
-      .getDoc<Meta>(`metas/$${this.name}`, undefined, this.options.metaCaching)
-      .subscribe(metaDoc =>
+      this.getRemoteMetas(this.options.metaCaching).subscribe(metaDoc =>
         this.metas = (!metaDoc ? {} : metaDoc.value) as DatabaseDataCollectionMetas
       );
     }
     return this as DatabaseData<Type>;
   }
 
+  getOptions() {
+    return this.options;
+  }
+
   getLinkingFields() {
     return [...(this.options.linkingFields || []), ...this.minimumLinkingFields];
+  }
+
+  getDataPickers() {
+    return this.options.effectDataPickers || {};
+  }
+
+  getRemoteMetas(caching?: false | CacheConfig) {
+    return this.databaseService.getDoc<Meta>(`metas/$${this.name}`, undefined, caching);
   }
 
   getMetas() {
@@ -487,6 +498,32 @@ export class DatabaseData<Type> {
     } as DatabaseDataSearchingData;
   }
 
+  createSearchIndex(
+    dataOptional?:
+      | DatabaseDataContextualIndexPicker
+      | DatabaseDataSearchIndexingLocalItem[]
+  ) {
+    // new index
+    const index = new Document({
+      document: { index: 'content' },
+      ...this.options.flexsearchOptions,
+    }) as FlexsearchDocumentIndex;
+    // add items
+    if (dataOptional) {
+      if (typeof dataOptional === 'function') {
+        this.searchIndexingKeys.forEach(key => {
+          if (dataOptional(this.searchIndexingItems[key])) {
+            index.add(this.searchIndexingItems[key]);
+          }
+        });
+      } else {
+        dataOptional.forEach(item => index.add(item));
+      }
+    }
+    // result
+    return index;
+  }
+
   setupSearching(noDefaultIndexing = false) {
     if (this.defaultIndex) {
       return of(this.getSearchingData());
@@ -498,26 +535,20 @@ export class DatabaseData<Type> {
         .where('type', '==', 'default')
         .where('group', '==', 'search_index')
         .orderBy('createdAt', 'desc')
-        .limit(3),
+        .limit(this.options.maxSearchIndexes || 3),
       this.options.searchingCaching !== undefined
         ? this.options.searchingCaching
         : !this.databaseService.isGlobalCachingEnabled()
-          ? false
-          : { name: 'All search indexes' },
+            ? false
+            : { name: 'Search indexes of collection: ' + this.name },
     )
     .pipe(
       map(metaItems => {
         // create the default index
-        this.defaultIndex = new Document({
-          document: { index: 'content' },
-          ...this.options.flexsearchOptions,
-        }) as FlexsearchDocumentIndex;
+        this.defaultIndex = this.createSearchIndex();
         // create the contextual indexes
         (this.options.predefinedContextuals || []).forEach(({name}) => {
-          this.contextualIndexes[name] = new Document({
-            document: { index: 'content' },
-            ...this.options.flexsearchOptions,
-          }) as FlexsearchDocumentIndex;
+          this.contextualIndexes[name] = this.createSearchIndex();
         });
         // process indexing items
         let indexId = 0;
@@ -716,7 +747,7 @@ export class DatabaseData<Type> {
     }
     // update search indexing item
     if (this.options.advancedMode && this.metas.searchIndexing) {
-      actions.push(this.updateSearchIndexingItem(id, updateData));
+      actions.push(this.updateSearchIndexingItem(id, updateData, currentData));
     }
     // run actions
     return combineLatest(actions).pipe(map(() => true));
@@ -829,7 +860,7 @@ export class DatabaseData<Type> {
     }
     // delete search indexing item
     if (this.options.advancedMode && this.metas.searchIndexing) {
-      actions.push(this.removeSearchIndexingItem(id));
+      actions.push(this.removeSearchIndexingItem(id, currentData));
     }
     // run actions
     return combineLatest(actions).pipe(map(() => true));
@@ -930,8 +961,12 @@ export class DatabaseData<Type> {
     );
   }
 
-  search(query: string, limit = 10, context?: string) {
-    const index = context ? this.contextualIndexes[context] : this.defaultIndex;
+  search(query: string, limit = 10, context?: string | FlexsearchDocumentIndex) {
+    const index = !context
+      ? this.defaultIndex
+      : typeof context === 'string'
+      ? this.contextualIndexes[context]
+      : context;
     if (!index) {
       throw new Error('No index found, please run "setupSearching()" first.');
     }
@@ -1011,7 +1046,8 @@ export class DatabaseData<Type> {
 
   private updateSearchIndexingItem(
     id: string,
-    data: Partial<Type> | NullableOptional<Partial<Type>>
+    data: Partial<Type> | NullableOptional<Partial<Type>>,
+    currentData?: Type,
   ) {
     const updateChecker: DatabaseDataSearchIndexingUpdateChecker =
       this.options.searchIndexingUpdateChecker ||
@@ -1021,7 +1057,7 @@ export class DatabaseData<Type> {
       return of(null);
     }
     // update
-    return this.getDoc(id)
+    return (currentData ? of(currentData) : this.getDoc(id))
     .pipe(
       switchMap(item => !item
         ? of([])
@@ -1049,15 +1085,15 @@ export class DatabaseData<Type> {
             `metas/${metaDoc.id}`,
             {
               updatedAt: new Date().toISOString(),
-              [`value.items.${id}`]: this.buildSearchIndexingItem(item),
+              [`value.items.${id}`]: this.buildSearchIndexingItem({...item, ...data}),
             }
           )
       )
     );
   }
 
-  private removeSearchIndexingItem(id: string) {
-    return this.getDoc(id)
+  private removeSearchIndexingItem(id: string, currentData?: Type) {
+    return (currentData ? of(currentData) : this.getDoc(id))
     .pipe(
       switchMap(item => !item
         ? of(undefined)
