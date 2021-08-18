@@ -486,6 +486,19 @@ export class DatabaseData<Type> {
     }
   }
 
+  getRemoteSearchIndexes(caching?: false | CacheConfig) {
+    return this.databaseService.getCollection<Meta>(
+      'metas',
+      ref => ref
+        .where('master', '==', this.name)
+        .where('type', '==', 'default')
+        .where('group', '==', 'search_index')
+        .orderBy('createdAt', 'desc')
+        .limit(this.options.maxSearchIndexes || 3),
+      caching,
+    );
+  }
+
   getSearchingData() {
     if (!this.options.advancedMode || !this.defaultIndex) {
       throw new Error('Searching only available when enabling "advancedMode" option with a proper setup.');
@@ -524,23 +537,18 @@ export class DatabaseData<Type> {
     return index;
   }
 
-  setupSearching(noDefaultIndexing = false) {
+  setupSearching(noDefaultIndexing = false, bypassCaching = false) {
     if (this.defaultIndex) {
       return of(this.getSearchingData());
     }
-    return this.databaseService.getCollection<Meta>(
-      'metas',
-      ref => ref
-        .where('master', '==', this.name)
-        .where('type', '==', 'default')
-        .where('group', '==', 'search_index')
-        .orderBy('createdAt', 'desc')
-        .limit(this.options.maxSearchIndexes || 3),
-      this.options.searchingCaching !== undefined
-        ? this.options.searchingCaching
-        : !this.databaseService.isGlobalCachingEnabled()
-            ? false
-            : { name: 'Search indexes of collection: ' + this.name },
+    return this.getRemoteSearchIndexes(
+      bypassCaching
+        ? false
+        : this.options.searchingCaching !== undefined
+          ? this.options.searchingCaching
+          : !this.databaseService.isGlobalCachingEnabled()
+              ? false
+              : { name: 'Search indexes of collection: ' + this.name },
     )
     .pipe(
       map(metaItems => {
