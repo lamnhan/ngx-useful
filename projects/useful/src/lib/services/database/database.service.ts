@@ -410,6 +410,13 @@ export interface DatabaseDataEffectedTask {
   percentage$: Observable<number>;
 }
 
+export interface DatabaseDataLookupInput {
+  keyword: string;
+  type: string;
+  status: string;
+  locale?: string;
+}
+
 export class DatabaseData<Type> {
   private metas: DatabaseDataCollectionMetas = {};
 
@@ -772,7 +779,6 @@ export class DatabaseData<Type> {
     }
     // get data
     const dataPickers = this.options.effectDataPickers || {};
-    const effectedStatus = (data as any).status as string;
     const effectedData = effectedProps.reduce(
       (result, prop) => {
         result[prop] = !dataPickers[prop]
@@ -783,6 +789,7 @@ export class DatabaseData<Type> {
       {} as Record<string, any>,
     );
     // update all effected
+    const effectedStatus = (data as any).status as undefined | string;
     const allEffects = [] as Observable<any>[];
     return combineLatest(
       this.options.updateEffects.map(({ collection: collectionName, key: effectedKey }, i) =>
@@ -954,12 +961,23 @@ export class DatabaseData<Type> {
       );
   }
 
-  lookup(keyword: string, limit = 10, lastItem?: Type, caching: false | CacheConfig = false) {
+  lookup(
+    input: DatabaseDataLookupInput,
+    limit = 10,
+    lastItem?: Type,
+    caching: false | CacheConfig = false
+  ) {
+    const { keyword, type, status, locale } = input;
     return this.getCollection(ref =>
       {
         let query = ref
+          .where('type', '==', type)
+          .where('status', '==', status)
           .where('keywords', 'array-contains', keyword)
           .orderBy('createdAt', 'desc');
+        if (locale) {
+          query = query.where('locale', '==', locale);
+        }
         if (lastItem) {
           query = query.startAfter((lastItem as any).createdAt);
         }
