@@ -322,8 +322,8 @@ export interface DatabaseDataOptions {
   metaCaching?: false | CacheConfig;
   // searching
   searchingCaching?: false | CacheConfig;
-  searchIndexingItemBuilder?: DatabaseDataSearchIndexingItemBuilder;
-  searchIndexingUpdateChecker?: DatabaseDataSearchIndexingUpdateChecker;
+  searchIndexingBuildItemExtender?: DatabaseDataSearchIndexingBuildItemExtender;
+  searchIndexingCheckUpdateExtender?: DatabaseDataSearchIndexingCheckUpdateExtender;
   predefinedContextuals?: Array<{ name: string, picker: DatabaseDataContextualIndexPicker }>;
   flexsearchOptions?: any;
   maxSearchIndexes?: number;
@@ -335,8 +335,8 @@ export interface DatabaseDataOptions {
   docMetaRegistry?: Record<string, DatabaseDataItemMetaRegistry>;
 }
 
-export type DatabaseDataSearchIndexingItemBuilder = (data: any) => DatabaseDataSearchIndexingItem;
-export type DatabaseDataSearchIndexingUpdateChecker = (data: any) => boolean;
+export type DatabaseDataSearchIndexingBuildItemExtender = (data: any) => Record<string, any>;
+export type DatabaseDataSearchIndexingCheckUpdateExtender = (data: any) => boolean;
 export type DatabaseDataContextualIndexPicker = (localIndexingItem?: DatabaseDataSearchIndexingLocalItem) => boolean;
 
 export interface DatabaseDataItemMetaRegistry {
@@ -1005,37 +1005,44 @@ export class DatabaseData<Type> {
     );
   }
 
-  private buildSearchIndexingItem(data: Type | NullableOptional<Type>) {
-    const builder: DatabaseDataSearchIndexingItemBuilder =
-      this.options.searchIndexingItemBuilder ||
-      (_data => {
-        const createdAt = _data.createdAt as string;
-        const type = _data.type as string;
-        const status = _data.status as string;
-        const locale = _data.locale as (undefined | string);
-        const content = (
-          ([
-            _data.id,
-            ...(_data.keywords || []),
-            ...(Object.keys(_data.authors || {})),
-            ...(Object.keys(_data.categories || {})),
-            ...(Object.keys(_data.tags || {})),
-          ] as string[])
-          .join(' ')
-        )
-        .replace(/\-|\_/g, ' ')
-        .toLowerCase();
-        const indexingItem = { content, createdAt, type, status, ...(!locale ? {} : {locale}) };
-        // check for size
-        const objectLength = JSON.stringify(indexingItem).length;
-        if (objectLength < 1000) {
-          return indexingItem;
-        } else {
-          const truncateContent = content.substr(0, content.length - (objectLength - 1000));
-          return { ...indexingItem, content: truncateContent };
-        }
-      });
-    return builder(data);
+  private buildSearchIndexingItem(data: any) {
+    const type = data.type as string;
+    const status = data.status as string;
+    const createdAt = data.createdAt as string;
+    const locale = data.locale as (undefined | string);
+    const content = (
+      ([
+        data.id,
+        ...(data.keywords || []),
+        ...(Object.keys(data.authors || {})),
+        ...(Object.keys(data.categories || {})),
+        ...(Object.keys(data.tags || {})),
+      ] as string[])
+      .join(' ')
+    )
+    .replace(/\-|\_/g, ' ')
+    .toLowerCase();
+    // combine data
+    const indexingItem = {
+      content,
+      type,
+      status,
+      createdAt,
+      ...(!locale ? {} : {locale}),
+      ...(
+        !this.options.searchIndexingBuildItemExtender
+          ? {}
+          : this.options.searchIndexingBuildItemExtender(data)
+      )
+    };
+    // check for size
+    const objectLength = JSON.stringify(indexingItem).length;
+    if (objectLength < 1000) {
+      return indexingItem;
+    } else {
+      const truncateContent = content.substr(0, content.length - (objectLength - 1000));
+      return { ...indexingItem, content: truncateContent };
+    }
   }
 
   private addSearchIndexingItem(
@@ -1075,11 +1082,11 @@ export class DatabaseData<Type> {
     data: Partial<Type> | NullableOptional<Partial<Type>>,
     currentData?: Type,
   ) {
-    const updateChecker: DatabaseDataSearchIndexingUpdateChecker =
-      this.options.searchIndexingUpdateChecker ||
-      (_data => (_data.status || _data.keywords));
+    const defaultUpdateChecker = (_data: any) => (_data.status || _data.keywords);
+    const extendedUpdateChecker = this.options.searchIndexingCheckUpdateExtender ||
+      ((_data: any) => false);
     // no update necessary
-    if (!updateChecker(data)) {
+    if (!defaultUpdateChecker(data) && !extendedUpdateChecker(data)) {
       return of(null);
     }
     // update
