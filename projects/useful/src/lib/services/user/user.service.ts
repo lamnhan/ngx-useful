@@ -25,6 +25,22 @@ export type ProfileDataService = DatabaseData<Profile>;
 
 export interface UserOptions {
   profilePublished?: boolean;
+  roleingRegistry?: Record<string, UserRoleing>;
+  rankingRegistry?: Record<string, UserRanking>;
+  badgingRegistry?: Record<string, UserBadging>;
+}
+
+export interface UserRoleing extends UserBadgeAlike {}
+
+export interface UserRanking extends UserBadgeAlike {}
+
+export interface UserBadging extends UserBadgeAlike {}
+
+interface UserBadgeAlike {
+  name: string;
+  title: string;
+  description?: string;
+  icon?: string;
 }
 
 @Injectable({
@@ -107,6 +123,30 @@ export class UserService {
     return this as UserService;
   }
 
+  getRoleingRegistry() {
+    return this.options.roleingRegistry || {};
+  }
+
+  getRoleing(name: string) {
+    return this.options.roleingRegistry?.[name];
+  }
+
+  getRankingRegistry() {
+    return this.options.rankingRegistry || {};
+  }
+
+  getRanking(name: string) {
+    return this.options.rankingRegistry?.[name];
+  }
+
+  getBadgingRegistry() {
+    return this.options.badgingRegistry || {};
+  }
+
+  getBadging(name: string) {
+    return this.options.badgingRegistry?.[name];
+  }
+
   allowedLevel(atLeast: number) {
     return this.level >= atLeast;
   }
@@ -125,12 +165,12 @@ export class UserService {
     return from(this.currentUser.sendEmailVerification());
   }
 
-  changeEmail(email: string) {
+  private changeEmail(email: string) {
     // TODO
     console.log('TODO: ...');
   }
 
-  changePhoneNumber(phoneNumber: string) {
+  private changePhoneNumber(phoneNumber: string) {
     // TODO
     console.log('TODO: ...');
   }
@@ -471,6 +511,7 @@ export class UserService {
       status: profilePublished ? 'publish' : 'draft',
       createdAt,
       updatedAt: createdAt,
+      role: 'subscriber',
       // custom fields
       ...(!profilePublished ? {} : this.getPublicProfileProperties(userDoc)),
     };
