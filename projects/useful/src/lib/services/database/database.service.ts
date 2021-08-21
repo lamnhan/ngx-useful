@@ -781,9 +781,12 @@ export class DatabaseData<Type> {
     const dataPickers = this.options.effectDataPickers || {};
     const effectedData = effectedProps.reduce(
       (result, prop) => {
-        result[prop] = !dataPickers[prop]
+        const value = !dataPickers[prop]
           ? (data as any)[prop]
           : dataPickers[prop]((data as any)[prop], data);
+        if (value) {
+          result[prop] = value;
+        }
         return result;
       },
       {} as Record<string, any>,
