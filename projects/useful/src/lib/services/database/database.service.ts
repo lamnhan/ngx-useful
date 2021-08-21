@@ -321,12 +321,12 @@ export interface DatabaseDataOptions {
   // meta
   metaCaching?: false | CacheConfig;
   // searching
-  searchingCaching?: false | CacheConfig;
+  searchCaching?: false | CacheConfig;
+  searchIndexingRetrievalLimit?: number;
   searchIndexingBuildItemExtender?: DatabaseDataSearchIndexingBuildItemExtender;
   searchIndexingCheckUpdateExtender?: DatabaseDataSearchIndexingCheckUpdateExtender;
-  predefinedContextuals?: Array<{ name: string, picker: DatabaseDataContextualIndexPicker }>;
+  predefinedSearchingContextuals?: Array<{ name: string, picker: DatabaseDataSearchingContextualPicker }>;
   flexsearchOptions?: any;
-  maxSearchIndexes?: number;
   // linking and effect
   updateEffects?: DatabaseDataUpdateEffect[];
   linkingFields?: string[];
@@ -337,7 +337,7 @@ export interface DatabaseDataOptions {
 
 export type DatabaseDataSearchIndexingBuildItemExtender = (data: any) => Record<string, any>;
 export type DatabaseDataSearchIndexingCheckUpdateExtender = (data: any) => boolean;
-export type DatabaseDataContextualIndexPicker = (localIndexingItem?: DatabaseDataSearchIndexingLocalItem) => boolean;
+export type DatabaseDataSearchingContextualPicker = (localIndexingItem?: DatabaseDataSearchIndexingLocalItem) => boolean;
 
 export interface DatabaseDataItemMetaRegistry {
   group: string;
@@ -501,7 +501,7 @@ export class DatabaseData<Type> {
         .where('type', '==', 'default')
         .where('group', '==', 'search_index')
         .orderBy('createdAt', 'desc')
-        .limit(this.options.maxSearchIndexes || 3),
+        .limit(this.options.searchIndexingRetrievalLimit || 3),
       caching,
     );
   }
@@ -520,7 +520,7 @@ export class DatabaseData<Type> {
 
   createSearchIndex(
     dataOptional?:
-      | DatabaseDataContextualIndexPicker
+      | DatabaseDataSearchingContextualPicker
       | DatabaseDataSearchIndexingLocalItem[]
   ) {
     // new index
@@ -551,8 +551,8 @@ export class DatabaseData<Type> {
     return this.getRemoteSearchIndexes(
       bypassCaching
         ? false
-        : this.options.searchingCaching !== undefined
-          ? this.options.searchingCaching
+        : this.options.searchCaching !== undefined
+          ? this.options.searchCaching
           : !this.databaseService.isGlobalCachingEnabled()
               ? false
               : { name: 'Search indexes of collection: ' + this.name },
@@ -562,7 +562,7 @@ export class DatabaseData<Type> {
         // create the default index
         this.defaultIndex = this.createSearchIndex();
         // create the contextual indexes
-        (this.options.predefinedContextuals || []).forEach(({name}) => {
+        (this.options.predefinedSearchingContextuals || []).forEach(({name}) => {
           this.contextualIndexes[name] = this.createSearchIndex();
         });
         // process indexing items
@@ -594,7 +594,7 @@ export class DatabaseData<Type> {
                 .add(this.searchIndexingItems[docId]);
             }
             // register contextual indexes
-            (this.options.predefinedContextuals || []).forEach(({name, picker}) => {
+            (this.options.predefinedSearchingContextuals || []).forEach(({name, picker}) => {
               if (picker(this.searchIndexingItems[docId])) {
                 (this.contextualIndexes[name] as FlexsearchDocumentIndex)
                   .add(this.searchIndexingItems[docId]);
