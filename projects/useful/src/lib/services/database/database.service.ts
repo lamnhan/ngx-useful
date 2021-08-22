@@ -341,7 +341,13 @@ export interface DatabaseDataOptions {
 export type DatabaseDataSearchIndexingBuildItemExtender = (data: any) => Record<string, any>;
 export type DatabaseDataSearchIndexingCheckUpdateExtender = (data: any) => boolean;
 export type DatabaseDataSearchingContextualPicker = (localIndexingItem?: DatabaseDataSearchIndexingLocalItem) => boolean;
-export type DatabaseDataLinkingHook = (mode: DatabaseDataLinkingMode, item: any, dataService: DatabaseData<any>) => Observable<any>;
+export type DatabaseDataLinkingHook =
+  (
+    mode: DatabaseDataLinkingMode,
+    item: any,
+    context: Record<string, any>,
+    dataService: DatabaseData<any>,
+  ) => Observable<any>;
 
 export interface DatabaseDataItemMetaRegistry {
   group: string;
@@ -398,10 +404,15 @@ export interface FlexsearchDocumentIndex {
 }
 
 export interface DatabaseDataSearchingData {
-  indexingKeys: string[];
-  indexingItems: Record<string, DatabaseDataSearchIndexingLocalItem>;
-  defaultIndex: FlexsearchDocumentIndex;
-  contextualIndexes: Record<string, FlexsearchDocumentIndex>;
+  keys: string[];
+  items: Record<string, DatabaseDataSearchIndexingLocalItem>;
+  default: DatabaseDataSearchingIndexData;
+  contextuals: Record<string, DatabaseDataSearchingIndexData>;
+}
+
+export interface DatabaseDataSearchingIndexData {
+  index: FlexsearchDocumentIndex;
+  keys: string[];
 }
 
 export interface DatabaseDataUpdateEffect {
@@ -430,8 +441,8 @@ export class DatabaseData<Type> {
   private searchIndexingItems: Record<string, DatabaseDataSearchIndexingLocalItem> = {};
   private lastSearchRetrieval?: Meta;
 
-  private defaultIndex?: FlexsearchDocumentIndex;
-  private contextualIndexes: Record<string, FlexsearchDocumentIndex> = {};
+  private defaultIndex?: DatabaseDataSearchingIndexData;
+  private contextualIndexes: Record<string, DatabaseDataSearchingIndexData> = {};
 
   private readonly minimumLinkingFields = ['id', 'title', 'type'];
 
@@ -500,15 +511,20 @@ export class DatabaseData<Type> {
     }
   }
 
-  getRemoteSearchIndexes(caching?: false | CacheConfig) {
+  getRemoteSearchIndexes(caching?: false | CacheConfig, lastItem?: Meta) {
     return this.databaseService.list<Meta>(
       'metas',
-      ref => ref
-        .where('master', '==', this.name)
-        .where('type', '==', 'default')
-        .where('group', '==', 'search_index')
-        .orderBy('createdAt', 'desc')
-        .limit(this.options.searchIndexingRetrievalLimit || 3),
+      ref => {
+        let query = ref
+          .where('master', '==', this.name)
+          .where('type', '==', 'default')
+          .where('group', '==', 'search_index')
+          .orderBy('createdAt', 'desc');
+        if (lastItem) {
+          query = query.startAfter(lastItem.createdAt);
+        }
+        return query.limit(this.options.searchIndexingRetrievalLimit || 3)
+      },
       caching,
     );
   }
@@ -518,10 +534,10 @@ export class DatabaseData<Type> {
       throw new Error('Searching only available when enabling "advancedMode" option with a proper setup.');
     }
     return {
-      indexingKeys: this.searchIndexingKeys,
-      indexingItems: this.searchIndexingItems,
-      defaultIndex: this.defaultIndex,
-      contextualIndexes: this.contextualIndexes,
+      keys: this.searchIndexingKeys,
+      items: this.searchIndexingItems,
+      default: this.defaultIndex,
+      contextuals: this.contextualIndexes,
       lastRetrieval: this.lastSearchRetrieval,
     } as DatabaseDataSearchingData;
   }
@@ -536,20 +552,25 @@ export class DatabaseData<Type> {
       document: { index: 'content' },
       ...this.options.flexsearchOptions,
     }) as FlexsearchDocumentIndex;
+    const keys = [] as string[];
     // add items
     if (dataOptional) {
       if (typeof dataOptional === 'function') {
-        this.searchIndexingKeys.forEach(key => {
-          if (dataOptional(this.searchIndexingItems[key])) {
-            index.add(this.searchIndexingItems[key]);
+        this.searchIndexingKeys.forEach(docId => {
+          if (dataOptional(this.searchIndexingItems[docId])) {
+            index.add(this.searchIndexingItems[docId]);
+            keys.push(docId);
           }
         });
       } else {
-        dataOptional.forEach(item => index.add(item));
+        dataOptional.forEach(item => {
+          index.add(item);
+          keys.push(item.docId);
+        });
       }
     }
     // result
-    return index;
+    return { index, keys };
   }
 
   setupSearching(noDefaultIndexing = false, bypassCaching = false) {
@@ -600,14 +621,22 @@ export class DatabaseData<Type> {
               status === 'publish' &&
               (!locale || !settingService || locale === settingService.locale)
             ) {
-              (this.defaultIndex as FlexsearchDocumentIndex)
+              (this.defaultIndex as DatabaseDataSearchingIndexData)
+                .index
                 .add(this.searchIndexingItems[docId]);
+              (this.defaultIndex as DatabaseDataSearchingIndexData)
+                .keys
+                .push(docId);
             }
             // register contextual indexes
             (this.options.predefinedSearchingContextuals || []).forEach(({name, picker}) => {
               if (picker(this.searchIndexingItems[docId])) {
-                (this.contextualIndexes[name] as FlexsearchDocumentIndex)
+                (this.contextualIndexes[name] as DatabaseDataSearchingIndexData)
+                  .index
                   .add(this.searchIndexingItems[docId]);
+                (this.contextualIndexes[name] as DatabaseDataSearchingIndexData)
+                  .keys
+                  .push(docId);
               }
             });
           });
@@ -662,11 +691,15 @@ export class DatabaseData<Type> {
     }
   }
 
-  onLinking(mode: DatabaseDataLinkingMode, item: Type): Observable<any> {
+  onLinking(
+    mode: DatabaseDataLinkingMode,
+    item: Type,
+    context: Record<string, any>
+  ): Observable<any> {
     if (!this.options.linkingHook) {
       return of(false);
     }
-    return this.options.linkingHook(mode, item, this);
+    return this.options.linkingHook(mode, item, context, this);
   }
 
   exists(idOrQuery: string | QueryFn) {
@@ -1037,19 +1070,19 @@ export class DatabaseData<Type> {
     );
   }
 
-  search(query: string, limit = 10, context?: string | FlexsearchDocumentIndex) {
-    const index = !context
+  search(query?: string, limit = 10, context?: string | DatabaseDataSearchingIndexData) {
+    const indexData = !context
       ? this.defaultIndex
       : typeof context === 'string'
       ? this.contextualIndexes[context]
       : context;
-    if (!index) {
+    if (!indexData) {
       throw new Error('No index found, please run "setupSearching()" first.');
     }
-    const [contentFound] = index.search(query);
+    const [contentFound] = !query ? [] : indexData.index.search(query);
     return new DatabaseDataSearchResult<Type>(
       this,
-      index,
+      indexData,
       limit,
       !contentFound ? [] : contentFound.result,
     );
@@ -1267,11 +1300,11 @@ export class DatabaseDataSearchResult<Type> {
 
   constructor(
     private dataService: DatabaseData<Type>,
-    private index: FlexsearchDocumentIndex,
+    private indexData: DatabaseDataSearchingIndexData,
     private limit: number,
     private searchResult: number[],
   ) {
-    const { indexingKeys } = this.dataService.getSearchingData();
+    const { keys: indexingKeys } = this.dataService.getSearchingData();
     this.indexingKeys = indexingKeys;
   }
 
@@ -1283,5 +1316,11 @@ export class DatabaseDataSearchResult<Type> {
     const offset = (page - 1) * this.limit;
     const ids = this.searchResult.slice(offset, offset + this.limit);
     return this.dataService.getItems(ids.map(id => this.indexingKeys[id]), itemCaching, itemTimeout);
+  }
+  
+  listDefault(page = 1, itemCaching?: false | CacheConfig, itemTimeout = 7000) {
+    const offset = (page - 1) * this.limit;
+    const keys = this.indexData.keys.slice(offset, offset + this.limit);
+    return this.dataService.getItems(keys, itemCaching, itemTimeout);
   }
 }
