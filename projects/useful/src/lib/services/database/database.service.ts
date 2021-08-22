@@ -113,8 +113,8 @@ export class DatabaseService {
 
   exists(path: string, queryFn?: QueryFn) {
     return !queryFn 
-      ? this.flatDoc(path).pipe(map(item => !!item))
-      : this.flatCollection(path, queryFn).pipe(map(items => !!(items || []).length));
+      ? this.flatGet(path).pipe(map(item => !!item))
+      : this.flatList(path, queryFn).pipe(map(items => !!(items || []).length));
   }
 
   doc<Type>(path: string) {
@@ -144,7 +144,7 @@ export class DatabaseService {
     return from(this.doc(path).delete());
   }
 
-  streamDoc<Type>(path: string, queryFn?: QueryFn) {
+  streamGet<Type>(path: string, queryFn?: QueryFn) {
     return new Observable<null | Type>(observer =>
       !queryFn
         ? this.doc<Type>(path).ref.onSnapshot(doc => observer.next(doc.data()))
@@ -154,7 +154,7 @@ export class DatabaseService {
     );
   }
 
-  streamCollection<Type>(path: string, queryFn?: QueryFn) {
+  streamList<Type>(path: string, queryFn?: QueryFn) {
     return new Observable<Type[]>(observer =>
       this.collection<Type>(path, queryFn).ref.onSnapshot(collection =>
         observer.next(collection.docs.map(doc => doc.data() as Type))
@@ -175,7 +175,7 @@ export class DatabaseService {
     );
   }
 
-  flatDoc<Type>(path: string, queryFn?: QueryFn): Observable<null | Type> {
+  flatGet<Type>(path: string, queryFn?: QueryFn): Observable<null | Type> {
     // try to get item from prerender data
     const docId = queryFn ? null : path.split('/').pop() as string;
     const prerenderStringifiedData =
@@ -196,7 +196,7 @@ export class DatabaseService {
       );
   }
 
-  flatCollection<Type>(path: string, queryFn?: QueryFn) {
+  flatList<Type>(path: string, queryFn?: QueryFn) {
     return this.collection<Type>(path, queryFn).get().pipe(
       take(1),
       map(collection => collection.docs.map(doc => doc.data())),
@@ -217,29 +217,29 @@ export class DatabaseService {
     );
   }
 
-  getDoc<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
+  get<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
     return caching === false
-    ? this.flatDoc<Type>(path, queryFn)
+    ? this.flatGet<Type>(path, queryFn)
     : this.cacheManager(
-      this.flatDoc<Type>(path, queryFn),
+      this.flatGet<Type>(path, queryFn),
       path,
       queryFn,
       caching,
     ) as Observable<null | Type>;
   }
 
-  getCollection<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
+  list<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
     return caching === false
-    ? this.flatCollection<Type>(path, queryFn)
+    ? this.flatList<Type>(path, queryFn)
     : this.cacheManager(
-      this.flatCollection<Type>(path, queryFn),
+      this.flatList<Type>(path, queryFn),
       path,
       queryFn,
       caching
     ) as Observable<Type[]>;
   }
 
-  getRecord<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
+  record<Type>(path: string, queryFn?: QueryFn, caching?: false | CacheConfig) {
     return caching === false
     ? this.flatRecord<Type>(path, queryFn)
     : this.cacheManager(
@@ -250,9 +250,9 @@ export class DatabaseService {
     ) as Observable<Record<string, Type>>;
   }
 
-  cachingDoc<Type>(path: string, queryFn?: QueryFn, caching?: CacheConfig) {
+  cachingGet<Type>(path: string, queryFn?: QueryFn, caching?: CacheConfig) {
     return this.cacheManager(
-      this.flatDoc<Type>(path, queryFn),
+      this.flatGet<Type>(path, queryFn),
       path,
       queryFn,
       caching,
@@ -260,9 +260,9 @@ export class DatabaseService {
     ) as Caching<null | Type>;
   }
 
-  cachingCollection<Type>(path: string, queryFn?: QueryFn, caching?: CacheConfig) {
+  cachingList<Type>(path: string, queryFn?: QueryFn, caching?: CacheConfig) {
     return this.cacheManager(
-      this.flatCollection<Type>(path, queryFn),
+      this.flatList<Type>(path, queryFn),
       path,
       queryFn,
       caching,
@@ -419,7 +419,7 @@ export interface DatabaseDataLookupInput {
   locale?: string;
 }
 
-export type DatabaseDataLinkingMode = 'add' | 'update' | 'delete';
+export type DatabaseDataLinkingMode = 'create' | 'update' | 'delete';
 
 export class DatabaseData<Type> {
   private metas: DatabaseDataCollectionMetas = {};
@@ -466,7 +466,7 @@ export class DatabaseData<Type> {
   }
 
   getRemoteMetas(caching?: false | CacheConfig) {
-    return this.databaseService.getDoc<Meta>(`metas/$${this.name}`, undefined, caching);
+    return this.databaseService.get<Meta>(`metas/$${this.name}`, undefined, caching);
   }
 
   getMetas() {
@@ -499,7 +499,7 @@ export class DatabaseData<Type> {
   }
 
   getRemoteSearchIndexes(caching?: false | CacheConfig) {
-    return this.databaseService.getCollection<Meta>(
+    return this.databaseService.list<Meta>(
       'metas',
       ref => ref
         .where('master', '==', this.name)
@@ -681,7 +681,7 @@ export class DatabaseData<Type> {
     return this.databaseService.collection<Type>(this.name, queryFn);
   }
 
-  add<AutoType extends Omit<Type, 'uid' | 'id' | 'title' | 'status' | 'type' | 'createdAt' | 'updatedAt'>>(
+  create<AutoType extends Omit<Type, 'uid' | 'id' | 'title' | 'status' | 'type' | 'createdAt' | 'updatedAt'>>(
     id: string,
     item: Type | AutoType | NullableOptional<Type | AutoType>
   ) {
@@ -907,56 +907,56 @@ export class DatabaseData<Type> {
     return this.databaseService.increment(`${this.name}/${id}`, data);
   }
 
-  streamDoc(idOrQuery: string | QueryFn) {
+  streamGet(idOrQuery: string | QueryFn) {
     return typeof idOrQuery === 'string'
-      ? this.databaseService.streamDoc<Type>(`${this.name}/${idOrQuery}`)
-      : this.databaseService.streamDoc<Type>(this.name, idOrQuery);
+      ? this.databaseService.streamGet<Type>(`${this.name}/${idOrQuery}`)
+      : this.databaseService.streamGet<Type>(this.name, idOrQuery);
   }
 
-  streamCollection(queryFn?: QueryFn) {
-    return this.databaseService.streamCollection<Type>(this.name, queryFn);
+  streamList(queryFn?: QueryFn) {
+    return this.databaseService.streamList<Type>(this.name, queryFn);
   }
 
   streamRecord(queryFn?: QueryFn) {
     return this.databaseService.streamRecord<Type>(this.name, queryFn);
   }
 
-  flatDoc(idOrQuery: string | QueryFn) {
+  flatGet(idOrQuery: string | QueryFn) {
     return typeof idOrQuery === 'string'
-      ? this.databaseService.flatDoc<Type>(`${this.name}/${idOrQuery}`)
-      : this.databaseService.flatDoc<Type>(this.name, idOrQuery);
+      ? this.databaseService.flatGet<Type>(`${this.name}/${idOrQuery}`)
+      : this.databaseService.flatGet<Type>(this.name, idOrQuery);
   }
 
-  flatCollection(queryFn?: QueryFn) {
-    return this.databaseService.flatCollection<Type>(this.name, queryFn);
+  flatList(queryFn?: QueryFn) {
+    return this.databaseService.flatList<Type>(this.name, queryFn);
   }
 
   flatRecord(queryFn?: QueryFn) {
     return this.databaseService.flatRecord<Type>(this.name, queryFn);
   }
 
-  getDoc(idOrQuery: string | QueryFn, caching?: false | CacheConfig) {
+  get(idOrQuery: string | QueryFn, caching?: false | CacheConfig) {
     return typeof idOrQuery === 'string'
-      ? this.databaseService.getDoc<Type>(`${this.name}/${idOrQuery}`, undefined, caching)
-      : this.databaseService.getDoc<Type>(this.name, idOrQuery, caching);
+      ? this.databaseService.get<Type>(`${this.name}/${idOrQuery}`, undefined, caching)
+      : this.databaseService.get<Type>(this.name, idOrQuery, caching);
   }
 
-  getCollection(queryFn?: QueryFn, caching?: false | CacheConfig) {
-    return this.databaseService.getCollection<Type>(this.name, queryFn, caching);
+  list(queryFn?: QueryFn, caching?: false | CacheConfig) {
+    return this.databaseService.list<Type>(this.name, queryFn, caching);
   }
 
-  getRecord(queryFn?: QueryFn, caching?: false | CacheConfig) {
-    return this.databaseService.getRecord<Type>(this.name, queryFn, caching);
+  record(queryFn?: QueryFn, caching?: false | CacheConfig) {
+    return this.databaseService.record<Type>(this.name, queryFn, caching);
   }
 
-  cachingDoc(idOrQuery: string | QueryFn, caching?: CacheConfig) {
+  cachingGet(idOrQuery: string | QueryFn, caching?: CacheConfig) {
     return typeof idOrQuery === 'string'
-      ? this.databaseService.cachingDoc<Type>(`${this.name}/${idOrQuery}`, undefined, caching)
-      : this.databaseService.cachingDoc<Type>(this.name, idOrQuery, caching);
+      ? this.databaseService.cachingGet<Type>(`${this.name}/${idOrQuery}`, undefined, caching)
+      : this.databaseService.cachingGet<Type>(this.name, idOrQuery, caching);
   }
 
-  cachingCollection(queryFn?: QueryFn, caching?: CacheConfig) {
-    return this.databaseService.cachingCollection<Type>(this.name, queryFn, caching);
+  cachingList(queryFn?: QueryFn, caching?: CacheConfig) {
+    return this.databaseService.cachingList<Type>(this.name, queryFn, caching);
   }
 
   cachingRecord(queryFn?: QueryFn, caching?: CacheConfig) {
@@ -968,7 +968,7 @@ export class DatabaseData<Type> {
       ? of([])
       : combineLatest(
         ids.map(id =>
-          this.getDoc(id, caching).pipe(
+          this.get(id, caching).pipe(
             timeout(itemTimeout),
             catchError(() => of(null)),
           )
@@ -986,7 +986,7 @@ export class DatabaseData<Type> {
     caching: false | CacheConfig = false
   ) {
     const { keyword, type, status, locale } = input;
-    return this.getCollection(ref =>
+    return this.list(ref =>
       {
         let query = ref
           .where('type', '==', type)
@@ -1108,13 +1108,13 @@ export class DatabaseData<Type> {
       return of(null);
     }
     // update
-    return (currentData ? of(currentData) : this.getDoc(id))
+    return (currentData ? of(currentData) : this.get(id))
     .pipe(
       switchMap(item => !item
         ? of([])
         : combineLatest([
           of(item),
-          this.databaseService.getCollection<Meta>(
+          this.databaseService.list<Meta>(
             'metas',
             ref => ref
               .where('master', '==', this.name)
@@ -1144,11 +1144,11 @@ export class DatabaseData<Type> {
   }
 
   private removeSearchIndexingItem(id: string, currentData?: Type) {
-    return (currentData ? of(currentData) : this.getDoc(id))
+    return (currentData ? of(currentData) : this.get(id))
     .pipe(
       switchMap(item => !item
         ? of(undefined)
-        : this.databaseService.getCollection<Meta>(
+        : this.databaseService.list<Meta>(
           'metas',
           ref => ref
             .where('master', '==', this.name)

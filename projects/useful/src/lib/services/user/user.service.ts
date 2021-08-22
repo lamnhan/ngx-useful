@@ -88,11 +88,11 @@ export class UserService {
             of(nativeUser),
             // get user doc
             nativeUser?.uid
-              ? this.userDataService.flatDoc(nativeUser.uid)
+              ? this.userDataService.flatGet(nativeUser.uid)
               : of(undefined),
             // get profile doc
             nativeUser?.uid
-              ? this.profileDataService.flatDoc(
+              ? this.profileDataService.flatGet(
                 ref => ref
                   .where('uid', '==', nativeUser.uid)
                   .where('type', '==', 'default')
@@ -491,7 +491,7 @@ export class UserService {
   private userInitializer(nativeUser: NativeUser, username: string) {
     const {uid} = nativeUser;
     const userDoc = {uid, username} as User;
-    return this.userDataService.add(uid, userDoc).pipe(
+    return this.userDataService.create(uid, userDoc).pipe(
       switchMap(() => this.proccessUserData(nativeUser, userDoc)),
     );
   }
@@ -515,7 +515,7 @@ export class UserService {
       // custom fields
       ...(!profilePublished ? {} : this.getPublicProfileProperties(userDoc)),
     };
-    return this.profileDataService.add(username, profileDoc).pipe(
+    return this.profileDataService.create(username, profileDoc).pipe(
       map(() => ({ nativeUser, data: userDoc, publicData: profileDoc }))
     );
   }
