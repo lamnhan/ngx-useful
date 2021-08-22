@@ -328,8 +328,9 @@ export interface DatabaseDataOptions {
   predefinedSearchingContextuals?: Array<{ name: string, picker: DatabaseDataSearchingContextualPicker }>;
   flexsearchOptions?: any;
   // linking and effect
-  updateEffects?: DatabaseDataUpdateEffect[];
   linkingFields?: string[];
+  linkingHook?: DatabaseDataLinkingHook;
+  updateEffects?: DatabaseDataUpdateEffect[];
   effectDataPickers?: Record<string, (propData: any, fullData: any) => any>;
   // doc meta
   docMetaRegistry?: Record<string, DatabaseDataItemMetaRegistry>;
@@ -338,6 +339,7 @@ export interface DatabaseDataOptions {
 export type DatabaseDataSearchIndexingBuildItemExtender = (data: any) => Record<string, any>;
 export type DatabaseDataSearchIndexingCheckUpdateExtender = (data: any) => boolean;
 export type DatabaseDataSearchingContextualPicker = (localIndexingItem?: DatabaseDataSearchIndexingLocalItem) => boolean;
+export type DatabaseDataLinkingHook = (mode: DatabaseDataLinkingMode, item: any, dataService: DatabaseData<any>) => Observable<any>;
 
 export interface DatabaseDataItemMetaRegistry {
   group: string;
@@ -417,11 +419,14 @@ export interface DatabaseDataLookupInput {
   locale?: string;
 }
 
+export type DatabaseDataLinkingMode = 'add' | 'update' | 'delete';
+
 export class DatabaseData<Type> {
   private metas: DatabaseDataCollectionMetas = {};
 
   private searchIndexingKeys: string[] = [];
   private searchIndexingItems: Record<string, DatabaseDataSearchIndexingLocalItem> = {};
+  private lastSearchRetrieval?: Meta;
 
   private defaultIndex?: FlexsearchDocumentIndex;
   private contextualIndexes: Record<string, FlexsearchDocumentIndex> = {};
@@ -515,6 +520,7 @@ export class DatabaseData<Type> {
       indexingItems: this.searchIndexingItems,
       defaultIndex: this.defaultIndex,
       contextualIndexes: this.contextualIndexes,
+      lastRetrieval: this.lastSearchRetrieval,
     } as DatabaseDataSearchingData;
   }
 
@@ -559,6 +565,8 @@ export class DatabaseData<Type> {
     )
     .pipe(
       map(metaItems => {
+        // save last retrieval
+        this.lastSearchRetrieval = metaItems[metaItems.length - 1];
         // create the default index
         this.defaultIndex = this.createSearchIndex();
         // create the contextual indexes
@@ -650,6 +658,13 @@ export class DatabaseData<Type> {
         }
       }
     }
+  }
+
+  onLinking(mode: DatabaseDataLinkingMode, item: Type): Observable<any> {
+    if (!this.options.linkingHook) {
+      return of(false);
+    }
+    return this.options.linkingHook(mode, item, this);
   }
 
   exists(idOrQuery: string | QueryFn) {
