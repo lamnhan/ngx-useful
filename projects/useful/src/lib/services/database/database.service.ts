@@ -318,6 +318,8 @@ export class DatabaseService {
 
 export interface DatabaseDataOptions {
   advancedMode?: boolean;
+  manualDocumentCounting?: boolean;
+  manualSearchIndexing?: boolean;
   // meta
   metaCaching?: false | CacheConfig;
   // searching
@@ -708,13 +710,20 @@ export class DatabaseData<Type> {
       this.databaseService.set(`${this.name}/${id}`, data)
     );
     // create metas
-    if (this.options.advancedMode && this.options.docMetaRegistry) {
+    if (
+      this.options.advancedMode &&
+      this.options.docMetaRegistry
+    ) {
       actions.push(
         this.addDocMetas(id, data, this.options.docMetaRegistry)
       );
     }
     // update document count
-    if (this.options.advancedMode && this.metas.documentCounting) {
+    if (
+      !this.options.manualDocumentCounting &&
+      this.options.advancedMode &&
+      this.metas.documentCounting
+    ) {
       const locale = (item as any).locale as string || settingService?.locale || 'en-US';
       actions.push(
         this.databaseService.update(`metas/$${this.name}`, {
@@ -727,7 +736,11 @@ export class DatabaseData<Type> {
       );
     }
     // add search indexing item
-    if (this.options.advancedMode && this.metas.searchIndexing) {
+    if (
+      !this.options.manualSearchIndexing &&
+      this.options.advancedMode &&
+      this.metas.searchIndexing
+    ) {
       actions.push(
         this.addSearchIndexingItem(data, this.metas.searchIndexing)
       );
@@ -750,7 +763,13 @@ export class DatabaseData<Type> {
     );
     // update count
     const newStatus = (data as any).status as undefined | string;
-    if (this.options.advancedMode && this.metas.documentCounting && newStatus && currentData) {
+    if (
+      !this.options.manualDocumentCounting &&
+      this.options.advancedMode &&
+      this.metas.documentCounting &&
+      newStatus &&
+      currentData
+    ) {
       const type = (currentData as any).type as string;
       const locale = (
         (currentData as any).locale ||
@@ -776,7 +795,11 @@ export class DatabaseData<Type> {
       }
     }
     // update search indexing item
-    if (this.options.advancedMode && this.metas.searchIndexing) {
+    if (
+      !this.options.manualSearchIndexing &&
+      this.options.advancedMode &&
+      this.metas.searchIndexing
+    ) {
       actions.push(this.updateSearchIndexingItem(id, updateData, currentData));
     }
     // run actions
@@ -871,7 +894,12 @@ export class DatabaseData<Type> {
       this.databaseService.delete(`${this.name}/${id}`)
     );
     // update count
-    if (this.options.advancedMode && this.metas.documentCounting && currentData) {
+    if (
+      !this.options.manualDocumentCounting &&
+      this.options.advancedMode &&
+      this.metas.documentCounting &&
+      currentData
+    ) {
       const type = (currentData as any).type as string;
       const locale = (
         (currentData as any).locale ||
@@ -892,7 +920,11 @@ export class DatabaseData<Type> {
       );
     }
     // delete search indexing item
-    if (this.options.advancedMode && this.metas.searchIndexing) {
+    if (
+      !this.options.manualSearchIndexing &&
+      this.options.advancedMode &&
+      this.metas.searchIndexing
+    ) {
       actions.push(this.removeSearchIndexingItem(id, currentData));
     }
     // run actions
