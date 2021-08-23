@@ -166,43 +166,15 @@ export class UserService {
   }
 
   private changeEmail(email: string) {
-    // TODO
     console.log('TODO: ...');
   }
 
   private changePhoneNumber(phoneNumber: string) {
-    // TODO
     console.log('TODO: ...');
   }
 
-  changeUsername(username: string) {
-    return this.checkUsernameExists(username).pipe(
-      switchMap(exists => {
-        if (exists) {
-          return throwError('User exists with the username: ' + username);
-        }
-        if (!this.currentUser || !this.data || !this.publicData) {
-          return throwError('Can not change username.');
-        }
-        const uid = this.currentUser.uid;
-        const currentUsername = this.data.username as string;
-        // in service
-        this.data.username = username;
-        this.publicData.id = username;
-        this.username = username;
-        // remotely
-        return this.userDataService.update(uid, {username}).pipe(
-          // remove current doc from /profiles
-          switchMap(() =>
-            this.profileDataService.delete(currentUsername)
-          ),
-          // add new doc to /profiles
-          switchMap(() =>
-            this.profileInitializer(this.currentUser as NativeUser, this.data as User)
-          ),
-        );
-      }),
-    );
+  private changeUsername(username: string) {
+    console.log('TODO: ...');
   }
 
   changePublicity(toPublic = false) {
@@ -458,42 +430,37 @@ export class UserService {
       return of({ nativeUser: undefined, data: undefined, publicData: undefined });
     }
     // has user (signed up or signed in)
-    else {
-      const nativeUsername = this.authService.credential?.additionalUserInfo?.username;
-      const defaultUsername = nativeUsername
-        ? nativeUsername
-        : nativeUser.email
-          ? nativeUser.email.split('@').shift() as string
-          : nativeUser.uid.substr(-7);
-      return !currentUserDoc
-        // new user (create record in users/ and profiles/)
-        ? this.profileDataService.exists(defaultUsername).pipe(
-          switchMap(exists =>
-            this.userInitializer(nativeUser, !exists ? defaultUsername : nativeUser.uid)
-          ),
-          switchMap(userDoc =>
-            this.profileInitializer(nativeUser, userDoc)
-          ),
-        )
-        // existing user
-        : this.proccessUserData(nativeUser, currentUserDoc).pipe(
-          switchMap(userDoc =>
-            !currentProfileDoc
-              // some how no record in profiles/ (add one)
-              ? this.profileInitializer(nativeUser, userDoc)
-              // everything is ok
-              : of({ nativeUser, data: userDoc, publicData: currentProfileDoc })
-          ),
-        );
-    }
-  }
-
-  private userInitializer(nativeUser: NativeUser, username: string) {
-    const {uid} = nativeUser;
-    const userDoc = {uid, username} as User;
-    return this.userDataService.create(uid, userDoc).pipe(
-      switchMap(() => this.proccessUserData(nativeUser, userDoc)),
-    );
+    const nativeUsername = this.authService.credential?.additionalUserInfo?.username;
+    const defaultUsername = nativeUsername
+      ? nativeUsername
+      : nativeUser.email
+        ? nativeUser.email.split('@').shift() as string
+        : nativeUser.uid.substr(-7);
+    return (currentUserDoc && currentProfileDoc)
+      ? this.proccessUserData(nativeUser, currentUserDoc).pipe(
+        map(userDoc => ({ nativeUser, data: userDoc, publicData: currentProfileDoc })),
+      )
+      // new user (create doc in users and profiles collection)
+      : this.profileDataService.exists(defaultUsername).pipe(
+        // prepare the data
+        switchMap(exists => {
+          const initialUserDoc = {
+            uid: nativeUser.uid,
+            username: !exists ? defaultUsername : nativeUser.uid,
+          } as User;
+          return this.proccessUserData(nativeUser, initialUserDoc).pipe(
+            map(userDoc => ({ initialUserDoc, userDoc })),
+          );
+        }),
+        // create the profile doc, then the user doc
+        switchMap(({ initialUserDoc, userDoc }) =>
+          this.profileInitializer(nativeUser, userDoc).pipe(
+            switchMap(result =>
+              this.userDataService.create(nativeUser.uid, initialUserDoc).pipe(map(() => result))
+            ),
+          )
+        ),
+      );
   }
 
   private profileInitializer(nativeUser: NativeUser, userDoc: User) {
