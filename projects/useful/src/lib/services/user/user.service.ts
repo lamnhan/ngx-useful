@@ -444,10 +444,14 @@ export class UserService {
       : this.profileDataService.exists(defaultUsername).pipe(
         // prepare the data
         switchMap(exists => {
-          const initialUserDoc = {
+          const createdAt = new Date().toISOString();
+          const initialUserDoc: User = {
             uid: nativeUser.uid,
             username: !exists ? defaultUsername : nativeUser.uid,
-          } as User;
+            status: 'publish',
+            createdAt,
+            updatedAt: createdAt,
+          };
           return this.proccessUserData(nativeUser, initialUserDoc).pipe(
             map(userDoc => ({ initialUserDoc, userDoc })),
           );
@@ -464,12 +468,13 @@ export class UserService {
   }
 
   private profileInitializer(nativeUser: NativeUser, userDoc: User) {
+    const {profilePublished} = this.options;
+    // basic fields
     const uid = nativeUser.uid;
     const username = userDoc.username as string;
     const displayName = userDoc.displayName as string;
-    // basic fields
-    const {profilePublished} = this.options;
-    const createdAt = new Date().toISOString();
+    const createdAt = userDoc.createdAt;
+    // sum-up
     const profileDoc: Profile = {
       uid,
       id: username,
