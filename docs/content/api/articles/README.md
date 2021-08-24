@@ -74,6 +74,7 @@ See [guides](https://ngx-useful.lamnhan.com/guides) for more articles. Also see 
 
 | Class                                                                                                    | Description                                   |
 | -------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| [AlertService](https://ngx-useful.lamnhan.com/content/reference/classes/alertservice.html)               |                                               |
 | [AppService](https://ngx-useful.lamnhan.com/content/reference/classes/appservice.html)                   | General app related methods                   |
 | [AuthService](https://ngx-useful.lamnhan.com/content/reference/classes/authservice.html)                 |                                               |
 | [CacheService](https://ngx-useful.lamnhan.com/content/reference/classes/cacheservice.html)               |                                               |
@@ -87,6 +88,7 @@ See [guides](https://ngx-useful.lamnhan.com/guides) for more articles. Also see 
 | [HelperService](https://ngx-useful.lamnhan.com/content/reference/classes/helperservice.html)             |                                               |
 | [LocalstorageService](https://ngx-useful.lamnhan.com/content/reference/classes/localstorageservice.html) |                                               |
 | [MetaService](https://ngx-useful.lamnhan.com/content/reference/classes/metaservice.html)                 |                                               |
+| [ModalService](https://ngx-useful.lamnhan.com/content/reference/classes/modalservice.html)               |                                               |
 | [NavService](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html)                   | Advanced navigation                           |
 | [NetworkService](https://ngx-useful.lamnhan.com/content/reference/classes/networkservice.html)           |                                               |
 | [NotifyService](https://ngx-useful.lamnhan.com/content/reference/classes/notifyservice.html)             | (DON'T USE YET) Notify service                |

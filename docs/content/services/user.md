@@ -15,30 +15,33 @@
 | [level](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#level)                 | <code>number</code>                                                                                                            |             |
 | [onUserChanged](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#onuserchanged) | <code>ReplaySubject<undefined \| User></code>                                                                                  |             |
 | [publicData](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#publicdata)       | <code>Profile</code>                                                                                                           |             |
-| [role](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#role)                   | <code>UserRoles</code>                                                                                                         |             |
+| [role](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#role)                   | <code>UserRole</code>                                                                                                          |             |
 | [uid](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#uid)                     | <code>undefined \| string</code>                                                                                               |             |
 | [username](https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#username)           | <code>undefined \| string</code>                                                                                               |             |
 
 <h3><a name="userservice-methods"><p>UserService methods</p>
 </a></h3>
 
-| Function                                                                     | Returns type                                                                                                                     | Description |
-| ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| [allowedLevel(atLeast)](#userservice-allowedlevel-0)                         | <code>boolean</code>                                                                                                             |             |
-| [changeEmail(email)](#userservice-changeemail-0)                             | <code>void</code>                                                                                                                |             |
-| [changePhoneNumber(phoneNumber)](#userservice-changephonenumber-0)           | <code>void</code>                                                                                                                |             |
-| [changePublicity(toPublic?)](#userservice-changepublicity-0)                 | <code>Observable<void></code>                                                                                                    |             |
-| [changeUsername(username)](#userservice-changeusername-0)                    | <code>Observable<object></code>                                                                                                  |             |
-| [checkUsernameExists(username)](#userservice-checkusernameexists-0)          | <code>Observable<boolean></code>                                                                                                 |             |
-| [init(userDataService, profileDataService)](#userservice-init-0)             | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html" target="_blank">UserService</a></code> |             |
-| [removeCoverPhoto()](#userservice-removecoverphoto-0)                        | <code>Observable<[void, void]></code>                                                                                            |             |
-| [setOptions(options)](#userservice-setoptions-0)                             | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html" target="_blank">UserService</a></code> |             |
-| [updateAdditionalData(data, publicly?)](#userservice-updateadditionaldata-0) | <code>Observable<void></code>                                                                                                    |             |
-| [updateAddresses(addresses)](#userservice-updateaddresses-0)                 | <code>Observable<void></code>                                                                                                    |             |
-| [updateProfile(data)](#userservice-updateprofile-0)                          | <code>Observable<[void, void, void]></code>                                                                                      |             |
-| [updatePublicly(publicly)](#userservice-updatepublicly-0)                    | <code>Observable<void></code>                                                                                                    |             |
-| [updateSettings(settings)](#userservice-updatesettings-0)                    | <code>Observable<void></code>                                                                                                    |             |
-| [verifyEmail()](#userservice-verifyemail-0)                                  | <code>Observable<void></code>                                                                                                    |             |
+| Function                                                                     | Returns type                                                                                                                                     | Description |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| [allowedLevel(atLeast)](#userservice-allowedlevel-0)                         | <code>boolean</code>                                                                                                                             |             |
+| [changePublicity(toPublic?)](#userservice-changepublicity-0)                 | <code>Observable<boolean></code>                                                                                                                 |             |
+| [checkUsernameExists(username)](#userservice-checkusernameexists-0)          | <code>Observable<boolean></code>                                                                                                                 |             |
+| [getBadging(name)](#userservice-getbadging-0)                                | <code>undefined \| <a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/userbadging.html" target="_blank">UserBadging</a></code> |             |
+| [getBadgingRegistry()](#userservice-getbadgingregistry-0)                    | <code>Record<string, UserBadging></code>                                                                                                         |             |
+| [getRanking(name)](#userservice-getranking-0)                                | <code>undefined \| <a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/userranking.html" target="_blank">UserRanking</a></code> |             |
+| [getRankingRegistry()](#userservice-getrankingregistry-0)                    | <code>Record<string, UserRanking></code>                                                                                                         |             |
+| [getRoleing(name)](#userservice-getroleing-0)                                | <code>undefined \| <a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/userroleing.html" target="_blank">UserRoleing</a></code> |             |
+| [getRoleingRegistry()](#userservice-getroleingregistry-0)                    | <code>Record<string, UserRoleing></code>                                                                                                         |             |
+| [init(userDataService, profileDataService)](#userservice-init-0)             | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html" target="_blank">UserService</a></code>                 |             |
+| [removeCoverPhoto()](#userservice-removecoverphoto-0)                        | <code>Observable<[boolean, boolean]></code>                                                                                                      |             |
+| [setOptions(options)](#userservice-setoptions-0)                             | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html" target="_blank">UserService</a></code>                 |             |
+| [updateAdditionalData(data, publicly?)](#userservice-updateadditionaldata-0) | <code>Observable<undefined \| false \| true></code>                                                                                              |             |
+| [updateAddresses(addresses)](#userservice-updateaddresses-0)                 | <code>Observable<boolean></code>                                                                                                                 |             |
+| [updateProfile(data)](#userservice-updateprofile-0)                          | <code>Observable<[void, undefined \| false \| true, undefined \| false \| true]></code>                                                          |             |
+| [updatePublicly(publicly)](#userservice-updatepublicly-0)                    | <code>Observable<boolean></code>                                                                                                                 |             |
+| [updateSettings(settings)](#userservice-updatesettings-0)                    | <code>Observable<boolean></code>                                                                                                                 |             |
+| [verifyEmail()](#userservice-verifyemail-0)                                  | <code>Observable<void></code>                                                                                                                    |             |
 
 <h4><a name="userservice-allowedlevel-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#allowedlevel"><p><code>allowedLevel(atLeast)</code></p>
 </a></h4>
@@ -57,40 +60,6 @@
 
 ---
 
-<h4><a name="userservice-changeemail-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#changeemail"><p><code>changeEmail(email)</code></p>
-</a></h4>
-
-**The `changeEmail` call signature.**
-
-**Parameters**
-
-| Param     | Type                | Description |
-| --------- | ------------------- | ----------- |
-| **email** | <code>string</code> |             |
-
-**Returns**
-
-<code>void</code>
-
----
-
-<h4><a name="userservice-changephonenumber-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#changephonenumber"><p><code>changePhoneNumber(phoneNumber)</code></p>
-</a></h4>
-
-**The `changePhoneNumber` call signature.**
-
-**Parameters**
-
-| Param           | Type                | Description |
-| --------------- | ------------------- | ----------- |
-| **phoneNumber** | <code>string</code> |             |
-
-**Returns**
-
-<code>void</code>
-
----
-
 <h4><a name="userservice-changepublicity-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#changepublicity"><p><code>changePublicity(toPublic?)</code></p>
 </a></h4>
 
@@ -104,24 +73,7 @@
 
 **Returns**
 
-<code>Observable<void></code>
-
----
-
-<h4><a name="userservice-changeusername-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#changeusername"><p><code>changeUsername(username)</code></p>
-</a></h4>
-
-**The `changeUsername` call signature.**
-
-**Parameters**
-
-| Param        | Type                | Description |
-| ------------ | ------------------- | ----------- |
-| **username** | <code>string</code> |             |
-
-**Returns**
-
-<code>Observable<object></code>
+<code>Observable<boolean></code>
 
 ---
 
@@ -139,6 +91,90 @@
 **Returns**
 
 <code>Observable<boolean></code>
+
+---
+
+<h4><a name="userservice-getbadging-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#getbadging"><p><code>getBadging(name)</code></p>
+</a></h4>
+
+**The `getBadging` call signature.**
+
+**Parameters**
+
+| Param    | Type                | Description |
+| -------- | ------------------- | ----------- |
+| **name** | <code>string</code> |             |
+
+**Returns**
+
+<code>undefined | <a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/userbadging.html" target="_blank">UserBadging</a></code>
+
+---
+
+<h4><a name="userservice-getbadgingregistry-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#getbadgingregistry"><p><code>getBadgingRegistry()</code></p>
+</a></h4>
+
+**The `getBadgingRegistry` call signature.**
+
+**Returns**
+
+<code>Record<string, UserBadging></code>
+
+---
+
+<h4><a name="userservice-getranking-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#getranking"><p><code>getRanking(name)</code></p>
+</a></h4>
+
+**The `getRanking` call signature.**
+
+**Parameters**
+
+| Param    | Type                | Description |
+| -------- | ------------------- | ----------- |
+| **name** | <code>string</code> |             |
+
+**Returns**
+
+<code>undefined | <a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/userranking.html" target="_blank">UserRanking</a></code>
+
+---
+
+<h4><a name="userservice-getrankingregistry-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#getrankingregistry"><p><code>getRankingRegistry()</code></p>
+</a></h4>
+
+**The `getRankingRegistry` call signature.**
+
+**Returns**
+
+<code>Record<string, UserRanking></code>
+
+---
+
+<h4><a name="userservice-getroleing-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#getroleing"><p><code>getRoleing(name)</code></p>
+</a></h4>
+
+**The `getRoleing` call signature.**
+
+**Parameters**
+
+| Param    | Type                | Description |
+| -------- | ------------------- | ----------- |
+| **name** | <code>string</code> |             |
+
+**Returns**
+
+<code>undefined | <a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/userroleing.html" target="_blank">UserRoleing</a></code>
+
+---
+
+<h4><a name="userservice-getroleingregistry-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html#getroleingregistry"><p><code>getRoleingRegistry()</code></p>
+</a></h4>
+
+**The `getRoleingRegistry` call signature.**
+
+**Returns**
+
+<code>Record<string, UserRoleing></code>
 
 ---
 
@@ -167,7 +203,7 @@
 
 **Returns**
 
-<code>Observable<[void, void]></code>
+<code>Observable<[boolean, boolean]></code>
 
 ---
 
@@ -202,7 +238,7 @@
 
 **Returns**
 
-<code>Observable<void></code>
+<code>Observable<undefined | false | true></code>
 
 ---
 
@@ -213,13 +249,13 @@
 
 **Parameters**
 
-| Param         | Type                                     | Description |
-| ------------- | ---------------------------------------- | ----------- |
-| **addresses** | <code>Record<string, UserAddress></code> |             |
+| Param         | Type                       | Description |
+| ------------- | -------------------------- | ----------- |
+| **addresses** | <code>UserAddress[]</code> |             |
 
 **Returns**
 
-<code>Observable<void></code>
+<code>Observable<boolean></code>
 
 ---
 
@@ -230,13 +266,13 @@
 
 **Parameters**
 
-| Param    | Type                             | Description |
-| -------- | -------------------------------- | ----------- |
-| **data** | <code>UserEditableProfile</code> |             |
+| Param    | Type                                               | Description |
+| -------- | -------------------------------------------------- | ----------- |
+| **data** | <code>UserEditableProfile & object & object</code> |             |
 
 **Returns**
 
-<code>Observable<[void, void, void]></code>
+<code>Observable<[void, undefined | false | true, undefined | false | true]></code>
 
 ---
 
@@ -253,7 +289,7 @@
 
 **Returns**
 
-<code>Observable<void></code>
+<code>Observable<boolean></code>
 
 ---
 
@@ -270,7 +306,7 @@
 
 **Returns**
 
-<code>Observable<void></code>
+<code>Observable<boolean></code>
 
 ---
 

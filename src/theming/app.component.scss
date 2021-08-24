@@ -1,22 +1,20 @@
 @import '@unistylus/core/scss/mixins';
 
-$shared_icons: (
-  github-light: '#{$bootstrap_icons}/dark/github.svg'
-);
+$shared_icons: ();
 
 // light theme
 $light_theme_icons: (
-  github: '#{$bootstrap_icons}/light/github.svg',
-  menu: '#{$bootstrap_icons}/light/list.svg'
+  github: '#{$bootstrap_icons}/github.svg',
+  menu: '#{$bootstrap_icons}/list.svg'
 );
 
 // dark theme
 $dark_theme_icons: (
-  github: '#{$bootstrap_icons}/dark/github.svg',
-  menu: '#{$bootstrap_icons}/dark/list.svg'
+  github: '#{$bootstrap_icons}/github.svg',
+  menu: '#{$bootstrap_icons}/list.svg'
 );
 
-@include register_app_icons(
+@include register_theme_icons(
   (
     light: $light_theme_icons,
     dark: $dark_theme_icons,

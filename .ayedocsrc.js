@@ -11,19 +11,24 @@ module.exports = {
       template: 'angularx'
     },
     // services
+    'docs/content/services/alert.md': {main: ['AlertService', 'FULL']},
     'docs/content/services/app.md': {main: ['AppService', 'FULL']},
     'docs/content/services/auth.md': {main: ['AuthService', 'FULL']},
     'docs/content/services/cache.md': {main: ['CacheService', 'FULL']},
     'docs/content/services/database.md': {main: ['DatabaseService', 'FULL']},
     'docs/content/services/error.md': {main: ['ErrorService', 'FULL']},
     'docs/content/services/fetch.md': {main: ['FetchService', 'FULL']},
+    'docs/content/services/guard.md': {main: ['GuardService', 'FULL']},
     'docs/content/services/helper.md': {main: ['HelperService', 'FULL']},
     'docs/content/services/localstorage.md': {main: ['LocalstorageService', 'FULL']},
     'docs/content/services/meta.md': {main: ['MetaService', 'FULL']},
+    'docs/content/services/modal.md': {main: ['ModalService', 'FULL']},
     'docs/content/services/nav.md': {main: ['NavService', 'FULL']},
+    'docs/content/services/network.md': {main: ['NetworkService', 'FULL']},
     'docs/content/services/persona.md': {main: ['PersonaService', 'FULL']},
     'docs/content/services/pwa.md': {main: ['PwaService', 'FULL']},
     'docs/content/services/setting.md': {main: ['SettingService', 'FULL']},
+    'docs/content/services/storage.md': {main: ['StorageService', 'FULL']},
     'docs/content/services/user.md': {main: ['UserService', 'FULL']},
     // pipes
     'docs/content/pipes/o1i.md': {main: ['O1iPipe', 'FULL']},
@@ -33,6 +38,8 @@ module.exports = {
     'docs/content/directives/router-link.md': {main: ['RouterLinkDirective', 'FULL']},
     // guards
     'docs/content/guards/auth.md': {main: ['AuthGuard', 'FULL']},
+    'docs/content/guards/dashboard.md': {main: ['DashboardGuard', 'FULL']},
     'docs/content/guards/admin.md': {main: ['AdminGuard', 'FULL']},
+    'docs/content/guards/online.md': {main: ['OnlineGuard', 'FULL']},
   }
 };

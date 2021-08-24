@@ -15,39 +15,44 @@
 <h3><a name="databaseservice-methods"><p>DatabaseService methods</p>
 </a></h3>
 
-| Function                                                                            | Returns type                                                                                                                                   | Description |
-| ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| [cachingCollection(path, queryFn?, caching?)](#databaseservice-cachingcollection-0) | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/caching.html" target="_blank">Caching</a></code>                       |             |
-| [cachingDoc(path, queryFn?, caching?)](#databaseservice-cachingdoc-0)               | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/caching.html" target="_blank">Caching</a></code>                       |             |
-| [cachingRecord(path, queryFn?, caching?)](#databaseservice-cachingrecord-0)         | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/caching.html" target="_blank">Caching</a></code>                       |             |
-| [collection(path, queryFn?)](#databaseservice-collection-0)                         | <code><a href="https://ngx-useful.lamnhan.com/content/reference/globals.html#databasecollection" target="_blank">DatabaseCollection</a></code> |             |
-| [delete(path)](#databaseservice-delete-0)                                           | <code>Observable<void></code>                                                                                                                  |             |
-| [doc(path)](#databaseservice-doc-0)                                                 | <code><a href="https://ngx-useful.lamnhan.com/content/reference/globals.html#databaseitem" target="_blank">DatabaseItem</a></code>             |             |
-| [exists(path, queryFn?)](#databaseservice-exists-0)                                 | <code>Observable<boolean></code>                                                                                                               |             |
-| [flatCollection(path, queryFn?)](#databaseservice-flatcollection-0)                 | <code>Observable<Type[]></code>                                                                                                                |             |
-| [flatDoc(path, queryFn?)](#databaseservice-flatdoc-0)                               | <code>Observable<any></code>                                                                                                                   |             |
-| [flatRecord(path, queryFn?)](#databaseservice-flatrecord-0)                         | <code>Observable<Record<string, Type>></code>                                                                                                  |             |
-| [getCollection(path, queryFn?, caching?)](#databaseservice-getcollection-0)         | <code>Observable<Type[]></code>                                                                                                                |             |
-| [getDoc(path, queryFn?, caching?)](#databaseservice-getdoc-0)                       | <code>Observable<any></code>                                                                                                                   |             |
-| [getRecord(path, queryFn?, caching?)](#databaseservice-getrecord-0)                 | <code>Observable<Record<string, Type>></code>                                                                                                  |             |
-| [getValueDelete()](#databaseservice-getvaluedelete-0)                               | <code>FieldValue<></code>                                                                                                                      |             |
-| [getValueIncrement(by?)](#databaseservice-getvalueincrement-0)                      | <code>FieldValue<></code>                                                                                                                      |             |
-| [increment(path, data)](#databaseservice-increment-0)                               | <code>Observable<void></code>                                                                                                                  |             |
-| [init(vendorService)](#databaseservice-init-0)                                      | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>       |             |
-| [isTypeDelete(value)](#databaseservice-istypedelete-0)                              | <code>boolean</code>                                                                                                                           |             |
-| [isTypeIncrement(value)](#databaseservice-istypeincrement-0)                        | <code>boolean</code>                                                                                                                           |             |
-| [set(path, item)](#databaseservice-set-0)                                           | <code>Observable<void></code>                                                                                                                  |             |
-| [setIntegrations(integrations)](#databaseservice-setintegrations-0)                 | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>       |             |
-| [setOptions(options)](#databaseservice-setoptions-0)                                | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>       |             |
-| [streamCollection(path, queryFn?)](#databaseservice-streamcollection-0)             | <code>Observable<Type[]></code>                                                                                                                |             |
-| [streamDoc(path, queryFn?)](#databaseservice-streamdoc-0)                           | <code>Observable<null \| Type></code>                                                                                                          |             |
-| [streamRecord(path, queryFn?)](#databaseservice-streamrecord-0)                     | <code>Observable<Record<string, Type>></code>                                                                                                  |             |
-| [update(path, item)](#databaseservice-update-0)                                     | <code>Observable<void></code>                                                                                                                  |             |
+| Function                                                                    | Returns type                                                                                                                                          | Description |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| [cachingGet(path, queryFn?, caching?)](#databaseservice-cachingget-0)       | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/caching.html" target="_blank">Caching</a></code>                              |             |
+| [cachingList(path, queryFn?, caching?)](#databaseservice-cachinglist-0)     | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/caching.html" target="_blank">Caching</a></code>                              |             |
+| [cachingRecord(path, queryFn?, caching?)](#databaseservice-cachingrecord-0) | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/caching.html" target="_blank">Caching</a></code>                              |             |
+| [collection(path, queryFn?)](#databaseservice-collection-0)                 | <code><a href="https://ngx-useful.lamnhan.com/content/reference/globals.html#databasecollection" target="_blank">DatabaseCollection</a></code>        |             |
+| [createId()](#databaseservice-createid-0)                                   | <code>string</code>                                                                                                                                   |             |
+| [delete(path)](#databaseservice-delete-0)                                   | <code>Observable<void></code>                                                                                                                         |             |
+| [doc(path)](#databaseservice-doc-0)                                         | <code><a href="https://ngx-useful.lamnhan.com/content/reference/globals.html#databaseitem" target="_blank">DatabaseItem</a></code>                    |             |
+| [exists(path, queryFn?)](#databaseservice-exists-0)                         | <code>Observable<boolean></code>                                                                                                                      |             |
+| [flatGet(path, queryFn?)](#databaseservice-flatget-0)                       | <code>Observable<null \| Type></code>                                                                                                                 |             |
+| [flatList(path, queryFn?)](#databaseservice-flatlist-0)                     | <code>Observable<Type[]></code>                                                                                                                       |             |
+| [flatRecord(path, queryFn?)](#databaseservice-flatrecord-0)                 | <code>Observable<Record<string, Type>></code>                                                                                                         |             |
+| [get(path, queryFn?, caching?)](#databaseservice-get-0)                     | <code>Observable<null \| Type></code>                                                                                                                 |             |
+| [getIntegrations()](#databaseservice-getintegrations-0)                     | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/databaseintegrations.html" target="_blank">DatabaseIntegrations</a></code> |             |
+| [getOptions()](#databaseservice-getoptions-0)                               | <code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/databaseoptions.html" target="_blank">DatabaseOptions</a></code>           |             |
+| [getValueDelete()](#databaseservice-getvaluedelete-0)                       | <code>FieldValue<></code>                                                                                                                             |             |
+| [getValueIncrement(by?)](#databaseservice-getvalueincrement-0)              | <code>FieldValue<></code>                                                                                                                             |             |
+| [getVendorService()](#databaseservice-getvendorservice-0)                   | <code>AngularFirestore<></code>                                                                                                                       |             |
+| [increment(path, data)](#databaseservice-increment-0)                       | <code>Observable<void></code>                                                                                                                         |             |
+| [init(vendorService)](#databaseservice-init-0)                              | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>              |             |
+| [isGlobalCachingEnabled()](#databaseservice-isglobalcachingenabled-0)       | <code>boolean</code>                                                                                                                                  |             |
+| [isTypeDelete(value)](#databaseservice-istypedelete-0)                      | <code>boolean</code>                                                                                                                                  |             |
+| [isTypeIncrement(value)](#databaseservice-istypeincrement-0)                | <code>boolean</code>                                                                                                                                  |             |
+| [list(path, queryFn?, caching?)](#databaseservice-list-0)                   | <code>Observable<Type[]></code>                                                                                                                       |             |
+| [record(path, queryFn?, caching?)](#databaseservice-record-0)               | <code>Observable<Record<string, Type>></code>                                                                                                         |             |
+| [set(path, item)](#databaseservice-set-0)                                   | <code>Observable<void></code>                                                                                                                         |             |
+| [setIntegrations(integrations)](#databaseservice-setintegrations-0)         | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>              |             |
+| [setOptions(options)](#databaseservice-setoptions-0)                        | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html" target="_blank">DatabaseService</a></code>              |             |
+| [streamGet(path, queryFn?)](#databaseservice-streamget-0)                   | <code>Observable<null \| Type></code>                                                                                                                 |             |
+| [streamList(path, queryFn?)](#databaseservice-streamlist-0)                 | <code>Observable<Type[]></code>                                                                                                                       |             |
+| [streamRecord(path, queryFn?)](#databaseservice-streamrecord-0)             | <code>Observable<Record<string, Type>></code>                                                                                                         |             |
+| [update(path, item)](#databaseservice-update-0)                             | <code>Observable<void></code>                                                                                                                         |             |
 
-<h4><a name="databaseservice-cachingcollection-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#cachingcollection"><p><code>cachingCollection(path, queryFn?, caching?)</code></p>
+<h4><a name="databaseservice-cachingget-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#cachingget"><p><code>cachingGet(path, queryFn?, caching?)</code></p>
 </a></h4>
 
-**The `cachingCollection` call signature.**
+**The `cachingGet` call signature.**
 
 **Parameters**
 
@@ -63,10 +68,10 @@
 
 ---
 
-<h4><a name="databaseservice-cachingdoc-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#cachingdoc"><p><code>cachingDoc(path, queryFn?, caching?)</code></p>
+<h4><a name="databaseservice-cachinglist-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#cachinglist"><p><code>cachingList(path, queryFn?, caching?)</code></p>
 </a></h4>
 
-**The `cachingDoc` call signature.**
+**The `cachingList` call signature.**
 
 **Parameters**
 
@@ -116,6 +121,17 @@
 **Returns**
 
 <code><a href="https://ngx-useful.lamnhan.com/content/reference/globals.html#databasecollection" target="_blank">DatabaseCollection</a></code>
+
+---
+
+<h4><a name="databaseservice-createid-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#createid"><p><code>createId()</code></p>
+</a></h4>
+
+**The `createId` call signature.**
+
+**Returns**
+
+<code>string</code>
 
 ---
 
@@ -171,10 +187,28 @@
 
 ---
 
-<h4><a name="databaseservice-flatcollection-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#flatcollection"><p><code>flatCollection(path, queryFn?)</code></p>
+<h4><a name="databaseservice-flatget-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#flatget"><p><code>flatGet(path, queryFn?)</code></p>
 </a></h4>
 
-**The `flatCollection` call signature.**
+**The `flatGet` call signature.**
+
+**Parameters**
+
+| Param    | Type                 | Description |
+| -------- | -------------------- | ----------- |
+| **path** | <code>string</code>  |             |
+| queryFn  | <code>QueryFn</code> |             |
+
+**Returns**
+
+<code>Observable<null | Type></code>
+
+---
+
+<h4><a name="databaseservice-flatlist-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#flatlist"><p><code>flatList(path, queryFn?)</code></p>
+</a></h4>
+
+**The `flatList` call signature.**
 
 **Parameters**
 
@@ -186,24 +220,6 @@
 **Returns**
 
 <code>Observable<Type[]></code>
-
----
-
-<h4><a name="databaseservice-flatdoc-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#flatdoc"><p><code>flatDoc(path, queryFn?)</code></p>
-</a></h4>
-
-**The `flatDoc` call signature.**
-
-**Parameters**
-
-| Param    | Type                 | Description |
-| -------- | -------------------- | ----------- |
-| **path** | <code>string</code>  |             |
-| queryFn  | <code>QueryFn</code> |             |
-
-**Returns**
-
-<code>Observable<any></code>
 
 ---
 
@@ -225,10 +241,10 @@
 
 ---
 
-<h4><a name="databaseservice-getcollection-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#getcollection"><p><code>getCollection(path, queryFn?, caching?)</code></p>
+<h4><a name="databaseservice-get-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#get"><p><code>get(path, queryFn?, caching?)</code></p>
 </a></h4>
 
-**The `getCollection` call signature.**
+**The `get` call signature.**
 
 **Parameters**
 
@@ -240,45 +256,29 @@
 
 **Returns**
 
-<code>Observable<Type[]></code>
+<code>Observable<null | Type></code>
 
 ---
 
-<h4><a name="databaseservice-getdoc-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#getdoc"><p><code>getDoc(path, queryFn?, caching?)</code></p>
+<h4><a name="databaseservice-getintegrations-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#getintegrations"><p><code>getIntegrations()</code></p>
 </a></h4>
 
-**The `getDoc` call signature.**
-
-**Parameters**
-
-| Param    | Type                                                                                                                                         | Description |
-| -------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| **path** | <code>string</code>                                                                                                                          |             |
-| queryFn  | <code>QueryFn</code>                                                                                                                         |             |
-| caching  | <code>false \| <a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/cacheconfig.html" target="_blank">CacheConfig</a></code> |             |
+**The `getIntegrations` call signature.**
 
 **Returns**
 
-<code>Observable<any></code>
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/databaseintegrations.html" target="_blank">DatabaseIntegrations</a></code>
 
 ---
 
-<h4><a name="databaseservice-getrecord-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#getrecord"><p><code>getRecord(path, queryFn?, caching?)</code></p>
+<h4><a name="databaseservice-getoptions-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#getoptions"><p><code>getOptions()</code></p>
 </a></h4>
 
-**The `getRecord` call signature.**
-
-**Parameters**
-
-| Param    | Type                                                                                                                                         | Description |
-| -------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| **path** | <code>string</code>                                                                                                                          |             |
-| queryFn  | <code>QueryFn</code>                                                                                                                         |             |
-| caching  | <code>false \| <a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/cacheconfig.html" target="_blank">CacheConfig</a></code> |             |
+**The `getOptions` call signature.**
 
 **Returns**
 
-<code>Observable<Record<string, Type>></code>
+<code><a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/databaseoptions.html" target="_blank">DatabaseOptions</a></code>
 
 ---
 
@@ -307,6 +307,17 @@
 **Returns**
 
 <code>FieldValue<></code>
+
+---
+
+<h4><a name="databaseservice-getvendorservice-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#getvendorservice"><p><code>getVendorService()</code></p>
+</a></h4>
+
+**The `getVendorService` call signature.**
+
+**Returns**
+
+<code>AngularFirestore<></code>
 
 ---
 
@@ -345,6 +356,17 @@
 
 ---
 
+<h4><a name="databaseservice-isglobalcachingenabled-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#isglobalcachingenabled"><p><code>isGlobalCachingEnabled()</code></p>
+</a></h4>
+
+**The `isGlobalCachingEnabled` call signature.**
+
+**Returns**
+
+<code>boolean</code>
+
+---
+
 <h4><a name="databaseservice-istypedelete-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#istypedelete"><p><code>isTypeDelete(value)</code></p>
 </a></h4>
 
@@ -376,6 +398,44 @@
 **Returns**
 
 <code>boolean</code>
+
+---
+
+<h4><a name="databaseservice-list-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#list"><p><code>list(path, queryFn?, caching?)</code></p>
+</a></h4>
+
+**The `list` call signature.**
+
+**Parameters**
+
+| Param    | Type                                                                                                                                         | Description |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **path** | <code>string</code>                                                                                                                          |             |
+| queryFn  | <code>QueryFn</code>                                                                                                                         |             |
+| caching  | <code>false \| <a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/cacheconfig.html" target="_blank">CacheConfig</a></code> |             |
+
+**Returns**
+
+<code>Observable<Type[]></code>
+
+---
+
+<h4><a name="databaseservice-record-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#record"><p><code>record(path, queryFn?, caching?)</code></p>
+</a></h4>
+
+**The `record` call signature.**
+
+**Parameters**
+
+| Param    | Type                                                                                                                                         | Description |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **path** | <code>string</code>                                                                                                                          |             |
+| queryFn  | <code>QueryFn</code>                                                                                                                         |             |
+| caching  | <code>false \| <a href="https://ngx-useful.lamnhan.com/content/reference/interfaces/cacheconfig.html" target="_blank">CacheConfig</a></code> |             |
+
+**Returns**
+
+<code>Observable<Record<string, Type>></code>
 
 ---
 
@@ -431,28 +491,10 @@
 
 ---
 
-<h4><a name="databaseservice-streamcollection-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#streamcollection"><p><code>streamCollection(path, queryFn?)</code></p>
+<h4><a name="databaseservice-streamget-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#streamget"><p><code>streamGet(path, queryFn?)</code></p>
 </a></h4>
 
-**The `streamCollection` call signature.**
-
-**Parameters**
-
-| Param    | Type                 | Description |
-| -------- | -------------------- | ----------- |
-| **path** | <code>string</code>  |             |
-| queryFn  | <code>QueryFn</code> |             |
-
-**Returns**
-
-<code>Observable<Type[]></code>
-
----
-
-<h4><a name="databaseservice-streamdoc-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#streamdoc"><p><code>streamDoc(path, queryFn?)</code></p>
-</a></h4>
-
-**The `streamDoc` call signature.**
+**The `streamGet` call signature.**
 
 **Parameters**
 
@@ -464,6 +506,24 @@
 **Returns**
 
 <code>Observable<null | Type></code>
+
+---
+
+<h4><a name="databaseservice-streamlist-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/databaseservice.html#streamlist"><p><code>streamList(path, queryFn?)</code></p>
+</a></h4>
+
+**The `streamList` call signature.**
+
+**Parameters**
+
+| Param    | Type                 | Description |
+| -------- | -------------------- | ----------- |
+| **path** | <code>string</code>  |             |
+| queryFn  | <code>QueryFn</code> |             |
+
+**Returns**
+
+<code>Observable<Type[]></code>
 
 ---
 

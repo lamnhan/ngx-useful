@@ -42,13 +42,18 @@ export class DataService {
         routerLink: ['service', 'setting']
       },
     {
-      text: 'Data',
+      text: 'Services',
       level: 0,
     },
       {
         text: 'Database',
         level: 1,
         routerLink: ['service', 'database']
+      },
+      {
+        text: 'Storage',
+        level: 1,
+        routerLink: ['service', 'storage']
       },
     {
       text: 'Authentication',
@@ -69,6 +74,16 @@ export class DataService {
       level: 0,
     },
       {
+        text: 'Alert',
+        level: 1,
+        routerLink: ['service', 'alert']
+      },
+      {
+        text: 'Modal',
+        level: 1,
+        routerLink: ['service', 'modal']
+      },
+      {
         text: 'Error',
         level: 1,
         routerLink: ['service', 'error']
@@ -77,6 +92,16 @@ export class DataService {
         text: 'Fetch',
         level: 1,
         routerLink: ['service', 'fetch']
+      },
+      {
+        text: 'Guard',
+        level: 1,
+        routerLink: ['service', 'guard']
+      },
+      {
+        text: 'Network',
+        level: 1,
+        routerLink: ['service', 'network']
       },
       {
         text: 'Localstorage',
@@ -141,9 +166,19 @@ export class DataService {
       routerLink: ['guard', 'auth']
     },
     {
+      text: 'Dashboard',
+      level: 1,
+      routerLink: ['guard', 'dashboard']
+    },
+    {
       text: 'Admin',
       level: 1,
       routerLink: ['guard', 'admin']
+    },
+    {
+      text: 'Online',
+      level: 1,
+      routerLink: ['guard', 'online']
     },
   ];
 
