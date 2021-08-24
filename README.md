@@ -25,10 +25,14 @@
 Install ngx-useful:
 
 ```sh
-npm i @lamnhan/ngx-useful@0.0.10
+npm i @lamnhan/ngx-useful
 ```
 
-You may also want to install [@lamnhan/unistylus](https://unistylus.lamnhan.com).
+You may also want to install [Unistylus](https://unistylus.lamnhan.com).
+
+```sh
+npm i @unistylus/core @unistylus/bootstrap
+```
 
 Basic usage, three steps to use a service:
 
