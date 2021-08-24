@@ -10,12 +10,12 @@ export class HomeComponent implements OnInit {
   installContent =
 `Using NPM:
 \`\`\`sh
-npm install --save @lamnhan/ngx-useful@0.0.10
+npm i @lamnhan/ngx-useful@0.0.10
 \`\`\`
 
 You may also [@lamnhan/unistylus](https://unistylus.lamnhan.com) (for theming):
 \`\`\`sh
-npm install --save @lamnhan/unistylus@0.0.10
+npm i @lamnhan/unistylus@0.0.10
 \`\`\`
 `;
 
