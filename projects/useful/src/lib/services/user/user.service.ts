@@ -444,13 +444,17 @@ export class UserService {
       : this.profileDataService.exists(defaultUsername).pipe(
         // prepare the data
         switchMap(exists => {
+          const uid = nativeUser.uid;
           const createdAt = new Date().toISOString();
           const initialUserDoc: User = {
-            uid: nativeUser.uid,
-            username: !exists ? defaultUsername : nativeUser.uid,
+            uid,
+            id: uid,
+            title: uid,
+            type: 'default',
             status: 'publish',
             createdAt,
             updatedAt: createdAt,
+            username: !exists ? defaultUsername : nativeUser.uid,
           };
           return this.proccessUserData(nativeUser, initialUserDoc).pipe(
             map(userDoc => ({ initialUserDoc, userDoc })),
