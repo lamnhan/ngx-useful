@@ -232,10 +232,11 @@ export class UserService {
     if (!this.currentUser || !this.data) {
       return throwError('No user.');
     }
+    const del = this.databaseService.getValueDelete() as any;
     const uid = this.currentUser.uid;
     const username = this.data.username as string;
     // in service
-    let profileDoc: Partial<Profile> | NullableOptional<Partial<Profile>>;
+    let profileDoc: Partial<Profile> | NullableOptional<Partial<Profile>> = {};
     Object.keys(publicly).forEach(key => {
       if (this.data) {
         if (publicly[key] === true) {
@@ -266,16 +267,16 @@ export class UserService {
           if (this.publicData) {
             if (key === 'email') {
               delete this.publicData.email;
-              profileDoc = {...profileDoc, email: null};
+              profileDoc = {...profileDoc, email: del};
             } else if (key === 'phoneNumber') {
               delete this.publicData.phoneNumber;
-              profileDoc = {...profileDoc, phoneNumber: null};
+              profileDoc = {...profileDoc, phoneNumber: del};
             } else if (this.publicData.props) {
               delete this.publicData.props[key];
               profileDoc = {
                 ...profileDoc,
                 props: (!this.publicData.props || !Object.keys(this.publicData.props).length)
-                  ? null
+                  ? del
                   : this.publicData.props
               };
             }
@@ -283,15 +284,14 @@ export class UserService {
         }
       }
     });
-    return this.userDataService.update(uid, {
-      publicly: (!this.data.publicly || !Object.keys(this.data.publicly).length)
-        ? this.databaseService.getValueDelete() as any
-        : this.data.publicly
-    }).pipe(
-      switchMap(() =>
-        this.profileDataService.update(username, profileDoc)
-      ),
-    );
+    return combineLatest([
+      this.userDataService.update(uid, {
+        publicly: (!this.data.publicly || !Object.keys(this.data.publicly).length)
+          ? this.databaseService.getValueDelete() as any
+          : this.data.publicly
+      }),
+      this.profileDataService.update(username, profileDoc)
+    ]);
   }
 
   updateAdditionalData(
