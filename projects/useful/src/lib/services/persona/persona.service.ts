@@ -7,6 +7,7 @@ export interface PersonaBuiltinProperties {
   menu?: Array<string | MenuItem>;
   menu2nd?: Array<string | MenuItem>;
   tabs?: Array<string | MenuItem>;
+  more?: Array<string | MenuItem>;
 }
 
 export interface PersonaProperties extends PersonaBuiltinProperties {
@@ -44,6 +45,7 @@ export class PersonaService {
   menu: MenuItem[] = [];
   menu2nd: MenuItem[] = [];
   tabs: MenuItem[] = [];
+  more: MenuItem[] = [];
 
   constructor() {}
 
@@ -71,7 +73,7 @@ export class PersonaService {
     // proccess menu & secondary menu & tabs
     if (this.menuRegistry) {
       Object.keys(data).forEach(persona => {
-        const {menu, menu2nd, tabs} = data[persona];
+        const {menu, menu2nd, tabs, more} = data[persona];
         if (menu) {
           data[persona].menu =
             menu.map(value => typeof value === 'string' ? this.menuRegistry[value] : value);
@@ -83,6 +85,10 @@ export class PersonaService {
         if (tabs) {
           data[persona].tabs =
             tabs.map(value => typeof value === 'string' ? this.menuRegistry[value] : value);
+        }
+        if (more) {
+          data[persona].more =
+            more.map(value => typeof value === 'string' ? this.menuRegistry[value] : value);
         }
       });
     }
@@ -119,5 +125,6 @@ export class PersonaService {
     this.menu = (this.get('menu') || []) as MenuItem[];
     this.menu2nd = (this.get('menu2nd') || []) as MenuItem[];
     this.tabs = (this.get('tabs') || []) as MenuItem[];
+    this.more = (this.get('more') || []) as MenuItem[];
   }
 }
