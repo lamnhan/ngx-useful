@@ -47,7 +47,7 @@
     "@unistylus/core": "0.0.3",
     "basiclightbox": "^5.0.4",
     "compressorjs": "^1.0.7",
-    "firebase": "8.6.1",
+    "firebase": "^9.0.0",
     "flexsearch": "^0.7.21",
     "howler": "^2.2.1",
     "localforage": "^1.9.0",
