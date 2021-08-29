@@ -12,7 +12,7 @@ import {
 } from '@angular/router';
 import { Observable, ReplaySubject } from 'rxjs';
 
-import { SettingService, AppSettings } from '../setting/setting.service';
+import { SettingService } from '../setting/setting.service';
 
 export type NavRouterEventHooks = 'RouteConfigLoadStart' | 'RouteConfigLoadEnd' | 'NavigationEnd';
 
@@ -59,6 +59,8 @@ export interface NavAdvanced extends NavRouteProps {
 
 export interface NavOptions {
   globalOffset?: number;
+  menuIcon?: string;
+  backIcon?: string;
 }
 
 export interface NavIntegrations {
@@ -148,6 +150,10 @@ export class NavService {
   routeData?: Record<string, unknown>;
   routePosition = 0;
   routeExtras?: NavigationExtras;
+
+  // util data
+  isBackable = false;
+  menuIcon!: string;
   
   // history
   private previousRoutePosition = 0;
@@ -174,6 +180,7 @@ export class NavService {
 
   setOptions(options: NavOptions) {
     this.options = options;
+    this.menuIcon = options.menuIcon || 'icon-menu';
     return this as NavService;
   }
   
@@ -375,8 +382,10 @@ export class NavService {
       && this.router.url !== '/';
   }
 
-  getMenuIcon(menuIcon = 'icon-menu', backIcon = 'icon-back') {
-    return this.isBackwardable() ? backIcon : menuIcon;
+  getMenuIcon() {
+    return this.isBackwardable()
+      ? (this.options.backIcon || 'icon-back')
+      : (this.options.menuIcon || 'icon-menu');
   }
 
   showLoadingIndicator() {
@@ -463,10 +472,13 @@ export class NavService {
     this.routeData = data;
     this.routePosition = position;
     this.routeExtras = extras;
-    // previous
+    // previous position
     this.previousRoutePosition = window.pageYOffset;
     // emit event
     this.onChanges.next(this);
+    // update data
+    this.isBackable = this.isBackwardable();
+    this.menuIcon = this.getMenuIcon();
     // do navigate
     return this.router.navigate(this.getRoute(input, locale), extras);
   }
