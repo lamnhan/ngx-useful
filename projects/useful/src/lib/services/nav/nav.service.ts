@@ -164,6 +164,9 @@ export class NavService {
   public readonly onRouteConfigLoadEnd = new ReplaySubject<NavService>(1);
   public readonly onNavigationEnd = new ReplaySubject<NavService>(1);
 
+  // change event
+  public readonly onChanges = new ReplaySubject<NavService>(1);
+
   constructor(
     public readonly router: Router,
     public readonly route: ActivatedRoute,
@@ -372,8 +375,8 @@ export class NavService {
       && this.router.url !== '/';
   }
 
-  getMenuIcon(menuClass = 'icon-menu', backClass = 'icon-back') {
-    return this.isBackwardable() ? backClass : menuClass;
+  getMenuIcon(menuIcon = 'icon-menu', backIcon = 'icon-back') {
+    return this.isBackwardable() ? backIcon : menuIcon;
   }
 
   showLoadingIndicator() {
@@ -462,6 +465,8 @@ export class NavService {
     this.routeExtras = extras;
     // previous
     this.previousRoutePosition = window.pageYOffset;
+    // emit event
+    this.onChanges.next(this);
     // do navigate
     return this.router.navigate(this.getRoute(input, locale), extras);
   }
@@ -476,15 +481,5 @@ export class NavService {
       top: position + (offset || this.options.globalOffset || 0),
       behavior: smooth ? 'smooth' : 'auto',
     });
-  }
-
-  private parseRouterUrl(routerUrl: string) {
-    const urlData = new URL(`https://lamnhan.com${routerUrl}`);
-    const url = urlData.pathname;
-    const fragment = urlData.hash ? urlData.hash.replace('#', '') : undefined;
-    const queryParams = {} as Record<string, string>;
-    urlData.searchParams.forEach((value, key) => queryParams[key] = value);
-    const extras = { fragment, queryParams };
-    return { url, extras };
   }
 }
