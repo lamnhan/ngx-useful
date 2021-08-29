@@ -24,7 +24,8 @@
         "dist/useful/useful",
         "dist/useful"
       ]
-    }
+    },
+    "skipLibCheck": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

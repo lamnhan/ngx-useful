@@ -1,8 +1,8 @@
 // @ts-ignore
 import { Index } from 'flexsearch';
 import { Injectable } from '@angular/core';
-import { AngularFireStorage } from '@angular/fire/storage';
-import firebase from 'firebase/app';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
+import firebase from 'firebase/compat/app';
 import { from, Observable, combineLatest, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import Compressor from 'compressorjs';

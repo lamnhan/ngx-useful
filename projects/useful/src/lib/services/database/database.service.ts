@@ -3,8 +3,8 @@ import { Document } from 'flexsearch';
 import { Injectable } from '@angular/core';
 import { from, of, Observable, combineLatest, BehaviorSubject } from 'rxjs';
 import { map, switchMap, take, tap, timeout, catchError } from 'rxjs/operators';
-import firebase from 'firebase/app';
-import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/firestore';
+import firebase from 'firebase/compat/app';
+import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection, QueryFn } from '@angular/fire/compat/firestore';
 import { Meta } from '@lamnhan/schemata';
 
 import { HelperService } from '../helper/helper.service';

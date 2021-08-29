@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ReplaySubject, of, from, throwError, combineLatest } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 import {
   Profile,
   User,

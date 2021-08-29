@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { from, ReplaySubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import firebase from 'firebase/app';
-import { AngularFireAuth } from '@angular/fire/auth';
+import firebase from 'firebase/compat/app';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 import { NativeUser, NativeUserCredential } from '../user/user.service';
 

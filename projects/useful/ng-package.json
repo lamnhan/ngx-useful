@@ -10,7 +10,7 @@
     "umdModuleIds": {
       "localforage": "localforage",
       "howler": "howler",
-      "firebase/app": "firebase",
+      "firebase/compat/app": "firebase",
       "@ngneat/transloco": "ng.transloco",
       "compressorjs": "compressorjs",
       "basiclightbox": "basiclightbox",
