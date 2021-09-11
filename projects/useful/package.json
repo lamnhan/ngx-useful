@@ -18,10 +18,10 @@
     "url": "https://github.com/lamnhan/ngx-useful/issues"
   },
   "peerDependencies": {
-    "@angular/core": "~12.2.3",
-    "@angular/common": "~12.2.3",
-    "@angular/platform-browser": "~12.2.3",
-    "@angular/router": "~12.2.3",
+    "@angular/core": "~12.2.5",
+    "@angular/common": "~12.2.5",
+    "@angular/platform-browser": "~12.2.5",
+    "@angular/router": "~12.2.5",
     "@lamnhan/schemata": "0.0.22"
   },
   "dependencies": {
