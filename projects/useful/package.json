@@ -25,9 +25,9 @@
     "@lamnhan/schemata": "0.0.22"
   },
   "dependencies": {
-    "@angular/fire": "^7.0.0",
-    "@ngneat/transloco": "^2.21.0",
-    "firebase": "^9.0.0",
+    "@angular/fire": "^7.0.4",
+    "@ngneat/transloco": "^2.23.0",
+    "firebase": "^9.0.2",
     "howler": "^2.2.1",
     "localforage": "^1.9.0",
     "compressorjs": "^1.0.7",

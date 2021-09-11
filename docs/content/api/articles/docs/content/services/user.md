@@ -36,10 +36,10 @@
 | [init(userDataService, profileDataService)](#userservice-init-0)             | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html" target="_blank">UserService</a></code>                 |             |
 | [removeCoverPhoto()](#userservice-removecoverphoto-0)                        | <code>Observable<[boolean, boolean]></code>                                                                                                      |             |
 | [setOptions(options)](#userservice-setoptions-0)                             | <code><a href="https://ngx-useful.lamnhan.com/content/reference/classes/userservice.html" target="_blank">UserService</a></code>                 |             |
-| [updateAdditionalData(data, publicly?)](#userservice-updateadditionaldata-0) | <code>Observable<undefined \| false \| true></code>                                                                                              |             |
+| [updateAdditionalData(data, publicly?)](#userservice-updateadditionaldata-0) | <code>Observable<undefined \| [boolean, boolean]></code>                                                                                         |             |
 | [updateAddresses(addresses)](#userservice-updateaddresses-0)                 | <code>Observable<boolean></code>                                                                                                                 |             |
 | [updateProfile(data)](#userservice-updateprofile-0)                          | <code>Observable<[void, undefined \| false \| true, undefined \| false \| true]></code>                                                          |             |
-| [updatePublicly(publicly)](#userservice-updatepublicly-0)                    | <code>Observable<boolean></code>                                                                                                                 |             |
+| [updatePublicly(publicly)](#userservice-updatepublicly-0)                    | <code>Observable<[boolean, boolean]></code>                                                                                                      |             |
 | [updateSettings(settings)](#userservice-updatesettings-0)                    | <code>Observable<boolean></code>                                                                                                                 |             |
 | [verifyEmail()](#userservice-verifyemail-0)                                  | <code>Observable<void></code>                                                                                                                    |             |
 
@@ -238,7 +238,7 @@
 
 **Returns**
 
-<code>Observable<undefined | false | true></code>
+<code>Observable<undefined | [boolean, boolean]></code>
 
 ---
 
@@ -289,7 +289,7 @@
 
 **Returns**
 
-<code>Observable<boolean></code>
+<code>Observable<[boolean, boolean]></code>
 
 ---
 
