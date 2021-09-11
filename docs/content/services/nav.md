@@ -10,11 +10,8 @@
 
 | Name                                                                                                                      | Type                                     | Description |
 | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | ----------- |
-| [isBackable](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#isbackable)                         | <code>boolean</code>                     |             |
 | [loading](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#loading)                               | <code>boolean</code>                     |             |
-| [menuIcon](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#menuicon)                             | <code>string</code>                      |             |
 | [menuVisible](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#menuvisible)                       | <code>boolean</code>                     |             |
-| [onChanges](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#onchanges)                           | <code>ReplaySubject<NavService<>></code> |             |
 | [onNavigationEnd](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#onnavigationend)               | <code>ReplaySubject<NavService<>></code> |             |
 | [onRefreshRouterLink](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#onrefreshrouterlink)       | <code>ReplaySubject<void></code>         |             |
 | [onRouteConfigLoadEnd](https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#onrouteconfigloadend)     | <code>ReplaySubject<NavService<>></code> |             |
@@ -33,7 +30,7 @@
 | Function                                                                 | Returns type                                                                                                                   | Description |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ----------- |
 | [back()](#navservice-back-0)                                             | <code>undefined \| Promise<boolean></code>                                                                                     |             |
-| [getMenuIcon()](#navservice-getmenuicon-0)                               | <code>string</code>                                                                                                            |             |
+| [getMenuIcon(menuClass?, backClass?)](#navservice-getmenuicon-0)         | <code>string</code>                                                                                                            |             |
 | [getRoute(input, withLocale?)](#navservice-getroute-0)                   | <code>string[]</code>                                                                                                          |             |
 | [getRouteUrl(input, withLocale?)](#navservice-getrouteurl-0)             | <code>string</code>                                                                                                            |             |
 | [hideLoadingIndicator()](#navservice-hideloadingindicator-0)             | <code>void</code>                                                                                                              |             |
@@ -63,10 +60,17 @@
 
 ---
 
-<h4><a name="navservice-getmenuicon-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#getmenuicon"><p><code>getMenuIcon()</code></p>
+<h4><a name="navservice-getmenuicon-0" href="https://ngx-useful.lamnhan.com/content/reference/classes/navservice.html#getmenuicon"><p><code>getMenuIcon(menuClass?, backClass?)</code></p>
 </a></h4>
 
 **The `getMenuIcon` call signature.**
+
+**Parameters**
+
+| Param     | Type                | Description |
+| --------- | ------------------- | ----------- |
+| menuClass | <code>string</code> |             |
+| backClass | <code>string</code> |             |
 
 **Returns**
 
