@@ -1,6 +1,6 @@
 {
   "name": "@lamnhan/ngx-useful",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "description": "A collection of helpful Angular services, pipes, ....",
   "author": "Lam Nhan",
   "homepage": "https://ngx-useful.lamnhan.com",
@@ -28,6 +28,7 @@
     "@angular/fire": "^7.0.4",
     "@ngneat/transloco": "^2.23.0",
     "firebase": "^9.0.2",
+    "rxfire": "^6.0.1",
     "howler": "^2.2.1",
     "localforage": "^1.9.0",
     "compressorjs": "^1.0.7",

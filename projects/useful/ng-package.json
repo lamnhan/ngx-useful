@@ -25,6 +25,7 @@
     "localforage",
     "compressorjs",
     "basiclightbox",
-    "flexsearch"
+    "flexsearch",
+    "rxfire"
   ]
 }
