@@ -7,7 +7,7 @@ export class GuardService {
   authHandler: string | string[] = ['login'];
   dashboardHandler: string | string[] = ['login', 'guard', 'dashboard'];
   adminHandler: string | string[] = ['login', 'guard', 'admin'];
-  onlineHandler: string | string[] = [''];
+  onlineHandler: string | string[] = ['offline'];
 
   constructor() {}
 

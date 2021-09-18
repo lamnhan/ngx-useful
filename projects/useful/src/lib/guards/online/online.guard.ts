@@ -34,6 +34,8 @@ export class OnlineGuard implements CanActivate, CanLoad {
     if (this.networkService.isOnline) {
       return true;
     }
+    // not passed url, serve the offline page
+    this.networkService.setRedirectUrl(url);
     this.ngZone.run(() => this.navService.navigate(this.guardService.onlineHandler));
     return false;
   }

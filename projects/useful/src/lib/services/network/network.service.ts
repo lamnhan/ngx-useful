@@ -6,9 +6,15 @@ import { ReplaySubject } from 'rxjs';
 })
 export class NetworkService {
   private readonly onChanged = new ReplaySubject<boolean>(1);
-  isOnline = false;
+  isOnline = true;
+
+  redirectUrl?: string;
 
   constructor() {}
+
+  setRedirectUrl(url?: string) {
+    this.redirectUrl = url;
+  }
 
   init() {
     window.addEventListener('online', () => {
