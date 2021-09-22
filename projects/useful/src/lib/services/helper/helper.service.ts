@@ -91,16 +91,39 @@ export class HelperService {
     return result;
   }
 
-  cleanupStr(value: string) {
-    return value
-      .toLowerCase()
+  cleanupText_viVN(text: string) {
+    return text
       .replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+      .replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
       .replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+      .replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
       .replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+      .replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
       .replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+      .replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
       .replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+      .replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
       .replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
-      .replace(/đ/g, 'd');
+      .replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D');
+  }
+
+  cleanupText(text: string) {
+    text = this.cleanupText_viVN(text);
+    return text;
+  }
+
+  slugify(text: string) {
+    return this.cleanupText(text)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/--+/g, '-')
   }
 
   filter<Item extends Record<string, unknown>>(
@@ -109,7 +132,7 @@ export class HelperService {
     fields?: string[]
   ) {
     const parse = (value: string) => {
-      const cleanValue = this.cleanupStr(value);
+      const cleanValue = this.cleanupText(value);
       const dashes2Spaces = cleanValue.replace(/\-|\_/g, ' ');
       const noDashes = cleanValue.replace(/\-|\_/g, '');
       return cleanValue + ' | ' + dashes2Spaces + ' | ' + noDashes;
@@ -137,7 +160,7 @@ export class HelperService {
       });
       // finalize values
       content = parse(content);
-      query = this.cleanupStr(query);
+      query = this.cleanupText(query);
       // check matching
       return (content.indexOf(query) !== -1);
     };

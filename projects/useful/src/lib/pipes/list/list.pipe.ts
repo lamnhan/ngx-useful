@@ -17,9 +17,7 @@ export class ListPipe implements PipeTransform {
       for (const val of value.split(separator).map(x => x.trim())) {
         const item = { title: val } as Record<string, unknown>;
         if (!!autoKey) {
-          item['$key'] = this.helperService.cleanupStr(val)
-          .toLowerCase()
-          .replace(/\ /g, '-');
+          item['$key'] = this.helperService.slugify(val);
         }
         items.push(item);
       }
