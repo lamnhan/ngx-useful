@@ -28,27 +28,27 @@ export class RouterLinkDirective implements OnInit, OnChanges, OnDestroy {
   private data?: Record<string, unknown>;
   private extras?: NavigationExtras;
 
-  @Input() set routeTitle(title: undefined | string) {
+  @Input() set usefulRouteTitle(title: undefined | string) {
     this.title = title;
   }
 
-  @Input() set routeData(data: undefined | Record<string, unknown>) {
+  @Input() set usefulRouteData(data: undefined | Record<string, unknown>) {
     this.data = data;
   }
 
-  @Input() set queryParams(queryParams: undefined | Record<string, unknown>) {
+  @Input() set usefulRouteQueryParams(queryParams: undefined | Record<string, unknown>) {
     if (queryParams) {
       this.extras = { ...this.extras, queryParams };
     }
   }
 
-  @Input() set fragment(fragment: undefined | string) {
+  @Input() set usefulRouteFragment(fragment: undefined | string) {
     if (fragment) {
       this.extras = { ...this.extras, fragment };
     }
   }
 
-  @Input() set routeExtras(extras: undefined | NavigationExtras) {
+  @Input() set usefulRouteExtras(extras: undefined | NavigationExtras) {
     if (extras) {
       this.extras = { ...this.extras, ...extras };
     }
@@ -62,11 +62,11 @@ export class RouterLinkDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  @Input() set routerBackwardable(backwardable: undefined | boolean) {
+  @Input() set usefulRouterBackwardable(backwardable: undefined | boolean) {
     this.backwardable = backwardable;
   }
 
-  @Input() set routerLocale(locale: undefined | string) {
+  @Input() set usefulRouterLocale(locale: undefined | string) {
     this.locale = locale;
   }
 
@@ -78,7 +78,7 @@ export class RouterLinkDirective implements OnInit, OnChanges, OnDestroy {
         : classes;
   }
 
-  @Input() set routerLinkActiveOptions(options: undefined | ActiveOptions) {
+  @Input() set usefulRouterLinkActiveOptions(options: undefined | ActiveOptions) {
     this.activeOptions = options || {};
   }
 

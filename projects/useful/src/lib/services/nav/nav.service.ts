@@ -156,7 +156,6 @@ export class NavService {
   menuIcon!: string;
   
   // history
-  private previousRoutePosition = 0;
   private previousRoutes: NavHistoryItem[] = [];
 
   // i18n
@@ -277,7 +276,7 @@ export class NavService {
           ) {
             this.previousRoutes.push({
               url: activeUrl,
-              position: this.previousRoutePosition,
+              position: 0, // will be setted when navigating further the history
               title: this.routeTitle,
               data: this.routeData ? {...this.routeData} : undefined,
               extras: this.routeExtras ? {...this.routeExtras} : undefined,
@@ -358,7 +357,13 @@ export class NavService {
           this.integrations.settingService.triggerSettingInitilizer();
         }
         // scroll to position
-        this.scrollTo(this.routePosition, 0, false);
+        const positionInterval = setInterval(() => {
+          this.scrollTo(this.routePosition, 0, false);
+          if (this.routePosition === window.scrollY) {
+            clearInterval(positionInterval);
+          }
+        }, 300);
+        setTimeout(() => clearInterval(positionInterval), 3000); // safety timeout
         // emit the event
         this.onNavigationEnd.next(this);
       }
@@ -457,30 +462,50 @@ export class NavService {
     }
     if (!this.backwardEnabled) {
       this.previousRoutes = []; // reset history
-    } else if (!this.previousRoutes.length) {
+    } else {
+      const currentPosition = window.scrollY;
       // initial history (add current route as the first item)
-      this.previousRoutes.push({
-        url: this.router.url,
-        position: window.pageYOffset,
-        title: this.routeTitle,
-        data: this.routeData ? {...this.routeData} : undefined,
-        extras: this.routeExtras ? {...this.routeExtras} : undefined,
-      });
+      if (!this.previousRoutes.length) {
+        this.previousRoutes.push({
+          url: this.router.url,
+          position: currentPosition,
+          title: this.routeTitle,
+          data: this.routeData ? {...this.routeData} : undefined,
+          extras: this.routeExtras ? {...this.routeExtras} : undefined,
+        });
+      }
+      // set position for the last route in history 
+      else {
+        this.previousRoutes[this.previousRoutes.length - 1].position = currentPosition;
+      }
     }
     // set values
     this.routeTitle = title;
     this.routeData = data;
     this.routePosition = position;
     this.routeExtras = extras;
-    // previous position
-    this.previousRoutePosition = window.pageYOffset;
-    // emit event
-    this.onChanges.next(this);
     // update data
     this.isBackable = this.isBackwardable();
     this.menuIcon = this.getMenuIcon();
+    // emit event
+    this.onChanges.next(this);
     // do navigate
     return this.router.navigate(this.getRoute(input, locale), extras);
+  }
+
+  updateQueryParams(queryParams: Record<string, string>, merge = true) {
+    return this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: queryParams, 
+      ...(merge ? { queryParamsHandling: 'merge' } : {}),
+    });
+  }
+
+  removeQueryParams() {
+    return this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: null,
+    });
   }
 
   scrollToTop(offset = 0, smooth = true) {
@@ -491,7 +516,7 @@ export class NavService {
     const position = (typeof input === 'number' ? input : (typeof input === 'string' ? document.getElementById(input) : input)?.getBoundingClientRect()?.top) || 0;
     return window.scrollTo({
       top: position + (offset || this.options.globalOffset || 0),
-      behavior: smooth ? 'smooth' : 'auto',
+      behavior: smooth ? 'smooth' : 'instant' as any,
     });
   }
 }
