@@ -493,7 +493,7 @@ export class NavService {
   }
 
   scrollTo(input: number | string | HTMLElement, offset = 0, smooth = true) {
-    const position = (typeof input === 'number' ? input : (typeof input === 'string' ? document.getElementById(input) : input)?.getBoundingClientRect()?.top) || 0;
+    const position = (typeof input === 'number' ? input : (typeof input === 'string' ? document.getElementById(input) : input)?.offsetTop) || 0;
     return window.scrollTo({
       top: position + (offset || this.options.globalOffset || 0),
       behavior: smooth ? 'smooth' : 'instant' as any,
