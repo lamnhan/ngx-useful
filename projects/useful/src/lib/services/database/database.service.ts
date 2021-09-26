@@ -718,7 +718,8 @@ export class DatabaseData<Type> {
 
   create<AutoType extends Omit<Type, 'uid' | 'id' | 'title' | 'status' | 'type' | 'createdAt' | 'updatedAt'>>(
     id: string,
-    item: Type | AutoType | NullableOptional<Type | AutoType>
+    item: Type | AutoType | NullableOptional<Type | AutoType>,
+    noAdvancedMode = false,
   ) {
     const actions: Array<Observable<any>> = [];
     // main action
@@ -744,6 +745,7 @@ export class DatabaseData<Type> {
     );
     // create metas
     if (
+      !noAdvancedMode &&
       this.options.advancedMode &&
       this.options.docMetaRegistry
     ) {
@@ -753,6 +755,7 @@ export class DatabaseData<Type> {
     }
     // update document count
     if (
+      !noAdvancedMode &&
       !this.options.manualDocumentCounting &&
       this.options.advancedMode &&
       this.metas.documentCounting
@@ -770,6 +773,7 @@ export class DatabaseData<Type> {
     }
     // add search indexing item
     if (
+      !noAdvancedMode &&
       !this.options.manualSearchIndexing &&
       this.options.advancedMode &&
       this.metas.searchIndexing
