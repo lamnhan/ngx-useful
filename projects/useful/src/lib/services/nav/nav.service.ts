@@ -265,22 +265,10 @@ export class NavService {
         this.onRefreshRouterLink.next();
         // record urls for backward navigation
         if (this.backwardEnabled) {
-          const activeUrl = event.urlAfterRedirects;
+          const { path: activeUrl } = this.parseRouterUrl(event.urlAfterRedirects);
           const backwardRoute = this.previousRoutes[this.previousRoutes.length - 2];
-          if (
-            !backwardRoute?.url
-            || (
-              backwardRoute?.url
-              && activeUrl !== backwardRoute?.url
-            )
-          ) {
-            this.previousRoutes.push({
-              url: activeUrl,
-              position: 0, // will be setted when navigating further the history
-              title: this.routeTitle,
-              data: this.routeData ? {...this.routeData} : undefined,
-              extras: this.routeExtras ? {...this.routeExtras} : undefined,
-            });
+          if (!backwardRoute?.url || activeUrl !== backwardRoute?.url) {
+            this.setNavHistory(event.urlAfterRedirects);
           } else {
             this.previousRoutes.pop();
           }
@@ -447,9 +435,7 @@ export class NavService {
 
   back() {
     const backwardRoute = this.previousRoutes[this.previousRoutes.length - 2];
-    if (!backwardRoute) {
-      return;
-    }
+    if (!backwardRoute) return;
     const { url, title, data, position, extras } = backwardRoute;
     return this.navigate(url, {title, data, position, extras});
   }
@@ -466,13 +452,7 @@ export class NavService {
       const currentPosition = window.scrollY;
       // initial history (add current route as the first item)
       if (!this.previousRoutes.length) {
-        this.previousRoutes.push({
-          url: this.router.url,
-          position: currentPosition,
-          title: this.routeTitle,
-          data: this.routeData ? {...this.routeData} : undefined,
-          extras: this.routeExtras ? {...this.routeExtras} : undefined,
-        });
+        this.setNavHistory(this.router.url, currentPosition);
       }
       // set position for the last route in history 
       else {
@@ -518,5 +498,36 @@ export class NavService {
       top: position + (offset || this.options.globalOffset || 0),
       behavior: smooth ? 'smooth' : 'instant' as any,
     });
+  }
+
+  private setNavHistory(routerUrl: string, position = 0) {
+    const { path, queryParams } = this.parseRouterUrl(routerUrl);
+    return this.previousRoutes.push({
+      url: path,
+      position,
+      title: this.routeTitle,
+      data: !this.routeData ? undefined : {...this.routeData},
+      extras:
+        !this.routeExtras && !queryParams
+          ? undefined
+          : { ...this.routeExtras, queryParams },
+    });
+  }
+
+  private parseRouterUrl(routerUrl: string) {
+    const [path, query] = routerUrl.split('?');
+    const queryParams = !query
+      ? undefined
+      : query
+        .split('&')
+        .reduce(
+          (result, item) => {
+            const [key, value] = item.split('=');
+            result[key] = value;
+            return result;
+          },
+          {} as Record<string, string>
+        );
+    return { path, queryParams };
   }
 }
