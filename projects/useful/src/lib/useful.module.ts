@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 
 import { RouterLinkDirectiveModule } from './directives/router-link/router-link.module';
-import { RouterExternalActiveDirectiveModule } from './directives/router-external-active/router-external-active.module';
 
 import { O2aPipeModule } from './pipes/o2a/o2a.module';
 import { O1iPipeModule } from './pipes/o1i/o1i.module';
@@ -42,7 +41,6 @@ import {AlertService} from './services/alert/alert.service';
   imports: [
     // directives
     RouterLinkDirectiveModule,
-    RouterExternalActiveDirectiveModule,
     // pipes
     O2aPipeModule,
     O1iPipeModule,
@@ -82,7 +80,6 @@ import {AlertService} from './services/alert/alert.service';
   exports: [
     // directives
     RouterLinkDirectiveModule,
-    RouterExternalActiveDirectiveModule,
     // pipes
     O2aPipeModule,
     O1iPipeModule,

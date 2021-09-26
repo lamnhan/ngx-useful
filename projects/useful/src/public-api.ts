@@ -23,8 +23,6 @@ export * from './lib/pipes/list/list.module';
 
 export * from './lib/directives/router-link/router-link.directive';
 export * from './lib/directives/router-link/router-link.module';
-export * from './lib/directives/router-external-active/router-external-active.directive';
-export * from './lib/directives/router-external-active/router-external-active.module';
 
 export * from './lib/guards/auth/auth.guard';
 export * from './lib/guards/dashboard/dashboard.guard';
