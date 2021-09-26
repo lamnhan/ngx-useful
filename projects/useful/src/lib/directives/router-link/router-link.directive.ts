@@ -9,9 +9,6 @@ interface ActiveOptions {
   also?: string[];
 }
 
-// NOTE: see implementation
-// https://github.com/angular/angular/blob/master/packages/router/src/directives/router_link.ts
-
 /**
  * Router link with more features
  */
@@ -31,16 +28,30 @@ export class RouterLinkDirective implements OnInit, OnChanges, OnDestroy {
   private data?: Record<string, unknown>;
   private extras?: NavigationExtras;
 
-  @Input() set usefulRouteTitle(title: undefined | string) {
+  @Input() set routeTitle(title: undefined | string) {
     this.title = title;
   }
 
-  @Input() set usefulRouteData(data: undefined | Record<string, unknown>) {
+  @Input() set routeData(data: undefined | Record<string, unknown>) {
     this.data = data;
   }
 
-  @Input() set usefulRouteExtras(extras: undefined | NavigationExtras) {
-    this.extras = extras;
+  @Input() set queryParams(queryParams: undefined | Record<string, unknown>) {
+    if (queryParams) {
+      this.extras = { ...this.extras, queryParams };
+    }
+  }
+
+  @Input() set fragment(fragment: undefined | string) {
+    if (fragment) {
+      this.extras = { ...this.extras, fragment };
+    }
+  }
+
+  @Input() set routeExtras(extras: undefined | NavigationExtras) {
+    if (extras) {
+      this.extras = { ...this.extras, ...extras };
+    }
   }
 
   @Input() set usefulRouterLink(input: undefined | string | string[] | Observable<string | string[]>) {
@@ -51,16 +62,15 @@ export class RouterLinkDirective implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  @Input() set usefulRouterBackwardable(backwardable: undefined | boolean) {
+  @Input() set routerBackwardable(backwardable: undefined | boolean) {
     this.backwardable = backwardable;
   }
 
-  @Input() set usefulRouterLocale(locale: undefined | string) {
+  @Input() set routerLocale(locale: undefined | string) {
     this.locale = locale;
   }
 
-  @Input()
-  set usefulRouterLinkActive(classes: undefined | string | string[]) {
+  @Input() set usefulRouterLinkActive(classes: undefined | string | string[]) {
     this.activeClasses = !classes
       ? []
       : typeof classes === 'string'
@@ -68,8 +78,7 @@ export class RouterLinkDirective implements OnInit, OnChanges, OnDestroy {
         : classes;
   }
 
-  @Input()
-  set usefulRouterLinkActiveOptions(options: undefined | ActiveOptions) {
+  @Input() set routerLinkActiveOptions(options: undefined | ActiveOptions) {
     this.activeOptions = options || {};
   }
 
@@ -121,14 +130,10 @@ export class RouterLinkDirective implements OnInit, OnChanges, OnDestroy {
     // active
     const {exact, also} = this.activeOptions;
     let isActive = this.navService.isActive(this.href, !!exact);
-    if (also) {
-      also.forEach(item => {
-        if (this.navService.isRouteActive(item, !!exact, this.locale)) {
-          isActive = true;
-          return;
-        }
-      });
-    }
+    (also || []).forEach(item => {
+      if (!this.navService.isRouteActive(item, !!exact, this.locale)) return;
+      isActive = true;
+    });
     this.class = isActive ? this.activeClasses : '';
   }
 }
