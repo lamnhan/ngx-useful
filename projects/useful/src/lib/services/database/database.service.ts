@@ -721,9 +721,9 @@ export class DatabaseData<Type> {
     item: Type | AutoType | NullableOptional<Type | AutoType>,
     noAdvancedMode = false,
   ) {
+    const { userService } = this.databaseService.getIntegrations();
     const actions: Array<Observable<any>> = [];
     // main action
-    const { settingService, userService } = this.databaseService.getIntegrations();
     const uid = (item as any).uid as string || ((!userService || !userService.uid) ? '' : userService.uid);
     const title = (item as any).title as string || id;
     const status = (item as any).status as string || 'draft';
@@ -743,24 +743,32 @@ export class DatabaseData<Type> {
     actions.push(
       this.databaseService.set(`${this.name}/${id}`, data)
     );
+    // advanced actions
+    if (!noAdvancedMode && this.options.advancedMode) {
+      actions.push(
+        this.createAdvancedOnly(data)
+      );
+    }
+    // run actions
+    return combineLatest(actions).pipe(take(1), map(() => true));
+  }
+
+  createAdvancedOnly(data: Type | NullableOptional<Type>) {
+    const actions: Array<Observable<any>> = [];
+    const { settingService } = this.databaseService.getIntegrations();
+    const { id, type, status } = data as any;
     // create metas
-    if (
-      !noAdvancedMode &&
-      this.options.advancedMode &&
-      this.options.docMetaRegistry
-    ) {
+    if (this.options.docMetaRegistry) {
       actions.push(
         this.addDocMetas(id, data, this.options.docMetaRegistry)
       );
     }
     // update document count
     if (
-      !noAdvancedMode &&
       !this.options.manualDocumentCounting &&
-      this.options.advancedMode &&
       this.metas.documentCounting
     ) {
-      const locale = (item as any).locale as string || settingService?.locale || 'en-US';
+      const locale = (data as any).locale as string || settingService?.locale || 'en-US';
       actions.push(
         this.databaseService.update(`metas/$${this.name}`, {
           [`value.documentCounting.${type}.${locale}.${status}`]:
@@ -773,36 +781,50 @@ export class DatabaseData<Type> {
     }
     // add search indexing item
     if (
-      !noAdvancedMode &&
       !this.options.manualSearchIndexing &&
-      this.options.advancedMode &&
       this.metas.searchIndexing
     ) {
       actions.push(
         this.addSearchIndexingItem(data, this.metas.searchIndexing)
       );
     }
-    // run actions
-    return combineLatest(actions).pipe(map(() => true));
+    return combineLatest(actions).pipe(take(1), map(() => true));
   }
 
   update(
     id: string,
     data: Partial<Type> | NullableOptional<Partial<Type>>,
     currentData?: Type,
+    noAdvancedMode = false,
   ) {
     const actions: Array<Observable<any>> = [];
     // main action
-    const updatedAt = (data as any).updatedAt as undefined | string || new Date().toISOString();
+    const updatedAt = (data as any).updatedAt as string || new Date().toISOString();
     const updateData = { ...data, updatedAt } as Partial<Type> | NullableOptional<Partial<Type>>;
     actions.push(
       this.databaseService.update(`${this.name}/${id}`, updateData)
     );
+    // advanced update
+    if (!noAdvancedMode && this.options.advancedMode) {
+      actions.push(
+        this.updateAdvancedOnly(id, updateData, currentData),
+      );
+    }
+    // run actions
+    return combineLatest(actions).pipe(take(1), map(() => true));
+  }
+
+  updateAdvancedOnly(
+    id: string,
+    data: Partial<Type> | NullableOptional<Partial<Type>>,
+    currentData?: Type,
+  ) {
+    const actions: Array<Observable<any>> = [];
+    const { settingService } = this.databaseService.getIntegrations();
     // update count
     const newStatus = (data as any).status as undefined | string;
     if (
       !this.options.manualDocumentCounting &&
-      this.options.advancedMode &&
       this.metas.documentCounting &&
       newStatus &&
       currentData
@@ -810,7 +832,7 @@ export class DatabaseData<Type> {
       const type = (currentData as any).type as string;
       const locale = (
         (currentData as any).locale ||
-        this.databaseService.getIntegrations().settingService?.defaultLocale ||
+        settingService?.defaultLocale ||
         'en-US'
       ) as string;
       const status = (currentData as any).status as string;
@@ -834,13 +856,15 @@ export class DatabaseData<Type> {
     // update search indexing item
     if (
       !this.options.manualSearchIndexing &&
-      this.options.advancedMode &&
       this.metas.searchIndexing
     ) {
-      actions.push(this.updateSearchIndexingItem(id, updateData, currentData));
+      const updateData = { ...data, updatedAt: (data as any).updatedAt || new Date().toISOString() };
+      actions.push(
+        this.updateSearchIndexingItem(id, updateData, currentData),
+      );
     }
-    // run actions
-    return combineLatest(actions).pipe(map(() => true));
+    // result
+    return combineLatest(actions).pipe(take(1), map(() => true));
   }
 
   updateEffects(
